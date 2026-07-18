@@ -25,7 +25,7 @@ export function AuthShell({
             className="object-cover object-center"
             sizes="42vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/35 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-indigo-950/35 via-transparent to-transparent" />
           <Link
             href="/"
             className="absolute left-8 top-7 rounded-full bg-white px-4 py-2 text-sm font-bold text-indigo-700 shadow-sm"
