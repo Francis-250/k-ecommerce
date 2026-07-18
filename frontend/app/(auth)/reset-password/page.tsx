@@ -7,7 +7,7 @@ export default function ResetPasswordPage() {
       title="Set a new password"
       description="Choose a strong password you haven’t used before. It must contain at least eight characters."
     >
-      <form className="space-y-7">
+      <form className="space-y-5">
         <Field
           label="New password"
           type="password"
@@ -20,7 +20,7 @@ export default function ResetPasswordPage() {
           placeholder="Confirm new password"
           autoComplete="new-password"
         />
-        <p className="text-sm text-slate-400">
+        <p className="text-xs text-slate-400">
           Use 8+ characters with a number and a symbol.
         </p>
         <PrimaryButton>Reset password</PrimaryButton>

@@ -7,7 +7,7 @@ export default function ForgotPasswordPage() {
       title="Forgot password?"
       description="No worries. Enter the email linked to your account and we’ll send you a secure reset link."
     >
-      <form className="space-y-8">
+      <form className="space-y-5">
         <Field
           label="Email"
           type="email"

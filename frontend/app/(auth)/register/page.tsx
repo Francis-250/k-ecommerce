@@ -8,8 +8,8 @@ export default function RegisterPage() {
       title="Create your account"
       description="Save your favourites, enjoy a faster checkout, and keep every order in one place."
     >
-      <form className="space-y-5">
-        <div className="grid gap-5 sm:grid-cols-2">
+      <form className="space-y-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <Field
             label="First name"
             placeholder="First name"
@@ -33,7 +33,7 @@ export default function RegisterPage() {
           placeholder="Create password"
           autoComplete="new-password"
         />
-        <label className="flex items-start gap-3 text-sm leading-6 text-slate-500">
+        <label className="flex items-start gap-2 text-xs leading-5 text-slate-500">
           <input type="checkbox" className="mt-1 h-4 w-4 accent-indigo-600" />
           <span>
             I agree to the{" "}

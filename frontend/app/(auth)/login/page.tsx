@@ -8,7 +8,7 @@ export default function LoginPage() {
       title="Hello, Welcome back"
       description="Sign in to continue shopping, track your orders, and discover styles selected for you."
     >
-      <form className="space-y-7">
+    <form className="space-y-5">
         <Field
           label="Email"
           type="email"
