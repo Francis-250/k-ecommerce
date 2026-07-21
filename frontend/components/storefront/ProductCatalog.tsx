@@ -105,7 +105,7 @@ export function ProductList({ count = 6 }: { count?: number }) {
               <div className="col-lg-8 col-md-7">
                 <div className="product_list_content">
                   <h3>
-                    <Link href="/products/printed-summer-dress">
+                    <Link href={`/products/${product.slug}`}>
                       {product.name}
                     </Link>
                   </h3>
@@ -151,18 +151,20 @@ export function Sidebar({ home = false }: { home?: boolean }) {
         <div className="sidebar_widget banner mb-35">
           <div className="banner_img mb-35">
             <Image
-              src="/storefront/assets/img/banner/banner5.jpg"
-              alt="Fashion offer"
+              src="/storefront/assets/img/banner/african-free-shipping.png"
+              alt="Shop African-made fashion with free shipping"
               width={270}
               height={130}
+              unoptimized
             />
           </div>
           <div className="banner_img">
             <Image
-              src="/storefront/assets/img/banner/banner6.jpg"
-              alt="Seasonal offer"
+              src="/storefront/assets/img/banner/african-fashion-sidebar.png"
+              alt="Black woman wearing contemporary African fashion"
               width={270}
               height={130}
+              unoptimized
             />
           </div>
         </div>
@@ -184,10 +186,11 @@ export function Sidebar({ home = false }: { home?: boolean }) {
         <div className="sidebar_widget bottom">
           <div className="banner_img">
             <Image
-              src="/storefront/assets/img/banner/banner9.jpg"
-              alt="I-RAS STYLES fashion"
+              src="/storefront/assets/img/banner/african-style-portrait.png"
+              alt="African style portrait in Ankara fashion"
               width={270}
               height={340}
+              unoptimized
             />
           </div>
         </div>
@@ -257,21 +260,23 @@ function Wishlist() {
           <Link href="/wishlist">Wishlist</Link>
         </h3>
       </div>
-      {["cart.png", "cart2.png"].map((image, i) => (
-        <div className="cart_item" key={image}>
+      {[
+        { image: "cart.png", name: "Emerald Ankara Handbag", slug: "emerald-ankara-handbag", price: 96 },
+        { image: "cart2.png", name: "Heritage Ankara Shirt", slug: "heritage-ankara-shirt", price: 78 },
+      ].map((product) => (
+        <div className="cart_item" key={product.slug}>
           <div className="cart_img">
             <Image
-              src={`/storefront/assets/img/cart/${image}`}
-              alt="Wishlist product"
+              src={`/storefront/assets/img/cart/${product.image}`}
+              alt={product.name}
               width={60}
               height={60}
+              unoptimized
             />
           </div>
           <div className="cart_info">
-            <Link href="/products/printed-summer-dress">
-              {i ? "Quisque ornare dui" : "lorem ipsum dolor"}
-            </Link>
-            <span className="cart_price">${i ? "105" : "115"}.00</span>
+            <Link href={`/products/${product.slug}`}>{product.name}</Link>
+            <span className="cart_price">${product.price.toFixed(2)}</span>
             <span className="quantity">Qty: 1</span>
           </div>
         </div>

@@ -7,9 +7,9 @@ import {
 } from "@/components/storefront/StorefrontShell";
 
 const products = [
-  { name: "Handbag fringilla", image: "cart17.png", price: "£65.00" },
-  { name: "Handbags justo", image: "cart18.png", price: "£90.00" },
-  { name: "Handbag elit", image: "cart19.png", price: "£80.00" },
+  { name: "Kente Panel Sneakers", slug: "kente-panel-sneakers", image: "cart17.png", price: "$84.00" },
+  { name: "Maasai Beaded Jewelry Set", slug: "maasai-beaded-jewelry-set", image: "cart18.png", price: "$72.00" },
+  { name: "Mudcloth Leather Backpack", slug: "mudcloth-leather-backpack", image: "cart19.png", price: "$124.00" },
 ];
 
 export default function WishlistPage() {
@@ -48,17 +48,18 @@ export default function WishlistPage() {
                             </button>
                           </td>
                           <td className="product_thumb">
-                            <Link href="/products/printed-summer-dress">
+                            <Link href={`/products/${product.slug}`}>
                               <Image
                                 src={`/storefront/assets/img/cart/${product.image}`}
                                 alt={product.name}
                                 width={100}
                                 height={100}
+                                unoptimized
                               />
                             </Link>
                           </td>
                           <td className="product_name">
-                            <Link href="/products/printed-summer-dress">
+                            <Link href={`/products/${product.slug}`}>
                               {product.name}
                             </Link>
                           </td>

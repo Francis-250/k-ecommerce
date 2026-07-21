@@ -7,13 +7,10 @@ import {
   ChevronDown,
   CircleX,
   Camera,
-  Mail,
-  MapPin,
   Menu,
   MessageCircle,
   Search,
   ShoppingCart,
-  Smartphone,
   Users,
   X,
 } from "lucide-react";
@@ -32,7 +29,7 @@ const mainLinks = [
       ["All products", "/shop"],
       ["Dresses", "/shop?category=Dresses"],
       ["Accessories", "/shop?category=Accessories"],
-      ["Featured product", "/products/printed-summer-dress"],
+      ["Featured product", "/products/indigo-ankara-midi-dress"],
     ],
   },
   {
@@ -513,17 +510,14 @@ function Footer() {
                 <h3>About us</h3>
                 <div className="footer_widget_contect">
                   <p>
-                    <MapPin size={16} aria-hidden="true" /> 19 Interpro Road
-                    Madison, AL 35758, USA
+                    I-RAS STYLES celebrates African creativity through
+                    contemporary fashion, expressive prints and thoughtfully
+                    crafted accessories.
                   </p>
                   <p>
-                    <Smartphone size={16} aria-hidden="true" /> (012) 234 432
-                    3568
+                    We connect heritage-inspired design with modern style for
+                    a confident global community.
                   </p>
-                  <a href="mailto:contact@plazathemes.com">
-                    <Mail size={16} aria-hidden="true" />{" "}
-                    Contact@plazathemes.com
-                  </a>
                 </div>
               </div>
             </div>

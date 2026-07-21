@@ -45,7 +45,7 @@ export function StorefrontHome() {
                   className="single_slider home-hero-slide"
                   style={{
                     backgroundImage:
-                      "url('/storefront/assets/img/slider/slide_1.png')",
+                      "url('/storefront/assets/img/slider/african-fashion-hero.png')",
                   }}
                 >
                   <Link
@@ -59,11 +59,10 @@ export function StorefrontHome() {
                   </Link>
                   <div className="slider_content">
                     <div className="slider_content_inner">
-                      <p>New season essentials</p>
-                      <h1 id="home-hero-title">Women&apos;s Fashion</h1>
+                      <p>African-made. Globally styled.</p>
+                      <h1 id="home-hero-title">African Fashion</h1>
                       <p>
-                        Thoughtful everyday pieces, selected for effortless
-                        style.
+                        Heritage textiles and confident contemporary design.
                       </p>
                       <span className="hero-cta">Shop the collection</span>
                     </div>
@@ -78,10 +77,11 @@ export function StorefrontHome() {
                   <div className="single_banner">
                     <Link href="/shop" aria-label="Shop the summer sale">
                       <Image
-                        src="/storefront/assets/img/banner/banner7.jpg"
-                        alt="Summer collection"
+                        src="/storefront/assets/img/banner/african-boutique-collection.png"
+                        alt="African-made boutique dress and accessories collection"
                         width={420}
                         height={180}
+                        unoptimized
                       />
                       <div className="banner_title">
                         <p>
@@ -95,10 +95,11 @@ export function StorefrontHome() {
                   <div className="single_banner">
                     <Link href="/shop" aria-label="Shop selected styles">
                       <Image
-                        src="/storefront/assets/img/banner/banner8.jpg"
-                        alt="Selected fashion styles"
+                        src="/storefront/assets/img/banner/african-dress-editorial.png"
+                        alt="Black woman wearing a contemporary African wax-print dress"
                         width={420}
                         height={180}
+                        unoptimized
                       />
                       <div className="banner_title title_2">
                         <p>

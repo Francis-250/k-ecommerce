@@ -11,7 +11,7 @@ export type CatalogProduct = {
 export const catalogProducts: CatalogProduct[] = [
   {
     id: 1,
-    slug: "printed-summer-dress",
+    slug: "indigo-ankara-midi-dress",
     name: "Indigo Ankara Midi Dress",
     price: 118,
     category: "Dresses",
@@ -20,7 +20,7 @@ export const catalogProducts: CatalogProduct[] = [
   },
   {
     id: 2,
-    slug: "condimentum-posuere",
+    slug: "emerald-ankara-handbag",
     name: "Emerald Ankara Handbag",
     price: 96,
     category: "Handbags",
@@ -29,7 +29,7 @@ export const catalogProducts: CatalogProduct[] = [
   },
   {
     id: 3,
-    slug: "donec-eu-furniture",
+    slug: "kente-panel-sneakers",
     name: "Kente Panel Sneakers",
     price: 84,
     category: "Accessories",
@@ -38,7 +38,7 @@ export const catalogProducts: CatalogProduct[] = [
   },
   {
     id: 4,
-    slug: "aliquam-lobortis",
+    slug: "maasai-beaded-jewelry-set",
     name: "Maasai Beaded Jewelry Set",
     price: 72,
     category: "Accessories",
@@ -47,7 +47,7 @@ export const catalogProducts: CatalogProduct[] = [
   },
   {
     id: 5,
-    slug: "aliquam-lobortis",
+    slug: "heritage-ankara-shirt",
     name: "Heritage Ankara Shirt",
     price: 78,
     category: "Tops",
@@ -56,7 +56,7 @@ export const catalogProducts: CatalogProduct[] = [
   },
   {
     id: 6,
-    slug: "donec-eu-furniture",
+    slug: "indigo-print-leather-sandals",
     name: "Indigo Print Leather Sandals",
     price: 68,
     category: "Accessories",
@@ -65,7 +65,7 @@ export const catalogProducts: CatalogProduct[] = [
   },
   {
     id: 7,
-    slug: "condimentum-posuere",
+    slug: "wax-print-headwrap-set",
     name: "Wax Print Headwrap Set",
     price: 48,
     category: "Accessories",
@@ -74,7 +74,7 @@ export const catalogProducts: CatalogProduct[] = [
   },
   {
     id: 8,
-    slug: "aliquam-lobortis",
+    slug: "mudcloth-leather-backpack",
     name: "Mudcloth Leather Backpack",
     price: 124,
     category: "Handbags",
