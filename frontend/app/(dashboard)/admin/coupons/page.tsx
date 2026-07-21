@@ -1,9 +1,4 @@
-import { DashboardPlaceholder } from "../../dashboard-placeholder";
+import { CouponsManagement } from "../_components/CouponsManagement";
 export default function CouponsPage() {
-  return (
-    <DashboardPlaceholder
-      title="Coupons"
-      description="Create promotions and manage active discount codes."
-    />
-  );
+  return <CouponsManagement />;
 }

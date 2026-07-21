@@ -1,9 +1,16 @@
-import { DashboardPlaceholder } from "../../dashboard-placeholder";
+import { AdminPageHeader } from "../_components/AdminPageHeader";
+import { ProductTable } from "../_components/ProductTable";
+
 export default function ProductsPage() {
   return (
-    <DashboardPlaceholder
-      title="Products"
-      description="Add products and maintain catalogue information."
-    />
+    <>
+      <AdminPageHeader
+        title="Products"
+        description="Manage your product catalogue and inventory."
+        actionHref="/admin/products/new"
+        actionLabel="Add new product"
+      />
+      <ProductTable />
+    </>
   );
 }

@@ -1,9 +1,5 @@
-import { DashboardPlaceholder } from "../dashboard-placeholder";
+import { AdminDashboard } from "./_components/AdminDashboard";
+
 export default function AdminPage() {
-  return (
-    <DashboardPlaceholder
-      title="Admin dashboard"
-      description="Manage the I-RAS Styles store and monitor daily activity."
-    />
-  );
+  return <AdminDashboard />;
 }

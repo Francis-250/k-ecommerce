@@ -1,9 +1,4 @@
-import { DashboardPlaceholder } from "../../dashboard-placeholder";
+import { OrdersManagement } from "../_components/OrdersManagement";
 export default function OrdersPage() {
-  return (
-    <DashboardPlaceholder
-      title="Orders"
-      description="Review, process, and track customer orders."
-    />
-  );
+  return <OrdersManagement />;
 }

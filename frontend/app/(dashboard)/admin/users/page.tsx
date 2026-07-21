@@ -1,9 +1,4 @@
-import { DashboardPlaceholder } from "../../dashboard-placeholder";
+import { CustomersManagement } from "../_components/CustomersManagement";
 export default function UsersPage() {
-  return (
-    <DashboardPlaceholder
-      title="Users"
-      description="Manage customer and staff accounts from one place."
-    />
-  );
+  return <CustomersManagement />;
 }

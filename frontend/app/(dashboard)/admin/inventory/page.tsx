@@ -1,9 +1,4 @@
-import { DashboardPlaceholder } from "../../dashboard-placeholder";
+import { InventoryManagement } from "../_components/InventoryManagement";
 export default function InventoryPage() {
-  return (
-    <DashboardPlaceholder
-      title="Inventory"
-      description="Monitor stock levels, low-stock items, and availability."
-    />
-  );
+  return <InventoryManagement />;
 }
