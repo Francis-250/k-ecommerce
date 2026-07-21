@@ -1,25 +1,188 @@
 import type { BlogPost, PortfolioProject } from "./types";
 
 export const blogPosts: BlogPost[] = [
-  { slug: "building-a-timeless-wardrobe", title: "Building a timeless wardrobe", excerpt: "A practical guide to choosing versatile pieces that work harder, last longer, and still feel personal.", image: "/coron/img/blog/blog9.jpg", category: "Style guide", publishedAt: "2026-07-14", readTime: "5 min read", sections: [{ heading: "Begin with what you wear", paragraphs: ["A lasting wardrobe starts with observation. Notice the shapes, colours, and materials you reach for most often before adding anything new.", "Choose fewer pieces with clear roles. A strong foundation makes seasonal details easier to enjoy without losing your own point of view."] }, { heading: "Quality lives in the details", paragraphs: ["Look closely at fabric, seams, fastenings, and care requirements. Thoughtful construction brings ease to everyday dressing and helps clothing age gracefully."] }] },
-  { slug: "the-art-of-accessorising", title: "The art of accessorising", excerpt: "Use proportion, texture, and colour to turn simple outfits into considered everyday looks.", image: "/coron/img/blog/blog6.jpg", category: "Accessories", publishedAt: "2026-07-08", readTime: "4 min read", sections: [{ heading: "Create one focal point", paragraphs: ["Start with one expressive piece and let supporting accessories stay quiet. This creates balance and keeps an outfit feeling intentional."] }, { heading: "Mix texture with confidence", paragraphs: ["Smooth leather, woven fibres, and polished metal can coexist when their colours share a clear relationship."] }] },
-  { slug: "colour-notes-for-the-new-season", title: "Colour notes for the new season", excerpt: "Discover a calm palette of softened neutrals, rich accents, and combinations made for daily wear.", image: "/coron/img/blog/blog10.jpg", category: "Trends", publishedAt: "2026-06-29", readTime: "6 min read", sections: [{ heading: "Anchor the palette", paragraphs: ["Ground expressive colour with warm neutrals. Cream, stone, and deep navy give brighter shades room to breathe."] }, { heading: "Wear colour your way", paragraphs: ["A trend is useful only when it supports your style. Try a new shade first in a scarf, bag, or fine knit before making it central."] }] },
-  { slug: "care-for-the-clothes-you-love", title: "Care for the clothes you love", excerpt: "Simple storage, washing, and repair habits that extend the useful life of favourite pieces.", image: "/coron/img/blog/blog12.jpg", category: "Care", publishedAt: "2026-06-18", readTime: "7 min read", sections: [{ heading: "Read before you wash", paragraphs: ["Care labels are a starting point, but frequency matters too. Airing and spot cleaning often protect fabric better than unnecessary washing."] }, { heading: "Make repair routine", paragraphs: ["Small repairs prevent larger problems. Keep a compact kit nearby and address loose buttons or open seams early."] }] },
+  {
+    slug: "building-a-timeless-wardrobe",
+    title: "Building a timeless wardrobe",
+    excerpt:
+      "A practical guide to choosing versatile pieces that work harder, last longer, and still feel personal.",
+    image: "/storefront/img/blog/blog9.jpg",
+    category: "Style guide",
+    publishedAt: "2026-07-14",
+    readTime: "5 min read",
+    sections: [
+      {
+        heading: "Begin with what you wear",
+        paragraphs: [
+          "A lasting wardrobe starts with observation. Notice the shapes, colours, and materials you reach for most often before adding anything new.",
+          "Choose fewer pieces with clear roles. A strong foundation makes seasonal details easier to enjoy without losing your own point of view.",
+        ],
+      },
+      {
+        heading: "Quality lives in the details",
+        paragraphs: [
+          "Look closely at fabric, seams, fastenings, and care requirements. Thoughtful construction brings ease to everyday dressing and helps clothing age gracefully.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "the-art-of-accessorising",
+    title: "The art of accessorising",
+    excerpt:
+      "Use proportion, texture, and colour to turn simple outfits into considered everyday looks.",
+    image: "/storefront/img/blog/blog6.jpg",
+    category: "Accessories",
+    publishedAt: "2026-07-08",
+    readTime: "4 min read",
+    sections: [
+      {
+        heading: "Create one focal point",
+        paragraphs: [
+          "Start with one expressive piece and let supporting accessories stay quiet. This creates balance and keeps an outfit feeling intentional.",
+        ],
+      },
+      {
+        heading: "Mix texture with confidence",
+        paragraphs: [
+          "Smooth leather, woven fibres, and polished metal can coexist when their colours share a clear relationship.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "colour-notes-for-the-new-season",
+    title: "Colour notes for the new season",
+    excerpt:
+      "Discover a calm palette of softened neutrals, rich accents, and combinations made for daily wear.",
+    image: "/storefront/img/blog/blog10.jpg",
+    category: "Trends",
+    publishedAt: "2026-06-29",
+    readTime: "6 min read",
+    sections: [
+      {
+        heading: "Anchor the palette",
+        paragraphs: [
+          "Ground expressive colour with warm neutrals. Cream, stone, and deep navy give brighter shades room to breathe.",
+        ],
+      },
+      {
+        heading: "Wear colour your way",
+        paragraphs: [
+          "A trend is useful only when it supports your style. Try a new shade first in a scarf, bag, or fine knit before making it central.",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "care-for-the-clothes-you-love",
+    title: "Care for the clothes you love",
+    excerpt:
+      "Simple storage, washing, and repair habits that extend the useful life of favourite pieces.",
+    image: "/storefront/img/blog/blog12.jpg",
+    category: "Care",
+    publishedAt: "2026-06-18",
+    readTime: "7 min read",
+    sections: [
+      {
+        heading: "Read before you wash",
+        paragraphs: [
+          "Care labels are a starting point, but frequency matters too. Airing and spot cleaning often protect fabric better than unnecessary washing.",
+        ],
+      },
+      {
+        heading: "Make repair routine",
+        paragraphs: [
+          "Small repairs prevent larger problems. Keep a compact kit nearby and address loose buttons or open seams early.",
+        ],
+      },
+    ],
+  },
 ];
 
-export const portfolioProjects: PortfolioProject[] = Array.from({ length: 8 }, (_, index) => {
-  const projects = [
-    ["quiet-luxury-editorial", "Quiet luxury editorial", "Editorial", "A restrained campaign shaped by tactile fabrics and warm natural light."],
-    ["city-essentials", "City essentials", "Campaign", "A versatile collection photographed around the rhythm of modern city life."],
-    ["objects-of-desire", "Objects of desire", "Accessories", "Sculptural accessories presented with playful scale and precise art direction."],
-    ["weekend-stories", "Weekend stories", "Lifestyle", "Relaxed silhouettes and candid moments for an easy weekend narrative."],
-    ["modern-classics", "Modern classics", "Editorial", "Familiar wardrobe forms revisited through modern colour and proportion."],
-    ["soft-structure", "Soft structure", "Campaign", "Tailoring and fluid layers meet in a study of movement and balance."],
-    ["crafted-details", "Crafted details", "Accessories", "A close-up celebration of material, finish, and thoughtful construction."],
-    ["summer-in-motion", "Summer in motion", "Lifestyle", "Lightweight pieces captured in colour, sunlight, and spontaneous movement."],
-  ][index];
-  return { slug: projects[0], title: projects[1], category: projects[2], summary: projects[3], image: `/coron/img/portfolio/port${index + 1}.jpg`, client: "Coron Studio", year: "2026", sections: [{ heading: "The brief", paragraphs: [projects[3], "The project needed to feel recognisably Coron: polished but welcoming, commercially clear, and rich in considered detail."] }, { heading: "Our approach", paragraphs: ["We developed a focused visual system around confident composition, natural texture, and the signature teal accent. Every frame was designed to work across editorial, social, and storefront contexts."] }] };
-});
+export const portfolioProjects: PortfolioProject[] = Array.from(
+  { length: 8 },
+  (_, index) => {
+    const projects = [
+      [
+        "quiet-luxury-editorial",
+        "Quiet luxury editorial",
+        "Editorial",
+        "A restrained campaign shaped by tactile fabrics and warm natural light.",
+      ],
+      [
+        "city-essentials",
+        "City essentials",
+        "Campaign",
+        "A versatile collection photographed around the rhythm of modern city life.",
+      ],
+      [
+        "objects-of-desire",
+        "Objects of desire",
+        "Accessories",
+        "Sculptural accessories presented with playful scale and precise art direction.",
+      ],
+      [
+        "weekend-stories",
+        "Weekend stories",
+        "Lifestyle",
+        "Relaxed silhouettes and candid moments for an easy weekend narrative.",
+      ],
+      [
+        "modern-classics",
+        "Modern classics",
+        "Editorial",
+        "Familiar wardrobe forms revisited through modern colour and proportion.",
+      ],
+      [
+        "soft-structure",
+        "Soft structure",
+        "Campaign",
+        "Tailoring and fluid layers meet in a study of movement and balance.",
+      ],
+      [
+        "crafted-details",
+        "Crafted details",
+        "Accessories",
+        "A close-up celebration of material, finish, and thoughtful construction.",
+      ],
+      [
+        "summer-in-motion",
+        "Summer in motion",
+        "Lifestyle",
+        "Lightweight pieces captured in colour, sunlight, and spontaneous movement.",
+      ],
+    ][index];
+    return {
+      slug: projects[0],
+      title: projects[1],
+      category: projects[2],
+      summary: projects[3],
+      image: `/storefront/img/portfolio/port${index + 1}.jpg`,
+      client: "Coron Studio",
+      year: "2026",
+      sections: [
+        {
+          heading: "The brief",
+          paragraphs: [
+            projects[3],
+            "The project needed to feel recognisably Coron: polished but welcoming, commercially clear, and rich in considered detail.",
+          ],
+        },
+        {
+          heading: "Our approach",
+          paragraphs: [
+            "We developed a focused visual system around confident composition, natural texture, and the signature teal accent. Every frame was designed to work across editorial, social, and storefront contexts.",
+          ],
+        },
+      ],
+    };
+  },
+);
 
-export function getBlogPost(slug: string) { return blogPosts.find((post) => post.slug === slug); }
-export function getPortfolioProject(slug: string) { return portfolioProjects.find((project) => project.slug === slug); }
+export function getBlogPost(slug: string) {
+  return blogPosts.find((post) => post.slug === slug);
+}
+export function getPortfolioProject(slug: string) {
+  return portfolioProjects.find((project) => project.slug === slug);
+}

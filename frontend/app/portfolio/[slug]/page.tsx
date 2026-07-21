@@ -1,10 +1,83 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Breadcrumb, CoronShell } from "@/components/coron/CoronShell";
-import { ArticleSections, BackLink } from "@/features/storefront/content/ContentUi";
-import { getPortfolioProject, portfolioProjects } from "@/features/storefront/content/data";
+import {
+  Breadcrumb,
+  StorefrontShell,
+} from "@/components/storefront/StorefrontShell";
+import {
+  ArticleSections,
+  BackLink,
+} from "@/features/storefront/content/ContentUi";
+import {
+  getPortfolioProject,
+  portfolioProjects,
+} from "@/features/storefront/content/data";
 
-export function generateStaticParams() { return portfolioProjects.map(({ slug }) => ({ slug })); }
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> { const project = getPortfolioProject((await params).slug); return project ? { title: `${project.title} | Coron`, description: project.summary } : {}; }
-export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) { const project = getPortfolioProject((await params).slug); if (!project) notFound(); return <CoronShell><Breadcrumb title={project.title}/><main className="coron-container coron-content"><article><BackLink href="/portfolio">All projects</BackLink><header className="my-8 grid gap-6 md:grid-cols-[2fr_1fr] md:items-end"><div><p className="mb-2 text-xs font-bold uppercase tracking-[.2em] text-[#00bba6]">{project.category}</p><h1 className="coron-page-title mb-3">{project.title}</h1><p className="max-w-2xl text-lg leading-8 text-[#666]">{project.summary}</p></div><dl className="grid grid-cols-2 gap-4 border-l-0 border-[#ddd] md:border-l md:pl-6"><div><dt className="text-xs uppercase tracking-wider text-[#999]">Client</dt><dd className="mt-1 font-bold text-[#333]">{project.client}</dd></div><div><dt className="text-xs uppercase tracking-wider text-[#999]">Year</dt><dd className="mt-1 font-bold text-[#333]">{project.year}</dd></div></dl></header><Image className="mb-10 max-h-[720px] w-full object-cover" src={project.image} alt="" width={1400} height={850} priority/><div className="mx-auto max-w-3xl"><ArticleSections sections={project.sections}/></div></article></main></CoronShell>; }
+export function generateStaticParams() {
+  return portfolioProjects.map(({ slug }) => ({ slug }));
+}
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const project = getPortfolioProject((await params).slug);
+  return project
+    ? { title: `${project.title} | Coron`, description: project.summary }
+    : {};
+}
+export default async function ProjectPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const project = getPortfolioProject((await params).slug);
+  if (!project) notFound();
+  return (
+    <StorefrontShell>
+      <Breadcrumb title={project.title} />
+      <main className="coron-container coron-content">
+        <article>
+          <BackLink href="/portfolio">All projects</BackLink>
+          <header className="my-8 grid gap-6 md:grid-cols-[2fr_1fr] md:items-end">
+            <div>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[.2em] text-[#00bba6]">
+                {project.category}
+              </p>
+              <h1 className="coron-page-title mb-3">{project.title}</h1>
+              <p className="max-w-2xl text-lg leading-8 text-[#666]">
+                {project.summary}
+              </p>
+            </div>
+            <dl className="grid grid-cols-2 gap-4 border-l-0 border-[#ddd] md:border-l md:pl-6">
+              <div>
+                <dt className="text-xs uppercase tracking-wider text-[#999]">
+                  Client
+                </dt>
+                <dd className="mt-1 font-bold text-[#333]">{project.client}</dd>
+              </div>
+              <div>
+                <dt className="text-xs uppercase tracking-wider text-[#999]">
+                  Year
+                </dt>
+                <dd className="mt-1 font-bold text-[#333]">{project.year}</dd>
+              </div>
+            </dl>
+          </header>
+          <Image
+            className="mb-10 max-h-[720px] w-full object-cover"
+            src={project.image}
+            alt=""
+            width={1400}
+            height={850}
+            priority
+          />
+          <div className="mx-auto max-w-3xl">
+            <ArticleSections sections={project.sections} />
+          </div>
+        </article>
+      </main>
+    </StorefrontShell>
+  );
+}

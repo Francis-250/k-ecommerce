@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { products } from "./data";
+import { ChevronRight, Grid3X3, List, ShoppingCart, Star } from "lucide-react";
+import { products } from "./catalog-data";
 import { AddToCartButton } from "@/features/storefront/cart";
 
 type Product = (typeof products)[number];
@@ -19,7 +20,10 @@ export function ProductCard({
         <div className="product_thumb">
           <Link href={`/products/${product.slug}`}>
             <Image
-              src={product.image.replace("/coron/img/", "/coron/assets/img/")}
+              src={product.image.replace(
+                "/storefront/img/",
+                "/storefront/assets/img/",
+              )}
               alt={product.name}
               width={270}
               height={270}
@@ -27,14 +31,25 @@ export function ProductCard({
           </Link>
           <div className={index % 2 ? "hot_img" : "img_icone"}>
             <Image
-              src={`/coron/assets/img/cart/${index % 2 ? "span-hot.png" : "span-new.png"}`}
+              src={`/storefront/assets/img/cart/${index % 2 ? "span-hot.png" : "span-new.png"}`}
               alt={index % 2 ? "Hot" : "New"}
               width={50}
               height={50}
             />
           </div>
           <div className="product_action">
-            <AddToCartButton item={{ slug: product.slug, name: product.name, price: Number(product.price.replace(/[^0-9.]/g, "")), image: product.image }}><><i className="fa fa-shopping-cart" aria-hidden="true" /> Add to cart</></AddToCartButton>
+            <AddToCartButton
+              item={{
+                slug: product.slug,
+                name: product.name,
+                price: Number(product.price.replace(/[^0-9.]/g, "")),
+                image: product.image,
+              }}
+            >
+              <>
+                <ShoppingCart size={16} aria-hidden="true" /> Add to cart
+              </>
+            </AddToCartButton>
           </div>
         </div>
         <div className="product_content">
@@ -97,11 +112,14 @@ export function ProductList({ count = 6 }: { count?: number }) {
                     className="product_ratting"
                     aria-label="5 out of 5 stars"
                   >
-                    <i className="fa fa-star" />
-                    <i className="fa fa-star" />
-                    <i className="fa fa-star" />
-                    <i className="fa fa-star" />
-                    <i className="fa fa-star" />
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={14}
+                        fill="currentColor"
+                        aria-hidden="true"
+                      />
+                    ))}
                   </div>
                   <span className="product_price">{product.price}</span>
                   <p>
@@ -111,7 +129,7 @@ export function ProductList({ count = 6 }: { count?: number }) {
                   </p>
                   <div className="product_action">
                     <Link href="/cart">
-                      <i className="fa fa-shopping-cart" /> Add to cart
+                      <ShoppingCart size={16} aria-hidden="true" /> Add to cart
                     </Link>
                   </div>
                 </div>
@@ -132,7 +150,7 @@ export function Sidebar({ home = false }: { home?: boolean }) {
         <div className="sidebar_widget banner mb-35">
           <div className="banner_img mb-35">
             <Image
-              src="/coron/assets/img/banner/banner5.jpg"
+              src="/storefront/assets/img/banner/banner5.jpg"
               alt="Fashion offer"
               width={270}
               height={130}
@@ -140,7 +158,7 @@ export function Sidebar({ home = false }: { home?: boolean }) {
           </div>
           <div className="banner_img">
             <Image
-              src="/coron/assets/img/banner/banner6.jpg"
+              src="/storefront/assets/img/banner/banner6.jpg"
               alt="Seasonal offer"
               width={270}
               height={130}
@@ -153,7 +171,7 @@ export function Sidebar({ home = false }: { home?: boolean }) {
             {["Women", "Men", "Footwear", "Jewelry", "Lady"].map((x) => (
               <li className="has-sub" key={x}>
                 <Link href="/shop">
-                  <i className="fa fa-caret-right" /> {x}
+                  <ChevronRight size={14} aria-hidden="true" /> {x}
                 </Link>
               </li>
             ))}
@@ -165,7 +183,7 @@ export function Sidebar({ home = false }: { home?: boolean }) {
         <div className="sidebar_widget bottom">
           <div className="banner_img">
             <Image
-              src="/coron/assets/img/banner/banner9.jpg"
+              src="/storefront/assets/img/banner/banner9.jpg"
               alt="Coron fashion"
               width={270}
               height={340}
@@ -242,7 +260,7 @@ function Wishlist() {
         <div className="cart_item" key={image}>
           <div className="cart_img">
             <Image
-              src={`/coron/assets/img/cart/${image}`}
+              src={`/storefront/assets/img/cart/${image}`}
               alt="Wishlist product"
               width={60}
               height={60}
@@ -318,7 +336,7 @@ export function ShopToolbar({ list = false }: { list?: boolean }) {
               href="/shop"
               aria-label="Grid view"
             >
-              <i className="fa fa-th-large" />
+              <Grid3X3 size={18} aria-hidden="true" />
             </Link>
           </li>
           <li>
@@ -327,7 +345,7 @@ export function ShopToolbar({ list = false }: { list?: boolean }) {
               href="/shop?view=list"
               aria-label="List view"
             >
-              <i className="fa fa-th-list" />
+              <List size={18} aria-hidden="true" />
             </Link>
           </li>
         </ul>

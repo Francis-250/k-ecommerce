@@ -1,4 +1,9 @@
-import { AccountField, AccountLink, AuthPage, Submit } from "../auth-ui";
+import {
+  AccountField,
+  AccountLink,
+  AuthPage,
+  Submit,
+} from "../_components/AuthPage";
 export default function ForgotPasswordPage() {
   return (
     <AuthPage title="Forgot password">

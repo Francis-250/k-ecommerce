@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import type { AddCartItem, CartItem } from "./types";
 
 type CartContextValue = {
@@ -14,10 +21,12 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
-const CART_STORAGE_KEY = "coron-storefront-cart";
+const CART_STORAGE_KEY = "storefront-cart";
 
 function itemId(item: AddCartItem) {
-  const options = Object.entries(item.options ?? {}).sort(([a], [b]) => a.localeCompare(b));
+  const options = Object.entries(item.options ?? {}).sort(([a], [b]) =>
+    a.localeCompare(b),
+  );
   return `${item.slug}:${JSON.stringify(options)}`;
 }
 
@@ -45,21 +54,41 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   }
 
-  const value = useMemo<CartContextValue>(() => ({
-    items,
-    itemCount: items.reduce((total, item) => total + item.quantity, 0),
-    subtotal: items.reduce((total, item) => total + item.price * item.quantity, 0),
-    addItem: (item) => updateItems((current) => {
-      const id = itemId(item);
-      const quantity = Math.max(1, item.quantity ?? 1);
-      const existing = current.find((entry) => entry.id === id);
-      if (existing) return current.map((entry) => entry.id === id ? { ...entry, quantity: entry.quantity + quantity } : entry);
-      return [...current, { ...item, id, quantity }];
+  const value = useMemo<CartContextValue>(
+    () => ({
+      items,
+      itemCount: items.reduce((total, item) => total + item.quantity, 0),
+      subtotal: items.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0,
+      ),
+      addItem: (item) =>
+        updateItems((current) => {
+          const id = itemId(item);
+          const quantity = Math.max(1, item.quantity ?? 1);
+          const existing = current.find((entry) => entry.id === id);
+          if (existing)
+            return current.map((entry) =>
+              entry.id === id
+                ? { ...entry, quantity: entry.quantity + quantity }
+                : entry,
+            );
+          return [...current, { ...item, id, quantity }];
+        }),
+      updateQuantity: (id, quantity) =>
+        updateItems((current) =>
+          current.map((item) =>
+            item.id === id
+              ? { ...item, quantity: Math.max(1, quantity) }
+              : item,
+          ),
+        ),
+      removeItem: (id) =>
+        updateItems((current) => current.filter((item) => item.id !== id)),
+      clearCart: () => updateItems(() => []),
     }),
-    updateQuantity: (id, quantity) => updateItems((current) => current.map((item) => item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item)),
-    removeItem: (id) => updateItems((current) => current.filter((item) => item.id !== id)),
-    clearCart: () => updateItems(() => []),
-  }), [items]);
+    [items],
+  );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

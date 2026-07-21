@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Breadcrumb, CoronShell } from "@/components/coron/CoronShell";
+import {
+  Breadcrumb,
+  StorefrontShell,
+} from "@/components/storefront/StorefrontShell";
 
 export function AuthPage({
   title,
@@ -10,7 +13,7 @@ export function AuthPage({
   children: ReactNode;
 }) {
   return (
-    <CoronShell>
+    <StorefrontShell>
       <Breadcrumb title={title} />
       <div className="customer_login">
         <div className="row">
@@ -19,7 +22,7 @@ export function AuthPage({
           </div>
         </div>
       </div>
-    </CoronShell>
+    </StorefrontShell>
   );
 }
 

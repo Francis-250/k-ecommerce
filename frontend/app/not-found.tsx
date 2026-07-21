@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { CoronShell } from "@/components/coron/CoronShell";
+import { StorefrontShell } from "@/components/storefront/StorefrontShell";
 export default function NotFound() {
   return (
-    <CoronShell>
+    <StorefrontShell>
       <main className="coron-error">
         <h1>404</h1>
         <h2>Oops! PAGE NOT FOUND</h2>
@@ -23,6 +23,6 @@ export default function NotFound() {
           Back to home page
         </Link>
       </main>
-    </CoronShell>
+    </StorefrontShell>
   );
 }

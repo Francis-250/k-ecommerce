@@ -2,7 +2,11 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { Breadcrumb, CoronShell } from "@/components/coron/CoronShell";
+import { FileText } from "lucide-react";
+import {
+  Breadcrumb,
+  StorefrontShell,
+} from "@/components/storefront/StorefrontShell";
 import { useCart } from "@/features/storefront/cart";
 import { toast } from "sonner";
 
@@ -104,15 +108,14 @@ export default function CheckoutPage() {
   const [payment, setPayment] = useState("");
 
   return (
-    <CoronShell>
+    <StorefrontShell>
       <Breadcrumb title="checkout" />
       <div className="Checkout_section">
         <div className="row">
           <div className="col-12">
             <div className="user-actions mb-20">
               <h3>
-                <i className="fa fa-file-o" aria-hidden="true" /> Returning
-                customer?{" "}
+                <FileText size={16} aria-hidden="true" /> Returning customer?{" "}
                 <button
                   className="Returning"
                   type="button"
@@ -154,8 +157,7 @@ export default function CheckoutPage() {
             </div>
             <div className="user-actions mb-20">
               <h3>
-                <i className="fa fa-file-o" aria-hidden="true" /> Returning
-                customer?{" "}
+                <FileText size={16} aria-hidden="true" /> Returning customer?{" "}
                 <button
                   className="Returning"
                   type="button"
@@ -251,7 +253,16 @@ export default function CheckoutPage() {
               </form>
             </div>
             <div className="col-lg-6 col-md-6">
-              <form onSubmit={(event) => { event.preventDefault(); if (items.length) toast.success("Order details are ready", { description: "Your cart products have been included in checkout." }); }}>
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (items.length)
+                    toast.success("Order details are ready", {
+                      description:
+                        "Your cart products have been included in checkout.",
+                    });
+                }}
+              >
                 <h3>Your order</h3>
                 <div className="order_table table-responsive mb-30">
                   <table>
@@ -261,7 +272,32 @@ export default function CheckoutPage() {
                         <th>Total</th>
                       </tr>
                     </thead>
-                    <tbody>{items.length ? items.map((item) => <tr key={item.id}><td>{item.name} <strong>× {item.quantity}</strong>{item.options && <small>{Object.entries(item.options).map(([name, value]) => `${name}: ${value}`).join(" · ")}</small>}</td><td>${(item.price * item.quantity).toFixed(2)}</td></tr>) : <tr><td colSpan={2}>Your cart is empty. Add products before checking out.</td></tr>}</tbody>
+                    <tbody>
+                      {items.length ? (
+                        items.map((item) => (
+                          <tr key={item.id}>
+                            <td>
+                              {item.name} <strong>× {item.quantity}</strong>
+                              {item.options && (
+                                <small>
+                                  {Object.entries(item.options)
+                                    .map(([name, value]) => `${name}: ${value}`)
+                                    .join(" · ")}
+                                </small>
+                              )}
+                            </td>
+                            <td>${(item.price * item.quantity).toFixed(2)}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={2}>
+                            Your cart is empty. Add products before checking
+                            out.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
                     <tfoot>
                       <tr>
                         <th>Cart Subtotal</th>
@@ -317,7 +353,7 @@ export default function CheckoutPage() {
                     <label htmlFor="payment_defult">
                       PayPal{" "}
                       <Image
-                        src="/coron/assets/img/visha/papyel.png"
+                        src="/storefront/assets/img/visha/papyel.png"
                         alt="PayPal"
                         width={120}
                         height={35}
@@ -336,7 +372,9 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                   <div className="order_button">
-                    <button type="submit" disabled={!items.length}>{items.length ? "Place order" : "Cart is empty"}</button>
+                    <button type="submit" disabled={!items.length}>
+                      {items.length ? "Place order" : "Cart is empty"}
+                    </button>
                   </div>
                 </div>
               </form>
@@ -344,6 +382,6 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
-    </CoronShell>
+    </StorefrontShell>
   );
 }

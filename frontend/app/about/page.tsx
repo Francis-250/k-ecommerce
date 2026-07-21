@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Breadcrumb, CoronShell } from "@/components/coron/CoronShell";
+import {
+  Breadcrumb,
+  StorefrontShell,
+} from "@/components/storefront/StorefrontShell";
 import { PageIntro } from "@/features/storefront/content/ContentUi";
 
 export const metadata: Metadata = {
@@ -25,7 +28,7 @@ const values = [
 ];
 export default function AboutPage() {
   return (
-    <CoronShell>
+    <StorefrontShell>
       <Breadcrumb title="About us" />
       <main className="coron-container coron-content">
         <PageIntro
@@ -36,7 +39,7 @@ export default function AboutPage() {
         <section className="grid items-center gap-10 lg:grid-cols-2">
           <Image
             className="h-full min-h-80 w-full object-cover"
-            src="/coron/img/ship/about1.jpg"
+            src="/storefront/img/ship/about1.jpg"
             alt="The Coron creative team collaborating in the studio"
             width={720}
             height={560}
@@ -86,7 +89,7 @@ export default function AboutPage() {
           <div className="lg:order-2">
             <Image
               className="h-full min-h-80 w-full object-cover"
-              src="/coron/img/ship/about3.jpg"
+              src="/storefront/img/ship/about3.jpg"
               alt="A Coron designer reviewing materials and ideas"
               width={720}
               height={520}
@@ -110,6 +113,6 @@ export default function AboutPage() {
           </div>
         </section>
       </main>
-    </CoronShell>
+    </StorefrontShell>
   );
 }

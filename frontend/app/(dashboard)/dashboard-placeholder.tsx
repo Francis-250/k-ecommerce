@@ -1,4 +1,7 @@
-import { Breadcrumb, CoronShell } from "@/components/coron/CoronShell";
+import {
+  Breadcrumb,
+  StorefrontShell,
+} from "@/components/storefront/StorefrontShell";
 
 export function DashboardPlaceholder({
   title,
@@ -8,7 +11,7 @@ export function DashboardPlaceholder({
   description: string;
 }) {
   return (
-    <CoronShell>
+    <StorefrontShell>
       <Breadcrumb title={title} />
       <div className="coron-container coron-content">
         <section className="coron-sidebar-box coron-center">
@@ -23,6 +26,6 @@ export function DashboardPlaceholder({
           </div>
         </section>
       </div>
-    </CoronShell>
+    </StorefrontShell>
   );
 }

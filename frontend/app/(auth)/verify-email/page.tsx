@@ -1,2 +1,23 @@
-import { AccountField, AccountLink, AuthPage, Submit } from "../auth-ui";
-export default function VerifyEmailPage() { return <AuthPage title="Verify email"><h2>Verify email</h2><form><p>Enter the verification code sent to your email address.</p><AccountField id="verification-code" label="Verification code" autoComplete="one-time-code" /><Submit>Verify email</Submit></form><AccountLink href="/register">Return to registration</AccountLink></AuthPage>; }
+import {
+  AccountField,
+  AccountLink,
+  AuthPage,
+  Submit,
+} from "../_components/AuthPage";
+export default function VerifyEmailPage() {
+  return (
+    <AuthPage title="Verify email">
+      <h2>Verify email</h2>
+      <form>
+        <p>Enter the verification code sent to your email address.</p>
+        <AccountField
+          id="verification-code"
+          label="Verification code"
+          autoComplete="one-time-code"
+        />
+        <Submit>Verify email</Submit>
+      </form>
+      <AccountLink href="/register">Return to registration</AccountLink>
+    </AuthPage>
+  );
+}

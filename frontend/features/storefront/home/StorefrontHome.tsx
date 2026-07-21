@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CoronShell } from "@/components/coron/CoronShell";
-import { ProductGrid, Sidebar } from "@/components/coron/Catalog";
+import { StorefrontShell } from "@/components/storefront/StorefrontShell";
+import { ProductGrid, Sidebar } from "@/components/storefront/ProductCatalog";
 
 const brands = [1, 2, 3, 4, 5, 6];
 
@@ -31,7 +31,7 @@ function ProductSection({
 
 export function StorefrontHome() {
   return (
-    <CoronShell>
+    <StorefrontShell>
       <main className="pos_home_section">
         <div className="row pos_home">
           <Sidebar home />
@@ -45,10 +45,18 @@ export function StorefrontHome() {
                   className="single_slider home-hero-slide"
                   style={{
                     backgroundImage:
-                      "url('/coron/assets/img/slider/slide_1.png')",
+                      "url('/storefront/assets/img/slider/slide_1.png')",
                   }}
                 >
-                  <Link className="home-hero-click-target" href="/shop?gender=Women" aria-label="Shop the women's collection"><span className="sr-only">Shop the women&apos;s collection</span></Link>
+                  <Link
+                    className="home-hero-click-target"
+                    href="/shop?gender=Women"
+                    aria-label="Shop the women's collection"
+                  >
+                    <span className="sr-only">
+                      Shop the women&apos;s collection
+                    </span>
+                  </Link>
                   <div className="slider_content">
                     <div className="slider_content_inner">
                       <p>New season essentials</p>
@@ -70,7 +78,7 @@ export function StorefrontHome() {
                   <div className="single_banner">
                     <Link href="/shop" aria-label="Shop the summer sale">
                       <Image
-                        src="/coron/assets/img/banner/banner7.jpg"
+                        src="/storefront/assets/img/banner/banner7.jpg"
                         alt="Summer collection"
                         width={420}
                         height={180}
@@ -87,7 +95,7 @@ export function StorefrontHome() {
                   <div className="single_banner">
                     <Link href="/shop" aria-label="Shop selected styles">
                       <Image
-                        src="/coron/assets/img/banner/banner8.jpg"
+                        src="/storefront/assets/img/banner/banner8.jpg"
                         alt="Selected fashion styles"
                         width={420}
                         height={180}
@@ -111,25 +119,25 @@ export function StorefrontHome() {
                 <h2 id="brands-title">Our Brands</h2>
               </div>
               <div className="brand_active brand-row">
-                  {brands.map((brand) => (
-                    <div className="brand-item" key={brand}>
-                      <div className="single_brand">
-                        <Link href="/shop">
-                          <Image
-                            src={`/coron/assets/img/brand/brand${brand}.jpg`}
-                            alt={`Browse brand ${brand}`}
-                            width={170}
-                            height={90}
-                          />
-                        </Link>
-                      </div>
+                {brands.map((brand) => (
+                  <div className="brand-item" key={brand}>
+                    <div className="single_brand">
+                      <Link href="/shop">
+                        <Image
+                          src={`/storefront/assets/img/brand/brand${brand}.jpg`}
+                          alt={`Browse brand ${brand}`}
+                          width={170}
+                          height={90}
+                        />
+                      </Link>
                     </div>
-                  ))}
+                  </div>
+                ))}
               </div>
             </section>
           </div>
         </div>
       </main>
-    </CoronShell>
+    </StorefrontShell>
   );
 }

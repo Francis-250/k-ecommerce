@@ -1,2 +1,2 @@
-export { getProduct, products } from "./data";
+export { getProduct, products } from "./product-data";
 export { ProductPage } from "./ProductPage";

@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProduct, products, ProductPage } from "@/features/storefront/products";
+import {
+  getProduct,
+  products,
+  ProductPage,
+} from "@/features/storefront/products";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -10,7 +14,9 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = getProduct((await params).slug);
-  return product ? { title: `${product.name} | Coron`, description: product.description } : {};
+  return product
+    ? { title: `${product.name} | Coron`, description: product.description }
+    : {};
 }
 
 export default async function ProductRoute({ params }: Props) {
