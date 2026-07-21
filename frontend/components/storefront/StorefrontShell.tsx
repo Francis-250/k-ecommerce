@@ -6,14 +6,15 @@ import { useMemo, useState, type ReactNode } from "react";
 import {
   ChevronDown,
   CircleX,
+  Camera,
   Mail,
   MapPin,
   Menu,
-  Rss,
+  MessageCircle,
   Search,
-  Share2,
   ShoppingCart,
   Smartphone,
+  Users,
   X,
 } from "lucide-react";
 import {
@@ -98,6 +99,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
 
   return (
     <>
+      <div className="storefront-african-border" aria-hidden="true" />
       <div className="pos_page">
         <div className="container">
           <div className="pos_page_inner">
@@ -224,7 +226,10 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                   <div className="col-lg-3 col-md-3">
                     <div className="logo">
                       <Link href="/">
-                        <span className="site-wordmark" aria-label="I-RAS STYLES">
+                        <span
+                          className="site-wordmark"
+                          aria-label="I-RAS STYLES"
+                        >
                           I-RAS <span>STYLES</span>
                         </span>
                       </Link>
@@ -568,19 +573,21 @@ function Footer() {
             <div className="col-lg-6 col-md-6">
               <div className="footer_social text-right">
                 <ul>
-                  {["Community", "Updates", "News", "Inspiration"].map(
-                    (label, index) => (
-                      <li key={label}>
-                        <a href="#social" aria-label={label}>
-                          {index === 3 ? (
-                            <Rss size={17} aria-hidden="true" />
-                          ) : (
-                            <Share2 size={17} aria-hidden="true" />
-                          )}
-                        </a>
-                      </li>
-                    ),
-                  )}
+                  <li>
+                    <a href="#facebook" aria-label="Facebook">
+                      <Users size={17} aria-hidden="true" />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#instagram" aria-label="Instagram">
+                      <Camera size={17} aria-hidden="true" />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#twitter" aria-label="Twitter">
+                      <MessageCircle size={17} aria-hidden="true" />
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>
