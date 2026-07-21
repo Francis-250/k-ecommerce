@@ -26,7 +26,6 @@ export default function AnalyticsPage() {
         </button>
         <select className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-600">
           <option>USD</option>
-          <option>RWF</option>
           <option>EUR</option>
         </select>
       </div>

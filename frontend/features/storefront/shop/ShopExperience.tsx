@@ -219,7 +219,7 @@ export function ShopExperience({
             <div className="banner_slider mb-35">
               <Image
                 src="/storefront/assets/img/banner/bannner10.jpg"
-                alt="Discover the latest Coron collection"
+                alt="Discover the latest I-RAS STYLES collection"
                 width={870}
                 height={220}
                 priority

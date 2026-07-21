@@ -10,9 +10,9 @@ import {
 import { portfolioProjects } from "@/features/storefront/content/data";
 
 export const metadata: Metadata = {
-  title: "Portfolio | Coron",
+  title: "Portfolio | I-RAS STYLES",
   description:
-    "Selected fashion campaigns, editorials, and creative projects by Coron.",
+    "Selected fashion campaigns, editorials, and creative projects by I-RAS STYLES.",
 };
 export default function PortfolioPage() {
   return (

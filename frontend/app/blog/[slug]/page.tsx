@@ -21,7 +21,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const post = getBlogPost((await params).slug);
   return post
-    ? { title: `${post.title} | Coron`, description: post.excerpt }
+    ? { title: `${post.title} | I-RAS STYLES`, description: post.excerpt }
     : {};
 }
 

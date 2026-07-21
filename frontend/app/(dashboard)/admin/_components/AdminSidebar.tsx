@@ -58,14 +58,14 @@ export function AdminSidebar({
             <Link
               href="/admin"
               className="flex min-w-0 items-center gap-2.5"
-              aria-label="Coron admin dashboard"
+              aria-label="I-RAS STYLES admin dashboard"
             >
               <span className="grid size-8 shrink-0 place-items-center rounded-md bg-emerald-600 text-xs font-semibold text-white">
-                CO
+                IR
               </span>
               {!collapsed && (
                 <span className="truncate text-[15px] font-semibold text-slate-800">
-                  Coron
+                  I-RAS STYLES
                 </span>
               )}
             </Link>

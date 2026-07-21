@@ -15,7 +15,10 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = getProduct((await params).slug);
   return product
-    ? { title: `${product.name} | Coron`, description: product.description }
+    ? {
+        title: `${product.name} | I-RAS STYLES`,
+        description: product.description,
+      }
     : {};
 }
 

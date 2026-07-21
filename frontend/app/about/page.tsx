@@ -8,9 +8,9 @@ import {
 import { PageIntro } from "@/features/storefront/content/ContentUi";
 
 export const metadata: Metadata = {
-  title: "About | Coron",
+  title: "About | I-RAS STYLES",
   description:
-    "Meet Coron and discover our approach to enduring, thoughtful style.",
+    "Meet I-RAS STYLES and discover our approach to enduring, thoughtful style.",
 };
 const values = [
   {
@@ -34,13 +34,13 @@ export default function AboutPage() {
         <PageIntro
           eyebrow="Our story"
           title="Style made thoughtful"
-          description="Coron brings together enduring design, honest quality, and an easy sense of individuality."
+          description="I-RAS STYLES brings together enduring design, honest quality, and an easy sense of individuality."
         />
         <section className="grid items-center gap-10 lg:grid-cols-2">
           <Image
             className="h-full min-h-80 w-full object-cover"
             src="/storefront/img/ship/about1.jpg"
-            alt="The Coron creative team collaborating in the studio"
+            alt="The I-RAS STYLES creative team collaborating in the studio"
             width={720}
             height={560}
             priority
@@ -54,8 +54,8 @@ export default function AboutPage() {
             </h2>
             <div className="space-y-4 text-base leading-7 text-[#666]">
               <p>
-                We started Coron with a simple belief: good style should feel
-                considered, useful, and entirely your own.
+                We started I-RAS STYLES with a simple belief: good style should
+                feel considered, useful, and entirely your own.
               </p>
               <p>
                 Our team works across design, sourcing, and storytelling to
@@ -90,7 +90,7 @@ export default function AboutPage() {
             <Image
               className="h-full min-h-80 w-full object-cover"
               src="/storefront/img/ship/about3.jpg"
-              alt="A Coron designer reviewing materials and ideas"
+              alt="An I-RAS STYLES designer reviewing materials and ideas"
               width={720}
               height={520}
             />

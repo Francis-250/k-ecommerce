@@ -159,14 +159,14 @@ export const portfolioProjects: PortfolioProject[] = Array.from(
       category: projects[2],
       summary: projects[3],
       image: `/storefront/img/portfolio/port${index + 1}.jpg`,
-      client: "Coron Studio",
+      client: "I-RAS STYLES Studio",
       year: "2026",
       sections: [
         {
           heading: "The brief",
           paragraphs: [
             projects[3],
-            "The project needed to feel recognisably Coron: polished but welcoming, commercially clear, and rich in considered detail.",
+            "The project needed to feel recognisably I-RAS STYLES: polished but welcoming, commercially clear, and rich in considered detail.",
           ],
         },
         {

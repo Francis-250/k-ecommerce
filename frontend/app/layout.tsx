@@ -7,9 +7,8 @@ import { CartProvider } from "@/features/storefront/cart";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: { default: "Coron Fashion", template: "%s | Coron" },
-  description: "Coron fashion ecommerce store.",
-  icons: { icon: "/storefront/assets/img/favicon.png" },
+  title: { default: "I-RAS STYLES", template: "%s | I-RAS STYLES" },
+  description: "I-RAS STYLES fashion ecommerce store.",
 };
 
 export default function RootLayout({

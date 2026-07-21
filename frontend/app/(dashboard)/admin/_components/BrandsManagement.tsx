@@ -7,8 +7,8 @@ const brands = [
   {
     id: 1,
     initials: "CO",
-    name: "Coron",
-    handle: "coron",
+    name: "I-RAS STYLES",
+    handle: "iras-styles",
     products: 42,
     country: "Rwanda",
     status: "Active",

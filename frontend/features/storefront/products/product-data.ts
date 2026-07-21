@@ -49,7 +49,7 @@ export const products: Product[] = [
     description:
       "A refined everyday piece with modern lines and lasting comfort.",
     longDescription:
-      "A signature Coron wardrobe staple designed with a clean profile, soft-touch fabric and considered details.",
+      "A signature I-RAS STYLES wardrobe staple designed with a clean profile, soft-touch fabric and considered details.",
     price: 80,
     rating: 4,
     reviewCount: 8,
@@ -103,7 +103,7 @@ export const products: Product[] = [
     name: "Donec Eu Furniture",
     category: "Featured",
     description:
-      "A bold Coron favorite balancing contemporary detail with a relaxed feel.",
+      "A bold I-RAS STYLES favorite balancing contemporary detail with a relaxed feel.",
     longDescription:
       "Made in a small production run, this design combines a distinctive silhouette with practical comfort.",
     price: 65,

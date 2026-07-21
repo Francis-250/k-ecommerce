@@ -50,14 +50,14 @@ export default function SettingsPage() {
           <div className="p-5">
             {tab === "store" && (
               <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
-                <Field label="Store name" defaultValue="Coron" />
+                <Field label="Store name" defaultValue="I-RAS STYLES" />
                 <Field
                   label="Support email"
                   type="email"
-                  defaultValue="support@coron.com"
+                  defaultValue="support@irasstyles.com"
                 />
                 <Field label="Phone number" defaultValue="+250 788 000 000" />
-                <Field label="Store domain" defaultValue="coron.com" />
+                <Field label="Store domain" defaultValue="irasstyles.com" />
                 <Field
                   label="Business address"
                   wide
@@ -67,13 +67,10 @@ export default function SettingsPage() {
             )}
             {tab === "regional" && (
               <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
-                <Select
-                  label="Store currency"
-                  options={["RWF", "USD", "EUR"]}
-                />
+                <Select label="Store currency" options={["USD", "EUR"]} />
                 <Select
                   label="Default language"
-                  options={["English", "French", "Kinyarwanda"]}
+                  options={["English", "French"]}
                 />
                 <Select
                   label="Timezone"
@@ -124,7 +121,7 @@ export default function SettingsPage() {
                 <Field
                   label="Email"
                   type="email"
-                  defaultValue="admin@coron.com"
+                  defaultValue="admin@irasstyles.com"
                 />
                 <Field label="Current password" type="password" />
                 <Field label="New password" type="password" />

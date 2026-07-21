@@ -124,7 +124,7 @@ export function ProductList({ count = 6 }: { count?: number }) {
                   <span className="product_price">{product.price}</span>
                   <p>
                     Short-sleeved blouse with feminine draped sleeve detail. A
-                    classic piece from the Coron collection, designed for
+                    classic piece from the I-RAS STYLES collection, designed for
                     comfort and everyday style.
                   </p>
                   <div className="product_action">
@@ -184,7 +184,7 @@ export function Sidebar({ home = false }: { home?: boolean }) {
           <div className="banner_img">
             <Image
               src="/storefront/assets/img/banner/banner9.jpg"
-              alt="Coron fashion"
+              alt="I-RAS STYLES fashion"
               width={270}
               height={340}
             />

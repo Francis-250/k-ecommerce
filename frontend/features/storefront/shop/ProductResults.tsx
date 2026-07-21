@@ -102,8 +102,8 @@ export function ProductResults({
                           ))}
                         </div>
                         <p>
-                          A versatile Coron piece designed for comfort, quality,
-                          and effortless everyday styling.
+                          A versatile I-RAS STYLES piece designed for comfort,
+                          quality, and effortless everyday styling.
                         </p>
                       </>
                     )}

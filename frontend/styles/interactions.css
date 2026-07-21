@@ -22,9 +22,23 @@ button:focus-visible {
   transition: 0.3s;
 }
 
-.selector-short,
-.mobile-wordmark {
+.selector-short {
   display: none;
+}
+
+.site-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  color: #172522;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.site-wordmark span {
+  color: #00bba6;
 }
 
 .search_bar {
@@ -598,16 +612,7 @@ button:focus-visible {
   .logo img {
     display: none;
   }
-  .mobile-wordmark {
-    display: inline-block;
-    color: #172522;
-    font-size: 25px;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-  }
-  .mobile-wordmark span {
-    color: #00bba6;
-  }
+  .site-wordmark { gap: 5px; font-size: 22px; letter-spacing: 0.04em; }
   .header_right_info {
     grid-template-columns: minmax(0, 1fr) 42px;
     gap: 8px;

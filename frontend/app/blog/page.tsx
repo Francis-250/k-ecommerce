@@ -7,9 +7,9 @@ import { BlogGrid, PageIntro } from "@/features/storefront/content/ContentUi";
 import { blogPosts } from "@/features/storefront/content/data";
 
 export const metadata: Metadata = {
-  title: "Journal | Coron",
+  title: "Journal | I-RAS STYLES",
   description:
-    "Style advice, seasonal ideas, and thoughtful guides from Coron.",
+    "Style advice, seasonal ideas, and thoughtful guides from I-RAS STYLES.",
 };
 
 export default function BlogPage() {
@@ -18,7 +18,7 @@ export default function BlogPage() {
       <Breadcrumb title="Journal" />
       <main className="coron-container coron-content">
         <PageIntro
-          eyebrow="The Coron journal"
+          eyebrow="The I-RAS STYLES journal"
           title="Ideas for considered style"
           description="Practical advice, new-season perspective, and stories behind the details that make personal style last."
         />

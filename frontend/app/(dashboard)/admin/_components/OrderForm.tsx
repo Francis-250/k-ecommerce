@@ -32,7 +32,7 @@ export function OrderForm() {
             <Field label="Discount" placeholder="0.00" />
             <Field label="Shipping" placeholder="0.00" />
             <Field label="Tax" placeholder="0.00" />
-            <Field label="Currency" placeholder="RWF" />
+            <Field label="Currency" placeholder="USD" />
           </div>
         </Section>
         <Section title="Notes">

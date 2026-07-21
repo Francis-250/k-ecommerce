@@ -59,7 +59,7 @@ export default async function ProductViewPage({
               Description
             </h3>
             <p className="max-w-2xl text-sm leading-6 text-slate-600">
-              A versatile Coron piece designed for comfort, quality, and
+              A versatile I-RAS STYLES piece designed for comfort, quality, and
               effortless everyday styling.
             </p>
           </div>

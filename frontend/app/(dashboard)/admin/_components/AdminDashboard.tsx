@@ -1,6 +1,5 @@
 import {
   ArrowUpRight,
-  Boxes,
   ChevronDown,
   DollarSign,
   PackageCheck,

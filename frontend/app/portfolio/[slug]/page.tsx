@@ -24,7 +24,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const project = getPortfolioProject((await params).slug);
   return project
-    ? { title: `${project.title} | Coron`, description: project.summary }
+    ? { title: `${project.title} | I-RAS STYLES`, description: project.summary }
     : {};
 }
 export default async function ProjectPage({

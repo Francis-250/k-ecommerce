@@ -6,7 +6,7 @@ export default function NewProductPage() {
     <>
       <AdminPageHeader
         title="Add new product"
-        description="Create a product and publish it to the Coron storefront."
+        description="Create a product and publish it to the I-RAS STYLES storefront."
       />
       <ProductForm />
     </>

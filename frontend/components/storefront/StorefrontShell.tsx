@@ -69,7 +69,6 @@ const mainLinks = [
 const languageOptions = [
   { label: "English", flag: "🇬🇧" },
   { label: "French", flag: "🇫🇷" },
-  { label: "Kinyarwanda", flag: "🇷🇼" },
 ] as const;
 
 export function StorefrontShell({ children }: { children: ReactNode }) {
@@ -77,7 +76,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   const [languageOpen, setLanguageOpen] = useState(false);
   const [currencyOpen, setCurrencyOpen] = useState(false);
   const [language, setLanguage] = useState("English");
-  const [currency, setCurrency] = useState("RWF");
+  const [currency, setCurrency] = useState("USD");
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -177,7 +176,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                             className={`dropdown_currency${currencyOpen ? " open" : ""}`}
                             hidden={!currencyOpen}
                           >
-                            {["RWF", "USD", "EUR"].map((item) => (
+                            {["USD", "EUR"].map((item) => (
                               <li key={item}>
                                 <a
                                   href={`#${item.toLowerCase()}`}
@@ -225,15 +224,8 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                   <div className="col-lg-3 col-md-3">
                     <div className="logo">
                       <Link href="/">
-                        <Image
-                          src="/storefront/assets/img/logo/logo.jpg.png"
-                          alt="Coron"
-                          width={212}
-                          height={57}
-                          priority
-                        />
-                        <span className="mobile-wordmark">
-                          CORON<span>.</span>
+                        <span className="site-wordmark" aria-label="I-RAS STYLES">
+                          I-RAS <span>STYLES</span>
                         </span>
                       </Link>
                     </div>
@@ -505,10 +497,6 @@ function Footer() {
             <div className="col-lg-3 col-md-6 col-sm-6">
               <div className="footer_widget">
                 <h3>About us</h3>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </p>
                 <div className="footer_widget_contect">
                   <p>
                     <MapPin size={16} aria-hidden="true" /> 19 Interpro Road
@@ -572,8 +560,8 @@ function Footer() {
                   </li>
                 </ul>
                 <p>
-                  Copyright © 2026 <Link href="/">Pos Coron</Link>. All rights
-                  reserved.
+                  Copyright © 2026 <Link href="/">I-RAS STYLES</Link>. All
+                  rights reserved.
                 </p>
               </div>
             </div>
