@@ -113,7 +113,7 @@ button:focus-visible {
 }
 
 .site-wordmark {
-  display: inline-flex;
+  display: none;
   align-items: baseline;
   gap: 7px;
   color: #172522;
@@ -125,6 +125,13 @@ button:focus-visible {
 }
 .site-wordmark span {
   color: #00bba6;
+}
+
+.logo .system-logo {
+  display: block;
+  width: min(230px, 100%);
+  height: auto;
+  object-fit: contain;
 }
 
 .search_bar {
@@ -699,6 +706,7 @@ button:focus-visible {
     display: none;
   }
   .site-wordmark {
+    display: inline-flex;
     gap: 5px;
     font-size: 22px;
     letter-spacing: 0.04em;

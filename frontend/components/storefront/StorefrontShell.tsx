@@ -226,6 +226,15 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                   <div className="col-lg-3 col-md-3">
                     <div className="logo">
                       <Link href="/">
+                        <Image
+                          className="system-logo"
+                          src="/storefront/assets/img/logo/iras-styles-badge.png"
+                          alt="I-RAS STYLES International Fashion"
+                          width={1118}
+                          height={520}
+                          priority
+                          unoptimized
+                        />
                         <span
                           className="site-wordmark"
                           aria-label="I-RAS STYLES"

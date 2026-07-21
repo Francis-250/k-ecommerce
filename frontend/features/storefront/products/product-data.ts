@@ -8,31 +8,31 @@ const image = (file: string, alt: string) => ({
 export const products: Product[] = [
   {
     slug: "printed-summer-dress",
-    name: "Printed Summer Dress",
+    name: "Indigo Ankara Midi Dress",
     category: "Dresses",
     description:
-      "A light, elegant summer dress with a flattering silhouette and an easy all-day fit.",
+      "A vibrant Ankara midi dress with a sculpted waist, flowing skirt and confident contemporary silhouette.",
     longDescription:
-      "Designed for warm days and effortless occasions, this printed dress pairs a soft drape with careful tailoring. Its versatile shape moves easily from relaxed afternoons to evening plans.",
+      "Cut from richly patterned African wax cotton, this statement dress balances traditional textile craft with modern tailoring. The tie waist and full skirt make it equally suited to celebrations and elevated everyday wear.",
     price: 118,
     previousPrice: 130,
     rating: 5,
     reviewCount: 12,
     stock: 29,
-    sku: "COR-PSD-001",
+    sku: "IRAS-DRE-001",
     badge: "Sale",
     images: [
-      image("product13.png", "Printed summer dress, front view"),
-      image("product14.jpg", "Printed summer dress, side view"),
-      image("product15.jpg", "Printed summer dress fabric detail"),
+      image("product13.png", "Indigo Ankara midi dress, front view"),
+      image("product7.png", "Coordinating African wax-print headwrap"),
+      image("product4.png", "Coordinating African beaded jewelry"),
     ],
     options: [
       { name: "Size", values: ["S", "M", "L", "XL"] },
       { name: "Color", values: ["Black", "Teal", "Coral"] },
     ],
     details: {
-      Composition: "Polyester blend",
-      Style: "Feminine",
+      Composition: "African wax cotton",
+      Style: "Contemporary heritage",
       Fit: "Regular",
       Care: "Machine wash at 30°C",
     },
@@ -44,8 +44,8 @@ export const products: Product[] = [
   },
   {
     slug: "aliquam-lobortis",
-    name: "Aliquam Lobortis",
-    category: "New collection",
+    name: "Heritage Ankara Shirt",
+    category: "Men's collection",
     description:
       "A refined everyday piece with modern lines and lasting comfort.",
     longDescription:
@@ -54,11 +54,11 @@ export const products: Product[] = [
     rating: 4,
     reviewCount: 8,
     stock: 18,
-    sku: "COR-ALI-002",
+    sku: "IRAS-MEN-002",
     badge: "New",
     images: [
-      image("product1.png", "Aliquam Lobortis product view"),
-      image("product6.png", "Aliquam Lobortis alternate view"),
+      image("product5.png", "Heritage Ankara shirt on model"),
+      image("product8.png", "Mudcloth leather backpack"),
     ],
     options: [
       { name: "Size", values: ["S", "M", "L"] },
@@ -73,7 +73,7 @@ export const products: Product[] = [
   },
   {
     slug: "condimentum-posuere",
-    name: "Condimentum Posuere",
+    name: "Emerald Ankara Handbag",
     category: "Accessories",
     description:
       "A versatile finishing piece made for polished everyday styling.",
@@ -84,24 +84,24 @@ export const products: Product[] = [
     rating: 4,
     reviewCount: 6,
     stock: 14,
-    sku: "COR-CON-003",
+    sku: "IRAS-BAG-003",
     badge: "Sale",
     images: [
-      image("product2.png", "Condimentum Posuere product view"),
-      image("product7.png", "Condimentum Posuere alternate view"),
+      image("product2.png", "Emerald Ankara handbag"),
+      image("product4.png", "African beaded jewelry set"),
     ],
     options: [{ name: "Color", values: ["Coral", "Black", "Teal"] }],
     details: {
-      Material: "Premium synthetic",
-      Style: "Classic",
+      Material: "Wax cotton and leather",
+      Style: "Artisan structured",
       Care: "Wipe clean",
     },
     relatedSlugs: ["printed-summer-dress", "aliquam-lobortis"],
   },
   {
     slug: "donec-eu-furniture",
-    name: "Donec Eu Furniture",
-    category: "Featured",
+    name: "Kente Panel Sneakers",
+    category: "Footwear",
     description:
       "A bold I-RAS STYLES favorite balancing contemporary detail with a relaxed feel.",
     longDescription:
@@ -110,13 +110,13 @@ export const products: Product[] = [
     rating: 5,
     reviewCount: 10,
     stock: 9,
-    sku: "COR-DON-004",
+    sku: "IRAS-SHO-004",
     images: [
-      image("product3.png", "Donec Eu Furniture product view"),
-      image("product8.png", "Donec Eu Furniture alternate view"),
+      image("product3.png", "Kente panel sneakers"),
+      image("product6.png", "African print leather sandals"),
     ],
     options: [{ name: "Size", values: ["M", "L", "XL"] }],
-    details: { Composition: "Viscose blend", Style: "Modern", Fit: "Relaxed" },
+    details: { Composition: "Leather and woven textile", Style: "Modern heritage", Fit: "Regular" },
     relatedSlugs: ["printed-summer-dress", "condimentum-posuere"],
   },
 ];

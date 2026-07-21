@@ -48,6 +48,7 @@ export function ProductResults({
                         alt={product.name}
                         width={270}
                         height={270}
+                        unoptimized
                       />
                       <span className="sr-only">View {product.name}</span>
                     </Link>

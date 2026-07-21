@@ -27,6 +27,7 @@ export function ProductCard({
               alt={product.name}
               width={270}
               height={270}
+              unoptimized
             />
           </Link>
           <div className={index % 2 ? "hot_img" : "img_icone"}>
