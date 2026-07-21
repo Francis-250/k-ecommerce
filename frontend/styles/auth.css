@@ -31,13 +31,13 @@
 .coron-auth-form button[type="submit"] {
   height: auto !important;
   border-radius: 0 !important;
-  background: #00bba6 !important;
+  background: #D4AF4A !important;
   color: #fff !important;
   padding: 11px 18px !important;
   box-shadow: none !important;
 }
 .coron-auth-form a {
-  color: #00bba6 !important;
+  color: #D4AF4A !important;
   font-weight: 700;
 }
 .coron-auth-form p {

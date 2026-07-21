@@ -7,7 +7,7 @@ a:active {
 
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid #00bba6;
+  outline: 2px solid #D4AF4A;
   outline-offset: 2px;
 }
 
@@ -101,7 +101,7 @@ button:focus-visible {
   display: block;
   width: 100%;
   border: 0;
-  background: #00bba6;
+  background: #D4AF4A;
   color: #fff;
   padding: 9px 12px;
   cursor: pointer;
@@ -124,7 +124,7 @@ button:focus-visible {
   white-space: nowrap;
 }
 .site-wordmark span {
-  color: #00bba6;
+  color: #D4AF4A;
 }
 
 .logo .system-logo {
@@ -205,7 +205,7 @@ button:focus-visible {
   flex-wrap: nowrap !important;
 }
 .shopping_cart > a:hover {
-  color: #00bba6 !important;
+  color: #D4AF4A !important;
 }
 .shopping_cart > a .cart-chevron {
   margin-left: 2px;
@@ -234,7 +234,7 @@ button:focus-visible {
 .single_product .product_content a:hover,
 .product_list_item h3 a:hover,
 .shop_tab_product .product_content a:hover {
-  color: #00bba6 !important;
+  color: #D4AF4A !important;
 }
 .single_product .product_info a {
   color: #555 !important;
@@ -500,7 +500,7 @@ button:focus-visible {
   }
   .mobile-menu nav a:hover,
   .mobile-menu nav a:focus {
-    background: #00bba6 !important;
+    background: #D4AF4A !important;
     color: #fff !important;
   }
   .mobile-menu nav li ul {
@@ -791,7 +791,7 @@ button:focus-visible {
 .error_form a {
   display: inline-block;
   margin-top: 12px;
-  background: #00bba6;
+  background: #D4AF4A;
   color: #fff;
   padding: 10px 18px;
 }
@@ -873,7 +873,7 @@ button:focus-visible {
   display: inline-block;
   margin-top: 12px;
   padding: 10px 20px;
-  background: #00bba6;
+  background: #D4AF4A;
   color: #fff;
   text-transform: uppercase;
 }
@@ -1127,4 +1127,28 @@ textarea:focus {
   border-color: var(--iras-gold) !important;
   box-shadow: 0 0 0 2px rgba(231, 184, 0, 0.16);
   outline: none;
+}
+
+/* Strong black interaction states requested for catalog cards and menus. */
+.pos_page .single_product .product_action button,
+.pos_page .shop_tab_product .product_action button {
+  background: #000 !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
+.pos_page .single_product .product_action button:hover,
+.pos_page .shop_tab_product .product_action button:hover,
+.pos_page .single_product .product_action button:focus-visible,
+.pos_page .shop_tab_product .product_action button:focus-visible {
+  background: #171717 !important;
+}
+
+.pos_page .main_menu nav > ul > li.active > a,
+.pos_page .main_menu nav > ul > li:hover > a,
+.pos_page .main_menu nav > ul > li:focus-within > a,
+.pos_page .mobile-menu nav a:hover,
+.pos_page .mobile-menu nav a:focus-visible {
+  background: #000 !important;
+  color: #fff !important;
 }

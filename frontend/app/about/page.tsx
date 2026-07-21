@@ -46,7 +46,7 @@ export default function AboutPage() {
             priority
           />
           <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-[.2em] text-[#00bba6]">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[.2em] text-[#D4AF4A]">
               Since 2010
             </p>
             <h2 className="mb-5 text-3xl leading-tight text-[#333]">
@@ -74,7 +74,7 @@ export default function AboutPage() {
             {values.map((value, index) => (
               <article key={value.title}>
                 <span
-                  className="mb-4 block text-3xl font-bold text-[#00bba6]"
+                  className="mb-4 block text-3xl font-bold text-[#D4AF4A]"
                   aria-hidden="true"
                 >
                   0{index + 1}
@@ -96,7 +96,7 @@ export default function AboutPage() {
             />
           </div>
           <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-[.2em] text-[#00bba6]">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[.2em] text-[#D4AF4A]">
               How we work
             </p>
             <h2 className="mb-5 text-3xl text-[#333]">

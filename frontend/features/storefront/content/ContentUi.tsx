@@ -13,7 +13,7 @@ export function PageIntro({
 }) {
   return (
     <header className="mx-auto mb-10 max-w-3xl text-center">
-      <p className="mb-2 text-xs font-bold uppercase tracking-[.22em] text-[#00bba6]">
+      <p className="mb-2 text-xs font-bold uppercase tracking-[.22em] text-[#D4AF4A]">
         {eyebrow}
       </p>
       <h1 className="coron-page-title mb-3">{title}</h1>
@@ -40,13 +40,13 @@ export function BlogGrid({ posts }: { posts: BlogPost[] }) {
             />
           </Link>
           <div className="p-6">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#00bba6]">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#D4AF4A]">
               {post.category}{" "}
               <span className="text-[#999]">· {post.readTime}</span>
             </p>
             <h2 className="mb-3 text-2xl text-[#333]">
               <Link
-                className="transition hover:text-[#00bba6] focus-visible:text-[#00bba6]"
+                className="transition hover:text-[#D4AF4A] focus-visible:text-[#D4AF4A]"
                 href={`/blog/${post.slug}`}
               >
                 {post.title}
@@ -54,7 +54,7 @@ export function BlogGrid({ posts }: { posts: BlogPost[] }) {
             </h2>
             <p className="mb-5 leading-6 text-[#666]">{post.excerpt}</p>
             <Link
-              className="font-bold text-[#00bba6] underline-offset-4 hover:underline"
+              className="font-bold text-[#D4AF4A] underline-offset-4 hover:underline"
               href={`/blog/${post.slug}`}
             >
               Read article <span aria-hidden="true">→</span>
@@ -89,12 +89,12 @@ export function PortfolioGrid({ projects }: { projects: PortfolioProject[] }) {
               </span>
             </span>
           </Link>
-          <p className="mt-4 text-xs font-bold uppercase tracking-wider text-[#00bba6]">
+          <p className="mt-4 text-xs font-bold uppercase tracking-wider text-[#D4AF4A]">
             {project.category}
           </p>
           <h2 className="mt-1 text-xl text-[#333]">
             <Link
-              className="hover:text-[#00bba6]"
+              className="hover:text-[#D4AF4A]"
               href={`/portfolio/${project.slug}`}
             >
               {project.title}
@@ -133,7 +133,7 @@ export function BackLink({
 }) {
   return (
     <Link
-      className="inline-flex items-center gap-2 font-bold text-[#00bba6] underline-offset-4 hover:underline"
+      className="inline-flex items-center gap-2 font-bold text-[#D4AF4A] underline-offset-4 hover:underline"
       href={href}
     >
       <span aria-hidden="true">←</span>

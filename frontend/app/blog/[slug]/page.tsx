@@ -39,7 +39,7 @@ export default async function BlogPostPage({
         <article className="mx-auto max-w-4xl">
           <BackLink href="/blog">All journal stories</BackLink>
           <header className="my-8">
-            <p className="mb-3 text-xs font-bold uppercase tracking-[.2em] text-[#00bba6]">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[.2em] text-[#D4AF4A]">
               {post.category}
             </p>
             <h1 className="coron-page-title mb-4 max-w-3xl">{post.title}</h1>

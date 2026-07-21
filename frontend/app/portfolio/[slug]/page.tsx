@@ -42,7 +42,7 @@ export default async function ProjectPage({
           <BackLink href="/portfolio">All projects</BackLink>
           <header className="my-8 grid gap-6 md:grid-cols-[2fr_1fr] md:items-end">
             <div>
-              <p className="mb-2 text-xs font-bold uppercase tracking-[.2em] text-[#00bba6]">
+              <p className="mb-2 text-xs font-bold uppercase tracking-[.2em] text-[#D4AF4A]">
                 {project.category}
               </p>
               <h1 className="coron-page-title mb-3">{project.title}</h1>
