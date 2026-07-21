@@ -1,26 +1,22 @@
-import { AuthFooter, AuthShell, Field, PrimaryButton } from "../auth-ui";
-
+import { AccountField, AccountLink, AuthPage, Submit } from "../auth-ui";
 export default function ForgotPasswordPage() {
   return (
-    <AuthShell
-      eyebrow="Account recovery"
-      title="Forgot password?"
-      description="No worries. Enter the email linked to your account and we’ll send you a secure reset link."
-    >
-      <form className="space-y-5">
-        <Field
-          label="Email"
+    <AuthPage title="Forgot password">
+      <h2>Forgot password</h2>
+      <form>
+        <p>
+          Enter the email address linked to your account and we will send you a
+          password reset link.
+        </p>
+        <AccountField
+          id="email"
+          label="Email address"
           type="email"
-          placeholder="Email address"
           autoComplete="email"
         />
-        <PrimaryButton>Send reset link</PrimaryButton>
+        <Submit>Send reset link</Submit>
       </form>
-      <AuthFooter
-        prompt="Remembered your password?"
-        href="/login"
-        action="Back to login"
-      />
-    </AuthShell>
+      <AccountLink href="/login">Back to login</AccountLink>
+    </AuthPage>
   );
 }

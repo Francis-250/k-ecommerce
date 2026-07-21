@@ -1,45 +1,18 @@
 import Link from "next/link";
-import { AuthFooter, AuthShell, Field, PrimaryButton } from "../auth-ui";
+import { AccountField } from "../auth-ui";
+import { Breadcrumb, CoronShell } from "@/components/coron/CoronShell";
 
 export default function LoginPage() {
-  return (
-    <AuthShell
-      eyebrow="Welcome to I-RAS Styles"
-      title="Hello, Welcome back"
-      description="Sign in to continue shopping, track your orders, and discover styles selected for you."
-    >
-    <form className="space-y-5">
-        <Field
-          label="Email"
-          type="email"
-          placeholder="Username or email"
-          autoComplete="email"
-        />
-        <Field
-          label="Password"
-          type="password"
-          placeholder="Password"
-          autoComplete="current-password"
-        />
-        <div className="flex items-center justify-between gap-4 text-sm text-indigo-600">
-          <label className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              className="h-4 w-4 rounded border-indigo-300 accent-indigo-600"
-            />
-            Remember me
-          </label>
-          <Link href="/forgot-password" className="font-medium hover:underline">
-            Forgot password?
-          </Link>
-        </div>
-        <PrimaryButton>Login</PrimaryButton>
-      </form>
-      <AuthFooter
-        prompt="Don’t have an account?"
-        href="/register"
-        action="Create one"
-      />
-    </AuthShell>
-  );
+  return <CoronShell><Breadcrumb title="Login" /><div className="customer_login"><div className="row">
+    <div className="col-lg-6 col-md-6"><div className="account_form"><h2>login</h2><form>
+      <AccountField id="login-email" label="Username or email" autoComplete="email" />
+      <AccountField id="login-password" label="Passwords" type="password" autoComplete="current-password" />
+      <div className="login_submit"><button type="submit">login</button><label htmlFor="remember"><input id="remember" type="checkbox" /> Remember me</label><Link href="/forgot-password">Lost your password?</Link></div>
+    </form></div></div>
+    <div className="col-lg-6 col-md-6"><div className="account_form register"><h2>Register</h2><form>
+      <AccountField id="register-email" label="Email address" type="email" autoComplete="email" />
+      <AccountField id="register-password" label="Passwords" type="password" autoComplete="new-password" />
+      <div className="login_submit"><button type="submit">Register</button></div>
+    </form></div></div>
+  </div></div></CoronShell>;
 }
