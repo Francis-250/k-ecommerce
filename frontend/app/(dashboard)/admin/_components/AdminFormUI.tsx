@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
 import {
   Check,
   ImagePlus,
@@ -227,6 +228,8 @@ export function ToggleRow({
   );
 }
 
+import { uploadProductImage } from "@/features/admin/catalog/api";
+
 type Preview = { url: string; name: string };
 
 export function ImageUploadField({
@@ -235,46 +238,62 @@ export function ImageUploadField({
   multiple = false,
   initialUrls = [],
   aspect = "square",
+  onChange,
 }: {
   label: string;
   description: string;
   multiple?: boolean;
   initialUrls?: string[];
   aspect?: "square" | "wide" | "logo";
+  onChange?: (urls: string[]) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [previews, setPreviews] = useState<Preview[]>(
     initialUrls.map((url) => ({ url, name: "Current image" })),
   );
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const objectUrls = useRef<string[]>([]);
 
-  useEffect(
-    () => () => objectUrls.current.forEach((url) => URL.revokeObjectURL(url)),
-    [],
-  );
-
-  function addFiles(files: FileList | null) {
+  async function addFiles(files: FileList | null) {
     if (!files) return;
     const accepted = Array.from(files).filter((file) => {
       if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
         setError(`${file.name} must be JPG, PNG, or WebP.`);
         return false;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        setError(`${file.name} must be smaller than 5 MB.`);
+      if (file.size > 10 * 1024 * 1024) {
+        setError(`${file.name} must be smaller than 10 MB.`);
         return false;
       }
       return true;
     });
     if (!accepted.length) return;
     setError("");
-    const next = accepted.map((file) => {
-      const url = URL.createObjectURL(file);
-      objectUrls.current.push(url);
-      return { url, name: file.name };
-    });
-    setPreviews((current) => (multiple ? [...current, ...next] : next));
+    setUploading(true);
+
+    try {
+      const uploadedUrls: string[] = [];
+      for (const file of accepted) {
+        const url = await uploadProductImage(file);
+        uploadedUrls.push(url);
+      }
+      setPreviews((current) => {
+        const nextPreviews = accepted.map((file, i) => ({
+          url: uploadedUrls[i],
+          name: file.name,
+        }));
+        const updated = multiple ? [...current, ...nextPreviews] : nextPreviews;
+        if (onChange) {
+          onChange(updated.map((p) => p.url));
+        }
+        return updated;
+      });
+      toast.success("Image uploaded to Cloudinary");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to upload image to Cloudinary");
+    } finally {
+      setUploading(false);
+    }
   }
 
   const ratio = {
@@ -314,9 +333,13 @@ export function ImageUploadField({
               <button
                 type="button"
                 onClick={() =>
-                  setPreviews((current) =>
-                    current.filter((_, itemIndex) => itemIndex !== index),
-                  )
+                  setPreviews((current) => {
+                    const updated = current.filter(
+                      (_, itemIndex) => itemIndex !== index,
+                    );
+                    if (onChange) onChange(updated.map((p) => p.url));
+                    return updated;
+                  })
                 }
                 className="absolute right-2 top-2 grid size-8 place-items-center rounded-lg bg-white text-slate-600 shadow-sm transition hover:text-red-600"
                 aria-label={`Remove ${preview.name}`}
@@ -329,6 +352,11 @@ export function ImageUploadField({
             </figure>
           ))}
         </div>
+      )}
+      {uploading && (
+        <p className="mb-2 text-xs font-medium text-blue-600">
+          Uploading image to Cloudinary...
+        </p>
       )}
       <label
         className="flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50/60 px-5 py-6 text-center transition hover:border-slate-500 hover:bg-slate-50 focus-within:border-slate-900 focus-within:ring-4 focus-within:ring-slate-900/5"

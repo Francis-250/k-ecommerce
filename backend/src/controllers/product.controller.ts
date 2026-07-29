@@ -45,7 +45,10 @@ export const listProducts = async (req: Request, res: Response) => {
         variants: { include: { inventory: true } },
         _count: { select: { reviews: true } },
       },
-      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+      orderBy:
+        req.query.admin === "true"
+          ? [{ createdAt: "desc" }]
+          : [{ isFeatured: "desc" }, { createdAt: "desc" }],
     }),
     prisma.product.count({ where }),
   ]);
@@ -94,20 +97,105 @@ export const getProduct = async (req: Request, res: Response) => {
 };
 
 export const createProduct = async (req: Request, res: Response) => {
-  const parsed = productSchema.safeParse(req.body);
+  const { categoryName, category, imageUrl, image, images, brandName, ...bodyData } = req.body;
+
+  let categoryId = bodyData.categoryId;
+  if (!categoryId && (categoryName || category)) {
+    const catName = categoryName || category;
+    const catSlug = String(catName).toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    let cat = await prisma.category.findFirst({
+      where: { OR: [{ slug: catSlug }, { name: String(catName) }] },
+    });
+    if (!cat) {
+      cat = await prisma.category.create({
+        data: { name: String(catName), slug: catSlug },
+      });
+    }
+    categoryId = cat.id;
+  }
+
+  let brandId = bodyData.brandId;
+  if (!brandId) {
+    const defaultBrand = await prisma.brand.findFirst();
+    if (defaultBrand) brandId = defaultBrand.id;
+  }
+
+  const parsed = productSchema.safeParse({
+    ...bodyData,
+    ...(categoryId ? { categoryId } : {}),
+    ...(brandId ? { brandId } : {}),
+  });
   if (!parsed.success) return validationError(res, parsed.error);
+
   const product = await prisma.product.create({ data: parsed.data });
+
+  const primaryImage = imageUrl || image || images?.[0];
+  if (primaryImage) {
+    await prisma.productImage.create({
+      data: {
+        productId: product.id,
+        url: primaryImage,
+        altText: product.name,
+        isPrimary: true,
+      },
+    });
+  }
+
   return res.status(201).json({ success: true, product });
 };
 
 export const updateProduct = async (req: Request, res: Response) => {
   const { id } = idParamsSchema.parse(req.params);
-  const parsed = productSchema.partial().safeParse(req.body);
+  const { categoryName, category, imageUrl, image, images, brandName, ...bodyData } = req.body;
+
+  let categoryId = bodyData.categoryId;
+  if (!categoryId && (categoryName || category)) {
+    const catName = categoryName || category;
+    const catSlug = String(catName).toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    let cat = await prisma.category.findFirst({
+      where: { OR: [{ slug: catSlug }, { name: String(catName) }] },
+    });
+    if (!cat) {
+      cat = await prisma.category.create({
+        data: { name: String(catName), slug: catSlug },
+      });
+    }
+    categoryId = cat.id;
+  }
+
+  const parsed = productSchema.partial().safeParse({
+    ...bodyData,
+    ...(categoryId ? { categoryId } : {}),
+  });
   if (!parsed.success) return validationError(res, parsed.error);
+
   const product = await prisma.product.update({
     where: { id },
     data: parsed.data,
   });
+
+  const primaryImage = imageUrl || image || images?.[0];
+  if (primaryImage) {
+    const existingImg = await prisma.productImage.findFirst({
+      where: { productId: product.id },
+    });
+    if (existingImg) {
+      await prisma.productImage.update({
+        where: { id: existingImg.id },
+        data: { url: primaryImage },
+      });
+    } else {
+      await prisma.productImage.create({
+        data: {
+          productId: product.id,
+          url: primaryImage,
+          altText: product.name,
+          isPrimary: true,
+        },
+      });
+    }
+  }
+
   return res.json({ success: true, product });
 };
 

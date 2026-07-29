@@ -112,7 +112,43 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body;
 }
 
+export type ApiProduct = {
+  id: string;
+  slug: string;
+  name: string;
+  sku: string | null;
+  description: string | null;
+  price: string;
+  compareAtPrice: string | null;
+  currency: string;
+  status: "DRAFT" | "ACTIVE" | "ARCHIVED";
+  audience: "WOMEN" | "MEN" | "UNISEX" | "KIDS";
+  isFeatured: boolean;
+  publishedAt: string | null;
+  category: { id: string; name: string; slug: string } | null;
+  brand: { id: string; name: string; slug: string } | null;
+  images: Array<{ id: string; url: string; altText: string | null }>;
+  createdAt: string;
+};
+
 export const catalogApi = {
+  listProducts: () =>
+    request<{
+      data: ApiProduct[];
+      pagination: { page: number; limit: number; total: number; pages: number };
+    }>("/products?admin=true&limit=100").then((body) => body.data),
+  createProduct: (input: Record<string, unknown>) =>
+    request<{ product: ApiProduct }>("/products", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }).then((body) => body.product),
+  updateProduct: (id: string, input: Record<string, unknown>) =>
+    request<{ product: ApiProduct }>(`/products/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    }).then((body) => body.product),
+  deleteProduct: (id: string) =>
+    request<void>(`/products/${id}`, { method: "DELETE" }),
   listBrands: () =>
     request<{ brands: Brand[] }>("/brands?admin=true").then(
       (body) => body.brands,
@@ -180,6 +216,18 @@ export async function uploadBrandLogo(file: File) {
     body: JSON.stringify({
       dataUri,
       folder: "brands",
+      altText: file.name,
+    }),
+  }).then((body) => body.image.url);
+}
+
+export async function uploadProductImage(file: File) {
+  const dataUri = await fileToDataUri(file);
+  return request<{ image: { url: string } }>("/media/images", {
+    method: "POST",
+    body: JSON.stringify({
+      dataUri,
+      folder: "products",
       altText: file.name,
     }),
   }).then((body) => body.image.url);

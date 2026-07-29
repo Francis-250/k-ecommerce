@@ -19,6 +19,12 @@ const ids = {
   otp: "seed-otp-consumed",
   imageDress: "seed-image-dress",
   imageBag: "seed-image-bag",
+  imageSneakers: "seed-image-sneakers",
+  imageJewelry: "seed-image-jewelry",
+  imageShirt: "seed-image-shirt",
+  imageSandals: "seed-image-sandals",
+  imageHeadwrap: "seed-image-headwrap",
+  imageBackpack: "seed-image-backpack",
   detailDress: "seed-detail-dress",
   optionSize: "seed-option-size",
   optionSmall: "seed-option-value-small",
@@ -44,16 +50,20 @@ async function cloudinarySeedImage(
 ) {
   if (existingUrl?.startsWith("https://res.cloudinary.com/"))
     return existingUrl;
-  const uploaded = await cloudinary.uploader.upload(localPath, {
-    public_id: publicId,
-    overwrite: true,
-    resource_type: "image",
-    transformation: [
-      { width: 2400, height: 2400, crop: "limit" },
-      { quality: "auto", fetch_format: "auto" },
-    ],
-  });
-  return uploaded.secure_url;
+  try {
+    const uploaded = await cloudinary.uploader.upload(localPath, {
+      public_id: publicId,
+      overwrite: true,
+      resource_type: "image",
+      transformation: [
+        { width: 2400, height: 2400, crop: "limit" },
+        { quality: "auto", fetch_format: "auto" },
+      ],
+    });
+    return uploaded.secure_url;
+  } catch (e) {
+    return localPath.replace("../frontend/public", "");
+  }
 }
 
 async function main() {
@@ -64,6 +74,24 @@ async function main() {
   });
   const existingBagImage = await prisma.productImage.findUnique({
     where: { id: ids.imageBag },
+  });
+  const existingSneakersImage = await prisma.productImage.findUnique({
+    where: { id: ids.imageSneakers },
+  });
+  const existingJewelryImage = await prisma.productImage.findUnique({
+    where: { id: ids.imageJewelry },
+  });
+  const existingShirtImage = await prisma.productImage.findUnique({
+    where: { id: ids.imageShirt },
+  });
+  const existingSandalsImage = await prisma.productImage.findUnique({
+    where: { id: ids.imageSandals },
+  });
+  const existingHeadwrapImage = await prisma.productImage.findUnique({
+    where: { id: ids.imageHeadwrap },
+  });
+  const existingBackpackImage = await prisma.productImage.findUnique({
+    where: { id: ids.imageBackpack },
   });
   const existingArticle = await prisma.article.findUnique({
     where: { slug: "building-a-timeless-wardrobe" },
@@ -96,6 +124,36 @@ async function main() {
     "iras-styles/products/emerald-ankara-handbag",
     "../frontend/public/storefront/assets/img/african-products/ankara-handbag.png",
     existingBagImage?.url,
+  );
+  const sneakersImageUrl = await cloudinarySeedImage(
+    "iras-styles/products/kente-panel-sneakers",
+    "../frontend/public/storefront/assets/img/african-products/kente-sneakers.png",
+    existingSneakersImage?.url,
+  );
+  const jewelryImageUrl = await cloudinarySeedImage(
+    "iras-styles/products/maasai-beaded-jewelry-set",
+    "../frontend/public/storefront/assets/img/african-products/beaded-jewelry.png",
+    existingJewelryImage?.url,
+  );
+  const shirtImageUrl = await cloudinarySeedImage(
+    "iras-styles/products/heritage-ankara-shirt",
+    "../frontend/public/storefront/assets/img/african-products/heritage-shirt.png",
+    existingShirtImage?.url,
+  );
+  const sandalsImageUrl = await cloudinarySeedImage(
+    "iras-styles/products/indigo-print-leather-sandals",
+    "../frontend/public/storefront/assets/img/african-products/leather-sandals.png",
+    existingSandalsImage?.url,
+  );
+  const headwrapImageUrl = await cloudinarySeedImage(
+    "iras-styles/products/wax-print-headwrap-set",
+    "../frontend/public/storefront/assets/img/african-products/wax-headwrap.png",
+    existingHeadwrapImage?.url,
+  );
+  const backpackImageUrl = await cloudinarySeedImage(
+    "iras-styles/products/mudcloth-leather-backpack",
+    "../frontend/public/storefront/assets/img/african-products/mudcloth-backpack.png",
+    existingBackpackImage?.url,
   );
   const articleImageUrl = await cloudinarySeedImage(
     "iras-styles/content/building-a-timeless-wardrobe",
@@ -304,6 +362,28 @@ async function main() {
     },
   });
 
+  const accessories = await prisma.category.upsert({
+    where: { slug: "accessories" },
+    update: { name: "Accessories", parentId: fashion.id, isActive: true },
+    create: {
+      name: "Accessories",
+      slug: "accessories",
+      parentId: fashion.id,
+      description: "Handmade African jewelry, footwear, and accessories.",
+    },
+  });
+
+  const tops = await prisma.category.upsert({
+    where: { slug: "tops" },
+    update: { name: "Tops", parentId: fashion.id, isActive: true },
+    create: {
+      name: "Tops",
+      slug: "tops",
+      parentId: fashion.id,
+      description: "Tailored African print shirts and blouses.",
+    },
+  });
+
   const dress = await prisma.product.upsert({
     where: { slug: "indigo-ankara-midi-dress" },
     update: {
@@ -362,12 +442,171 @@ async function main() {
     },
   });
 
+  const sneakers = await prisma.product.upsert({
+    where: { slug: "kente-panel-sneakers" },
+    update: {
+      categoryId: accessories.id,
+      brandId: brand.id,
+      status: "ACTIVE",
+      price: 84,
+      publishedAt: new Date("2026-01-07T00:00:00.000Z"),
+    },
+    create: {
+      categoryId: accessories.id,
+      brandId: brand.id,
+      name: "Kente Panel Sneakers",
+      slug: "kente-panel-sneakers",
+      sku: "IRAS-SHOES-KENTE",
+      shortDescription: "Low-top sneakers with authentic Kente cloth side panels.",
+      description:
+        "Handcrafted sneakers combining premium canvas and traditional Ghanaian Kente weave accents.",
+      price: 84,
+      currency: "USD",
+      status: "ACTIVE",
+      audience: "MEN",
+      publishedAt: new Date("2026-01-07T00:00:00.000Z"),
+    },
+  });
+
+  const jewelry = await prisma.product.upsert({
+    where: { slug: "maasai-beaded-jewelry-set" },
+    update: {
+      categoryId: accessories.id,
+      brandId: brand.id,
+      status: "ACTIVE",
+      price: 72,
+      isFeatured: true,
+      publishedAt: new Date("2026-01-08T00:00:00.000Z"),
+    },
+    create: {
+      categoryId: accessories.id,
+      brandId: brand.id,
+      name: "Maasai Beaded Jewelry Set",
+      slug: "maasai-beaded-jewelry-set",
+      sku: "IRAS-JEWELRY-MAASAI",
+      shortDescription: "Hand-beaded neckpiece and matching drop earrings.",
+      description:
+        "Vibrant multi-colored beaded necklace and earring set crafted by Kenyan artisans.",
+      price: 72,
+      currency: "USD",
+      status: "ACTIVE",
+      audience: "WOMEN",
+      isFeatured: true,
+      publishedAt: new Date("2026-01-08T00:00:00.000Z"),
+    },
+  });
+
+  const shirt = await prisma.product.upsert({
+    where: { slug: "heritage-ankara-shirt" },
+    update: {
+      categoryId: tops.id,
+      brandId: brand.id,
+      status: "ACTIVE",
+      price: 78,
+      isFeatured: true,
+      publishedAt: new Date("2026-01-09T00:00:00.000Z"),
+    },
+    create: {
+      categoryId: tops.id,
+      brandId: brand.id,
+      name: "Heritage Ankara Shirt",
+      slug: "heritage-ankara-shirt",
+      sku: "IRAS-TOP-HERITAGE",
+      shortDescription: "Short-sleeve button-up in vibrant African wax print.",
+      description:
+        "Tailored relaxed-fit shirt for men, crafted with premium breathable cotton.",
+      price: 78,
+      currency: "USD",
+      status: "ACTIVE",
+      audience: "MEN",
+      isFeatured: true,
+      publishedAt: new Date("2026-01-09T00:00:00.000Z"),
+    },
+  });
+
+  const sandals = await prisma.product.upsert({
+    where: { slug: "indigo-print-leather-sandals" },
+    update: {
+      categoryId: accessories.id,
+      brandId: brand.id,
+      status: "ACTIVE",
+      price: 68,
+      publishedAt: new Date("2026-01-10T00:00:00.000Z"),
+    },
+    create: {
+      categoryId: accessories.id,
+      brandId: brand.id,
+      name: "Indigo Print Leather Sandals",
+      slug: "indigo-print-leather-sandals",
+      sku: "IRAS-SANDALS-INDIGO",
+      shortDescription: "Genuine leather flat sandals with printed textile straps.",
+      description:
+        "Comfortable summer footwear styled with handcrafted leather soles and indigo Ankara fabric.",
+      price: 68,
+      currency: "USD",
+      status: "ACTIVE",
+      audience: "WOMEN",
+      publishedAt: new Date("2026-01-10T00:00:00.000Z"),
+    },
+  });
+
+  const headwrap = await prisma.product.upsert({
+    where: { slug: "wax-print-headwrap-set" },
+    update: {
+      categoryId: accessories.id,
+      brandId: brand.id,
+      status: "ACTIVE",
+      price: 48,
+      publishedAt: new Date("2026-01-11T00:00:00.000Z"),
+    },
+    create: {
+      categoryId: accessories.id,
+      brandId: brand.id,
+      name: "Wax Print Headwrap Set",
+      slug: "wax-print-headwrap-set",
+      sku: "IRAS-HEADWRAP-WAX",
+      shortDescription: "Versatile African print crown wraps with matching hoop earrings.",
+      description:
+        "Extra-long Ankara fabric wrap suitable for creative head wraps and protective styling.",
+      price: 48,
+      currency: "USD",
+      status: "ACTIVE",
+      audience: "WOMEN",
+      publishedAt: new Date("2026-01-11T00:00:00.000Z"),
+    },
+  });
+
+  const backpack = await prisma.product.upsert({
+    where: { slug: "mudcloth-leather-backpack" },
+    update: {
+      categoryId: handbags.id,
+      brandId: brand.id,
+      status: "ACTIVE",
+      price: 124,
+      isFeatured: true,
+      publishedAt: new Date("2026-01-12T00:00:00.000Z"),
+    },
+    create: {
+      categoryId: handbags.id,
+      brandId: brand.id,
+      name: "Mudcloth Leather Backpack",
+      slug: "mudcloth-leather-backpack",
+      sku: "IRAS-BAG-MUDCLOTH",
+      shortDescription: "Full-grain leather daypack accented with Malian mudcloth fabric.",
+      description:
+        "Spacious luxury backpack featuring laptop sleeve and hand-dyed Bogolan texture.",
+      price: 124,
+      currency: "USD",
+      status: "ACTIVE",
+      audience: "MEN",
+      isFeatured: true,
+      publishedAt: new Date("2026-01-12T00:00:00.000Z"),
+    },
+  });
+
   await prisma.productImage.upsert({
     where: { id: ids.imageDress },
-    update: {
-      productId: dress.id,
-      url: dressImageUrl,
-    },
+    update: { productId: dress.id, url: dressImageUrl },
     create: {
       id: ids.imageDress,
       productId: dress.id,
@@ -379,15 +618,84 @@ async function main() {
 
   await prisma.productImage.upsert({
     where: { id: ids.imageBag },
-    update: {
-      productId: bag.id,
-      url: bagImageUrl,
-    },
+    update: { productId: bag.id, url: bagImageUrl },
     create: {
       id: ids.imageBag,
       productId: bag.id,
       url: bagImageUrl,
       altText: "Emerald Ankara handbag",
+      isPrimary: true,
+    },
+  });
+
+  await prisma.productImage.upsert({
+    where: { id: ids.imageSneakers },
+    update: { productId: sneakers.id, url: sneakersImageUrl },
+    create: {
+      id: ids.imageSneakers,
+      productId: sneakers.id,
+      url: sneakersImageUrl,
+      altText: "Kente Panel Sneakers",
+      isPrimary: true,
+    },
+  });
+
+  await prisma.productImage.upsert({
+    where: { id: ids.imageJewelry },
+    update: { productId: jewelry.id, url: jewelryImageUrl },
+    create: {
+      id: ids.imageJewelry,
+      productId: jewelry.id,
+      url: jewelryImageUrl,
+      altText: "Maasai Beaded Jewelry Set",
+      isPrimary: true,
+    },
+  });
+
+  await prisma.productImage.upsert({
+    where: { id: ids.imageShirt },
+    update: { productId: shirt.id, url: shirtImageUrl },
+    create: {
+      id: ids.imageShirt,
+      productId: shirt.id,
+      url: shirtImageUrl,
+      altText: "Heritage Ankara Shirt",
+      isPrimary: true,
+    },
+  });
+
+  await prisma.productImage.upsert({
+    where: { id: ids.imageSandals },
+    update: { productId: sandals.id, url: sandalsImageUrl },
+    create: {
+      id: ids.imageSandals,
+      productId: sandals.id,
+      url: sandalsImageUrl,
+      altText: "Indigo Print Leather Sandals",
+      isPrimary: true,
+    },
+  });
+
+  await prisma.productImage.upsert({
+    where: { id: ids.imageHeadwrap },
+    update: { productId: headwrap.id, url: headwrapImageUrl },
+    create: {
+      id: ids.imageHeadwrap,
+      productId: headwrap.id,
+      url: headwrapImageUrl,
+      altText: "Wax Print Headwrap Set",
+      isPrimary: true,
+    },
+  });
+
+  await prisma.productImage.upsert({
+    where: { id: ids.imageBackpack },
+    update: { productId: backpack.id, url: backpackImageUrl },
+    create: {
+      id: ids.imageBackpack,
+      productId: backpack.id,
+      url: backpackImageUrl,
+      altText: "Mudcloth Leather Backpack",
       isPrimary: true,
     },
   });

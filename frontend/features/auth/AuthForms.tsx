@@ -54,6 +54,7 @@ export function LoginForm() {
           id="login-password"
           label="Password"
           type="password"
+
           autoComplete="current-password"
         />
         <div className="login_submit">

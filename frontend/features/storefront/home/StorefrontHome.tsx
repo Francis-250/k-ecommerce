@@ -22,7 +22,7 @@ type HomeProduct = {
 function ProductSection({
   title,
   products,
-  count = 3,
+  count = 8,
 }: {
   title: string;
   products: HomeProduct[];

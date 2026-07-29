@@ -8,9 +8,46 @@ import {
   type CouponInput,
 } from "./api";
 
+export const productsQueryKey = ["admin", "products"] as const;
 export const brandsQueryKey = ["admin", "brands"] as const;
 export const categoriesQueryKey = ["admin", "categories"] as const;
 export const couponsQueryKey = ["admin", "coupons"] as const;
+
+export function useProducts() {
+  return useQuery({
+    queryKey: productsQueryKey,
+    queryFn: catalogApi.listProducts,
+  });
+}
+
+export function useProductMutations() {
+  const queryClient = useQueryClient();
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: productsQueryKey });
+    queryClient.invalidateQueries({ queryKey: ["storefront", "catalog"] });
+  };
+  return {
+    create: useMutation({
+      mutationFn: (input: Record<string, unknown>) =>
+        catalogApi.createProduct(input),
+      onSuccess: refresh,
+    }),
+    update: useMutation({
+      mutationFn: ({
+        id,
+        input,
+      }: {
+        id: string;
+        input: Record<string, unknown>;
+      }) => catalogApi.updateProduct(id, input),
+      onSuccess: refresh,
+    }),
+    remove: useMutation({
+      mutationFn: catalogApi.deleteProduct,
+      onSuccess: refresh,
+    }),
+  };
+}
 
 export function useBrands() {
   return useQuery({ queryKey: brandsQueryKey, queryFn: catalogApi.listBrands });
