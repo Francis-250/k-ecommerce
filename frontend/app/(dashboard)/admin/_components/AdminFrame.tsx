@@ -9,7 +9,7 @@ export function AdminFrame({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-[#f6f7f8] text-slate-900 [&_a]:!no-underline [&_a:focus]:!no-underline [&_a:hover]:!no-underline">
       <AdminSidebar
         collapsed={collapsed}
         mobileOpen={mobileOpen}

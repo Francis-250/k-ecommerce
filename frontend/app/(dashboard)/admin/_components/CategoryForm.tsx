@@ -1,53 +1,133 @@
 "use client";
+
+import { FolderTree, SlidersHorizontal } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+import {
+  ChoiceCard,
+  FormActions,
+  FormCard,
+  FormField,
+  FormGrid,
+  FormSelect,
+  FormTextarea,
+  ImageUploadField,
+  ToggleRow,
+} from "./AdminFormUI";
+
 export function CategoryForm() {
+  const [type, setType] = useState("manual");
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
         toast.success("Category created");
       }}
-      className="grid gap-5 xl:grid-cols-[2fr_1fr]"
+      className="mx-auto max-w-5xl"
     >
-      <section className="rounded-lg border border-slate-200 bg-white p-5">
-        <h2 className="mb-4 font-semibold text-slate-800">Category details</h2>
-        <Field label="Title" />
-        <label className="mt-4 block text-sm font-medium text-slate-700">
-          Description
-          <textarea
-            rows={5}
-            className="mt-2 w-full rounded-md border border-slate-200 bg-slate-50 p-3 font-normal outline-none focus:border-emerald-500"
-          />
-        </label>
-        <Field label="URL slug" />
-      </section>
-      <div className="space-y-5">
-        <section className="rounded-lg border border-slate-200 bg-white p-5">
-          <h2 className="mb-4 font-semibold text-slate-800">Collection type</h2>
-          <label className="flex gap-3 text-sm">
-            <input defaultChecked name="type" type="radio" />
-            Manual
-          </label>
-          <label className="mt-3 flex gap-3 text-sm">
-            <input name="type" type="radio" />
-            Automatic rules
-          </label>
-        </section>
-        <button className="h-10 w-full rounded-md bg-emerald-600 text-sm font-medium text-white">
-          Save category
-        </button>
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-6">
+          <FormCard
+            title="Category details"
+            description="Organise products into a clear storefront destination."
+            icon={<FolderTree size={18} />}
+          >
+            <div className="space-y-5">
+              <FormField
+                label="Category title"
+                placeholder="Dresses"
+                required
+              />
+              <FormTextarea
+                label="Description"
+                rows={6}
+                placeholder="Describe the products customers will find in this category."
+              />
+              <FormGrid>
+                <FormField label="URL handle" placeholder="dresses" required />
+                <FormSelect label="Parent category">
+                  <option value="">No parent category</option>
+                  <option>Fashion</option>
+                  <option>Accessories</option>
+                </FormSelect>
+              </FormGrid>
+            </div>
+          </FormCard>
+
+          <FormCard
+            title="Product assignment"
+            description="Choose how products become part of this category."
+            icon={<SlidersHorizontal size={18} />}
+          >
+            <div className="grid gap-3 sm:grid-cols-2">
+              <ChoiceCard
+                name="category-type"
+                value="manual"
+                title="Manual"
+                description="Select each product yourself and control the exact order."
+                checked={type === "manual"}
+                onChange={() => setType("manual")}
+              />
+              <ChoiceCard
+                name="category-type"
+                value="automatic"
+                title="Automatic"
+                description="Include products that match rules for tags, price, or brand."
+                checked={type === "automatic"}
+                onChange={() => setType("automatic")}
+              />
+            </div>
+            {type === "automatic" && (
+              <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="mb-4 text-sm font-semibold text-slate-800">
+                  Match all conditions
+                </p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <FormSelect label="Field">
+                    <option>Product tag</option>
+                    <option>Brand</option>
+                    <option>Price</option>
+                  </FormSelect>
+                  <FormSelect label="Condition">
+                    <option>is equal to</option>
+                    <option>contains</option>
+                    <option>is greater than</option>
+                  </FormSelect>
+                  <FormField label="Value" placeholder="occasion" />
+                </div>
+              </div>
+            )}
+          </FormCard>
+        </div>
+
+        <aside className="space-y-6 xl:sticky xl:top-20">
+          <FormCard title="Category image">
+            <ImageUploadField
+              label="Cover image"
+              description="Use a strong lifestyle image with enough space for overlaid text."
+              aspect="wide"
+            />
+          </FormCard>
+          <FormCard title="Visibility">
+            <ToggleRow
+              title="Active category"
+              description="Show this category in storefront navigation."
+              defaultChecked
+            />
+            <FormField
+              label="Sort priority"
+              type="number"
+              min="0"
+              defaultValue="0"
+              hint="Lower numbers appear first."
+            />
+          </FormCard>
+        </aside>
       </div>
-    </form>
-  );
-}
-function Field({ label }: { label: string }) {
-  return (
-    <label className="mt-4 block text-sm font-medium text-slate-700 first:mt-0">
-      {label}
-      <input
-        required
-        className="mt-2 h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 font-normal outline-none focus:border-emerald-500"
+      <FormActions
+        cancelHref="/admin/categories"
+        submitLabel="Create category"
       />
-    </label>
+    </form>
   );
 }

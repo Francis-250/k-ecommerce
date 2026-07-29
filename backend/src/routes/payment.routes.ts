@@ -1,0 +1,12 @@
+import { Router } from "express";
+import * as c from "../controllers/payment.controller";
+import { requireAdmin, verifyToken } from "../middlewares/auth.middleware";
+const router = Router();
+router.post("/checkout-intent", verifyToken, c.createCheckoutIntent);
+router.post("/checkout-confirm", verifyToken, c.confirmCheckoutPayment);
+router.use(verifyToken, requireAdmin);
+router.get("/", c.listPayments);
+router.get("/:id", c.getPayment);
+router.post("/", c.createPayment);
+router.patch("/:id", c.updatePayment);
+export default router;

@@ -35,7 +35,7 @@ export function TablePagination({
               type="button"
               key={item}
               onClick={() => onPageChange(item)}
-              className={`grid size-8 place-items-center rounded-md text-xs ${item === safePage ? "bg-emerald-600 text-white" : "text-slate-600 hover:bg-slate-100"}`}
+              className={`grid size-8 place-items-center rounded-md text-xs ${item === safePage ? "bg-slate-950 text-white" : "text-slate-600 hover:bg-slate-100"}`}
             >
               {item}
             </button>

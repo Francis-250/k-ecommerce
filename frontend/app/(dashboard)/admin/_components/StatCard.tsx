@@ -11,12 +11,14 @@ export function StatCard({
   label,
   value,
   change,
+  caption = "vs last month",
   icon: Icon,
   theme,
 }: {
   label: string;
   value: string;
-  change: string;
+  change?: string;
+  caption?: string;
   icon: LucideIcon;
   theme: keyof typeof themes;
 }) {
@@ -28,8 +30,10 @@ export function StatCard({
           {value}
         </p>
         <p className="mt-2 text-xs">
-          <span className="font-medium text-emerald-600">{change}</span>{" "}
-          <span className="text-slate-400">vs last month</span>
+          {change && (
+            <span className="font-medium text-emerald-600">{change} </span>
+          )}
+          <span className="text-slate-400">{caption}</span>
         </p>
       </div>
       <span

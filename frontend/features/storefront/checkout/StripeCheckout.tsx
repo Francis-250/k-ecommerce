@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import {
   Elements,
   PaymentElement,
@@ -8,17 +8,26 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
-import { X } from "lucide-react";
+import { LoaderCircle, X } from "lucide-react";
 import { toast } from "sonner";
-import type { CartItem } from "@/features/storefront/cart/types";
+import { confirmCheckoutPayment, createCheckoutIntent } from "./api";
 import { useCart } from "@/features/storefront/cart";
 
+type PreparedPayment = {
+  orderId: string;
+  amount: number;
+  clientSecret: string;
+  publishableKey: string;
+};
+
 function PaymentForm({
-  total,
+  payment,
   onClose,
+  onSuccess,
 }: {
-  total: number;
+  payment: PreparedPayment;
   onClose: () => void;
+  onSuccess: (orderNumber: string) => void;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -27,39 +36,49 @@ function PaymentForm({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     if (!stripe || !elements) return;
 
     setSubmitting(true);
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/checkout?payment=success`,
+        return_url: `${window.location.origin}/checkout?payment=return`,
       },
       redirect: "if_required",
     });
 
-    if (error) {
+    if (error || !paymentIntent) {
       toast.error("Payment was not completed", {
-        description: error.message ?? "Please check your payment details.",
+        description: error?.message ?? "Please check your payment details.",
       });
       setSubmitting(false);
       return;
     }
 
-    if (paymentIntent?.status === "succeeded") {
+    try {
+      const confirmation = await confirmCheckoutPayment(
+        payment.orderId,
+        paymentIntent.id,
+      );
+      if (confirmation.paymentStatus === "FAILED") {
+        throw new Error("Stripe did not complete this payment.");
+      }
       clearCart();
-      toast.success("Payment successful", {
-        description: "Thank you. Your Stripe payment has been received.",
-      });
-    } else {
-      toast.success("Payment submitted", {
-        description: "Stripe is processing your payment.",
-      });
+      toast.success(
+        confirmation.paymentStatus === "SUCCEEDED"
+          ? "Payment successful"
+          : "Payment is processing",
+      );
+      onSuccess(confirmation.orderNumber);
+    } catch (confirmationError) {
+      toast.error(
+        confirmationError instanceof Error
+          ? confirmationError.message
+          : "Payment status could not be confirmed.",
+      );
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
-    onClose();
   }
 
   return (
@@ -70,7 +89,7 @@ function PaymentForm({
             Secure Stripe payment
           </h2>
           <p className="mt-1 text-sm text-slate-500">
-            Complete your ${total.toFixed(2)} payment securely.
+            Complete your ${payment.amount.toFixed(2)} payment securely.
           </p>
         </div>
         <button
@@ -84,16 +103,13 @@ function PaymentForm({
         </button>
       </div>
       <PaymentElement
-        options={{
-          layout: "tabs",
-          paymentMethodOrder: ["card"],
-        }}
+        options={{ layout: "tabs", paymentMethodOrder: ["card"] }}
       />
       <div className="order_button mt-5">
         <button type="submit" disabled={!stripe || submitting}>
           {submitting
             ? "Processing payment..."
-            : `Pay $${total.toFixed(2)} with Stripe`}
+            : `Pay $${payment.amount.toFixed(2)} with Stripe`}
         </button>
       </div>
       <button
@@ -109,133 +125,91 @@ function PaymentForm({
 }
 
 export function StripeCheckout({
-  items,
-  total,
+  disabled,
+  estimatedTotal,
+  createPendingOrder,
+  onSuccess,
 }: {
-  items: CartItem[];
-  total: number;
+  disabled: boolean;
+  estimatedTotal: number;
+  createPendingOrder: () => Promise<string>;
+  onSuccess: (orderNumber: string) => void;
 }) {
-  const [clientSecret, setClientSecret] = useState("");
+  const [payment, setPayment] = useState<PreparedPayment | null>(null);
   const [stripePromise, setStripePromise] =
     useState<PromiseLike<Stripe | null> | null>(null);
-  const [error, setError] = useState("");
-  const [paymentOpen, setPaymentOpen] = useState(false);
-  const cartPayload = useMemo(
-    () =>
-      items.map(({ slug, quantity }) => ({
-        slug,
-        quantity,
-      })),
-    [items],
-  );
+  const [preparing, setPreparing] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState("");
 
-  useEffect(() => {
-    if (cartPayload.length === 0) return;
-
-    const controller = new AbortController();
-
-    void fetch("/api/stripe/payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cartPayload }),
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        const data = (await response.json()) as {
-          clientSecret?: string;
-          publishableKey?: string;
-          error?: string;
-        };
-
-        if (!response.ok || !data.clientSecret || !data.publishableKey) {
-          throw new Error(data.error ?? "Unable to start Stripe checkout.");
-        }
-
-        setError("");
-        setClientSecret(data.clientSecret);
-        setStripePromise(loadStripe(data.publishableKey));
-      })
-      .catch((requestError: unknown) => {
-        if (
-          requestError instanceof DOMException &&
-          requestError.name === "AbortError"
-        )
-          return;
-        setError(
-          requestError instanceof Error
-            ? requestError.message
-            : "Unable to start Stripe checkout.",
-        );
-      });
-
-    return () => controller.abort();
-  }, [cartPayload]);
-
-  useEffect(() => {
-    if (!paymentOpen) return;
-
-    const previousOverflow = document.body.style.overflow;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setPaymentOpen(false);
-    };
-
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", closeOnEscape);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [paymentOpen]);
-
-  if (items.length === 0) {
-    return (
-      <div className="order_button">
-        <button type="button" disabled>
-          Cart is empty
-        </button>
-      </div>
-    );
+  async function prepare() {
+    setPreparing(true);
+    try {
+      const orderId = pendingOrderId || (await createPendingOrder());
+      setPendingOrderId(orderId);
+      const intent = await createCheckoutIntent(orderId);
+      setPayment(intent);
+      setStripePromise(loadStripe(intent.publishableKey));
+    } catch (error) {
+      const checkoutError = error as Error & { status?: number };
+      toast.error(checkoutError.message);
+    } finally {
+      setPreparing(false);
+    }
   }
 
-  if (error) return <p role="alert">{error}</p>;
-  if (!clientSecret || !stripePromise)
-    return <p>Loading secure payment form…</p>;
-
   return (
-    <Elements
-      stripe={stripePromise}
-      options={{
-        clientSecret,
-        appearance: {
-          theme: "stripe",
-          variables: { colorPrimary: "#111111" },
-        },
-      }}
-    >
+    <>
       <div className="order_button">
-        <button type="button" onClick={() => setPaymentOpen(true)}>
-          Pay ${total.toFixed(2)} with Stripe
+        <button
+          type="button"
+          disabled={disabled || preparing}
+          onClick={prepare}
+        >
+          {preparing ? (
+            <>
+              <LoaderCircle className="animate-spin" size={16} /> Preparing
+              checkout...
+            </>
+          ) : disabled ? (
+            "Cart is empty"
+          ) : (
+            `Continue to payment · $${estimatedTotal.toFixed(2)}`
+          )}
         </button>
       </div>
-      {paymentOpen && (
-        <div
-          className="fixed inset-0 z-[1000] flex items-center justify-center overflow-y-auto bg-black/65 p-4"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setPaymentOpen(false);
+      {payment && stripePromise && (
+        <Elements
+          stripe={stripePromise}
+          options={{
+            clientSecret: payment.clientSecret,
+            appearance: {
+              theme: "stripe",
+              variables: { colorPrimary: "#111111" },
+            },
           }}
         >
           <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="stripe-payment-title"
-            className="my-auto w-full max-w-lg rounded-xl bg-white p-5 shadow-2xl sm:p-7"
+            className="fixed inset-0 z-[1000] flex items-center justify-center overflow-y-auto bg-black/65 p-4"
+            role="presentation"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) setPayment(null);
+            }}
           >
-            <PaymentForm total={total} onClose={() => setPaymentOpen(false)} />
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="stripe-payment-title"
+              className="my-auto w-full max-w-lg rounded-xl bg-white p-5 shadow-2xl sm:p-7"
+            >
+              <PaymentForm
+                payment={payment}
+                onClose={() => setPayment(null)}
+                onSuccess={onSuccess}
+              />
+            </div>
           </div>
-        </div>
+        </Elements>
       )}
-    </Elements>
+    </>
   );
 }

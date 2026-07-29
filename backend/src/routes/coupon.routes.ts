@@ -1,0 +1,10 @@
+import { Router } from "express";
+import * as controller from "../controllers/coupon.controller";
+import { requireAdmin, verifyToken } from "../middlewares/auth.middleware";
+const router = Router();
+router.post("/validate", verifyToken, controller.validateCoupon);
+router.get("/", verifyToken, requireAdmin, controller.listCoupons);
+router.post("/", verifyToken, requireAdmin, controller.createCoupon);
+router.patch("/:id", verifyToken, requireAdmin, controller.updateCoupon);
+router.delete("/:id", verifyToken, requireAdmin, controller.deleteCoupon);
+export default router;

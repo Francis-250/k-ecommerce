@@ -31,11 +31,15 @@ export function AccountField({
   label,
   type = "text",
   autoComplete,
+  defaultValue,
+  inputMode,
 }: {
   id: string;
   label: string;
   type?: string;
   autoComplete?: string;
+  defaultValue?: string;
+  inputMode?: "text" | "numeric" | "email" | "tel";
 }) {
   return (
     <p>
@@ -47,6 +51,8 @@ export function AccountField({
         name={id}
         type={type}
         autoComplete={autoComplete}
+        defaultValue={defaultValue}
+        inputMode={inputMode}
         required
       />
     </p>

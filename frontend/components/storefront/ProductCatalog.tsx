@@ -13,7 +13,6 @@ export function ProductCard({
   product?: Product;
   column?: string;
 }) {
-  const index = products.indexOf(product);
   return (
     <div className={column}>
       <div className="single_product">
@@ -30,13 +29,8 @@ export function ProductCard({
               unoptimized
             />
           </Link>
-          <div className={index % 2 ? "hot_img" : "img_icone"}>
-            <Image
-              src={`/storefront/assets/img/cart/${index % 2 ? "span-hot.png" : "span-new.png"}`}
-              alt={index % 2 ? "Hot" : "New"}
-              width={50}
-              height={50}
-            />
+          <div className={product.featured ? "hot_img" : "img_icone"}>
+            <span>{product.featured ? "Hot" : "New"}</span>
           </div>
           <div className="product_action">
             <AddToCartButton
@@ -77,13 +71,15 @@ export function ProductCard({
 export function ProductGrid({
   count = 8,
   columns = "col-lg-4 col-md-6",
+  items = products,
 }: {
   count?: number;
   columns?: string;
+  items?: Product[];
 }) {
   return (
     <div className="row">
-      {products.slice(0, count).map((product, index) => (
+      {items.slice(0, count).map((product, index) => (
         <ProductCard
           key={`${product.name}-${index}`}
           product={product}
@@ -144,56 +140,97 @@ export function ProductList({ count = 6 }: { count?: number }) {
 }
 
 const categories = ["Accessories", "Dresses", "Tops", "HandBags"];
-export function Sidebar({ home = false }: { home?: boolean }) {
+export function Sidebar({
+  home = false,
+  homeCategories,
+  homeImages,
+  homeProducts = [],
+}: {
+  home?: boolean;
+  homeCategories?: Array<{ name: string; slug: string; count: number }>;
+  homeImages?: {
+    top: { url: string; alt: string };
+    middle: { url: string; alt: string };
+    bottom: { url: string; alt: string };
+  };
+  homeProducts?: Array<{
+    image: string;
+    name: string;
+    slug: string;
+    price: string;
+  }>;
+}) {
   if (home)
     return (
       <aside className="col-lg-3 col-md-8 col-12">
         <div className="sidebar_widget banner mb-35">
-          <div className="banner_img mb-35">
-            <Image
-              src="/storefront/assets/img/banner/african-free-shipping.png"
-              alt="Shop African-made fashion with free shipping"
-              width={270}
-              height={130}
-              unoptimized
-            />
-          </div>
-          <div className="banner_img">
-            <Image
-              src="/storefront/assets/img/banner/african-fashion-sidebar.png"
-              alt="Black woman wearing contemporary African fashion"
-              width={270}
-              height={130}
-              unoptimized
-            />
-          </div>
+          {homeImages && (
+            <>
+              <div className="banner_img mb-35">
+                <Image
+                  src={homeImages.top.url}
+                  alt={homeImages.top.alt}
+                  width={270}
+                  height={130}
+                  unoptimized
+                />
+              </div>
+              <div className="banner_img">
+                <Image
+                  src={homeImages.middle.url}
+                  alt={homeImages.middle.alt}
+                  width={270}
+                  height={130}
+                  unoptimized
+                />
+              </div>
+            </>
+          )}
         </div>
         <div className="sidebar_widget catrgorie mb-35">
           <h3>Categories</h3>
           <ul>
-            {["Women", "Men", "Footwear", "Jewelry", "Lady"].map((x) => (
-              <li className="has-sub" key={x}>
-                <Link href="/shop">
-                  <ChevronRight size={14} aria-hidden="true" /> {x}
+            {(homeCategories?.length
+              ? homeCategories
+              : [
+                  { name: "Women", slug: "", count: 0 },
+                  { name: "Men", slug: "", count: 0 },
+                  { name: "Footwear", slug: "", count: 0 },
+                  { name: "Jewelry", slug: "", count: 0 },
+                  { name: "Lady", slug: "", count: 0 },
+                ]
+            ).map((category) => (
+              <li className="has-sub" key={category.name}>
+                <Link
+                  href={
+                    category.slug
+                      ? `/shop?category=${encodeURIComponent(category.slug)}`
+                      : "/shop"
+                  }
+                >
+                  <ChevronRight size={14} aria-hidden="true" /> {category.name}
+                  {category.count > 0 && <span> ({category.count})</span>}
                 </Link>
               </li>
             ))}
           </ul>
         </div>
-        <Wishlist />
+        <Wishlist products={homeProducts} />
         <Tags />
         <Newsletter />
-        <div className="sidebar_widget bottom">
-          <div className="banner_img">
-            <Image
-              src="/storefront/assets/img/banner/african-style-portrait.png"
-              alt="African style portrait in Ankara fashion"
-              width={270}
-              height={340}
-              unoptimized
-            />
+        {homeImages && (
+          <div className="sidebar_widget bottom">
+            <div className="banner_img">
+              <Image
+                src={homeImages.bottom.url}
+                alt={homeImages.bottom.alt}
+                width={270}
+                height={340}
+                unoptimized
+              />
+            </div>
           </div>
-        </div>
+        )}
       </aside>
     );
   return (
@@ -252,7 +289,16 @@ export function Sidebar({ home = false }: { home?: boolean }) {
   );
 }
 
-function Wishlist() {
+function Wishlist({
+  products = [],
+}: {
+  products?: Array<{
+    image: string;
+    name: string;
+    slug: string;
+    price: string;
+  }>;
+}) {
   return (
     <div className="sidebar_widget wishlist mb-30">
       <div className="block_title">
@@ -260,14 +306,11 @@ function Wishlist() {
           <Link href="/wishlist">Wishlist</Link>
         </h3>
       </div>
-      {[
-        { image: "cart.png", name: "Emerald Ankara Handbag", slug: "emerald-ankara-handbag", price: 96 },
-        { image: "cart2.png", name: "Heritage Ankara Shirt", slug: "heritage-ankara-shirt", price: 78 },
-      ].map((product) => (
+      {products.slice(0, 2).map((product) => (
         <div className="cart_item" key={product.slug}>
           <div className="cart_img">
             <Image
-              src={`/storefront/assets/img/cart/${product.image}`}
+              src={product.image}
               alt={product.name}
               width={60}
               height={60}
@@ -276,7 +319,7 @@ function Wishlist() {
           </div>
           <div className="cart_info">
             <Link href={`/products/${product.slug}`}>{product.name}</Link>
-            <span className="cart_price">${product.price.toFixed(2)}</span>
+            <span className="cart_price">{product.price}</span>
             <span className="quantity">Qty: 1</span>
           </div>
         </div>

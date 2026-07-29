@@ -10,6 +10,8 @@ import {
   validatePassword,
 } from "../utils/helpers";
 import { sendEmail } from "../lib/mailer";
+import { OAuth2Client } from "google-auth-library";
+import { randomBytes } from "node:crypto";
 
 type RegisterBody = {
   email?: string;
@@ -21,6 +23,166 @@ type RegisterBody = {
 type LoginBody = {
   email?: string;
   password?: string;
+};
+
+type GoogleLoginBody = {
+  credential?: string;
+};
+
+const googleClient = new OAuth2Client();
+
+function createSession(
+  res: Response,
+  user: {
+    id: string;
+    role: "CUSTOMER" | "STAFF" | "ADMIN" | "SUPER_ADMIN";
+  },
+) {
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET is not configured");
+  }
+
+  const token = generateJWT(
+    {
+      sub: user.id,
+      role: user.role,
+    },
+    jwtSecret,
+    "1d",
+  );
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 24 * 60 * 60 * 1000,
+    path: "/",
+  });
+}
+
+export const getGoogleClientConfig = (_req: Request, res: Response) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+
+  if (!clientId) {
+    return res.status(503).json({
+      success: false,
+      message: "Google sign-in is not configured",
+    });
+  }
+
+  return res.json({ success: true, clientId });
+};
+
+export const googleLogin = async (
+  req: Request<unknown, unknown, GoogleLoginBody>,
+  res: Response,
+) => {
+  try {
+    const credential = req.body.credential?.trim();
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: "Google credential is required",
+      });
+    }
+
+    if (!clientId) {
+      return res.status(503).json({
+        success: false,
+        message: "Google sign-in is not configured",
+      });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: clientId,
+    });
+    const payload = ticket.getPayload();
+    const googleId = payload?.sub;
+    const email = payload?.email?.trim().toLowerCase();
+
+    if (!payload || !googleId || !email || !payload.email_verified) {
+      return res.status(401).json({
+        success: false,
+        message: "Google could not verify this email address",
+      });
+    }
+
+    let user = await prisma.user.findFirst({
+      where: { OR: [{ googleId }, { email }] },
+    });
+
+    if (user?.googleId && user.googleId !== googleId) {
+      return res.status(409).json({
+        success: false,
+        message: "This email is already linked to another Google account",
+      });
+    }
+
+    const googleIsAuthoritative =
+      email.endsWith("@gmail.com") || Boolean(payload.hd);
+
+    if (user && !user.googleId && !googleIsAuthoritative) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "Sign in with your password before linking Google to this account",
+      });
+    }
+
+    if (user && (!user.isActive || user.isBanned)) {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is unavailable",
+      });
+    }
+
+    if (user) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          googleId,
+          isVerified: true,
+          emailVerifiedAt: user.emailVerifiedAt ?? new Date(),
+          avatar: user.avatar ?? payload.picture,
+          lastLogin: new Date(),
+        },
+      });
+    } else {
+      const fallbackName = email.split("@")[0] || "Customer";
+      user = await prisma.user.create({
+        data: {
+          email,
+          googleId,
+          password: await hashPassword(randomBytes(32).toString("hex")),
+          firstName: payload.given_name?.trim() || fallbackName,
+          lastName: payload.family_name?.trim() || "Customer",
+          avatar: payload.picture,
+          isVerified: true,
+          emailVerifiedAt: new Date(),
+          lastLogin: new Date(),
+        },
+      });
+    }
+
+    createSession(res, user);
+
+    return res.status(200).json({
+      success: true,
+      message: "Google sign-in successful",
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+
+    return res.status(401).json({
+      success: false,
+      message: "Google sign-in could not be verified",
+    });
+  }
 };
 
 export const register = async (
@@ -150,33 +312,21 @@ export const login = async (
       });
     }
 
-    const jwtSecret = process.env.JWT_SECRET;
-
-    if (!jwtSecret) {
-      console.error("JWT_SECRET is not configured");
-
-      return res.status(500).json({
+    if (!existingUser.isVerified) {
+      return res.status(403).json({
         success: false,
-        message: "Server configuration error",
+        message: "Verify your email before signing in",
       });
     }
 
-    const token = generateJWT(
-      {
-        sub: existingUser.id,
-        role: existingUser.role,
-      },
-      jwtSecret,
-      "1d",
-    );
+    if (!existingUser.isActive || existingUser.isBanned) {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is unavailable",
+      });
+    }
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-      path: "/",
-    });
+    createSession(res, existingUser);
 
     return res.status(200).json({
       success: true,

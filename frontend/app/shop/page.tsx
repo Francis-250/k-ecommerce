@@ -6,22 +6,14 @@ export default async function ShopPage({
   searchParams: Promise<{ gender?: string; category?: string; q?: string }>;
 }) {
   const params = await searchParams;
-  const gender: "All" | "Women" | "Men" =
-    params.gender === "Women" || params.gender === "Men"
+  const gender =
+    params.gender === "Women" ||
+    params.gender === "Men" ||
+    params.gender === "Unisex" ||
+    params.gender === "Kids"
       ? params.gender
       : "All";
-  type ShopCategory = "All" | "Accessories" | "Dresses" | "Tops" | "Handbags";
-  const categories: ShopCategory[] = [
-    "Accessories",
-    "Dresses",
-    "Tops",
-    "Handbags",
-  ];
-  const category: ShopCategory = categories.includes(
-    params.category as ShopCategory,
-  )
-    ? (params.category as ShopCategory)
-    : "All";
+  const category = params.category?.trim() || "All";
   const query = params.q?.trim() ?? "";
   return (
     <ShopExperience

@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Check,
   LockKeyhole,
@@ -16,7 +17,12 @@ import {
 } from "@/components/storefront/StorefrontShell";
 import { useCart } from "@/features/storefront/cart";
 import { StripeCheckout } from "@/features/storefront/checkout/StripeCheckout";
+import {
+  createOrder,
+  type CheckoutAddress,
+} from "@/features/storefront/checkout/api";
 import { toast } from "sonner";
+import { useAuthStore } from "@/features/auth/store";
 
 type FieldProps = {
   id: string;
@@ -25,6 +31,7 @@ type FieldProps = {
   autoComplete?: string;
   placeholder?: string;
   required?: boolean;
+  defaultValue?: string;
 };
 
 function Field({
@@ -34,6 +41,7 @@ function Field({
   autoComplete,
   placeholder,
   required = true,
+  defaultValue,
 }: FieldProps) {
   return (
     <label className="pc-field" htmlFor={id}>
@@ -47,13 +55,14 @@ function Field({
         type={type}
         autoComplete={autoComplete}
         placeholder={placeholder}
+        defaultValue={defaultValue}
         required={required}
       />
     </label>
   );
 }
 
-function DeliveryFields({ prefix = "billing" }: { prefix?: string }) {
+function DeliveryFields({ prefix = "shipping" }: { prefix?: string }) {
   return (
     <div className="pc-fields">
       <div className="pc-field pc-field-full">
@@ -118,11 +127,17 @@ function DeliveryFields({ prefix = "billing" }: { prefix?: string }) {
 }
 
 export default function CheckoutPage() {
+  const router = useRouter();
+  const detailsForm = useRef<HTMLFormElement>(null);
   const { items, subtotal } = useCart();
-  const [shippingOpen, setShippingOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const status = useAuthStore((state) => state.status);
+  const [billingOpen, setBillingOpen] = useState(false);
   const [couponOpen, setCouponOpen] = useState(false);
   const [coupon, setCoupon] = useState("");
+  const [completedOrder, setCompletedOrder] = useState("");
+  const shipping = subtotal >= 100 ? 0 : items.length ? 12 : 0;
+  const estimatedTotal = subtotal + shipping;
 
   function applyCoupon() {
     if (!coupon.trim()) {
@@ -132,6 +147,80 @@ export default function CheckoutPage() {
     toast.info("Coupon received", {
       description: "The code will be verified before your order is completed.",
     });
+  }
+
+  function address(form: FormData, prefix: string): CheckoutAddress {
+    return {
+      firstName: String(form.get(`${prefix}-first-name`) ?? ""),
+      lastName: String(form.get(`${prefix}-last-name`) ?? ""),
+      company: String(form.get(`${prefix}-company`) ?? "") || null,
+      phone: String(form.get(`${prefix}-phone`) ?? ""),
+      countryCode: "US",
+      country: "United States",
+      state: String(form.get(`${prefix}-state`) ?? ""),
+      city: String(form.get(`${prefix}-city`) ?? ""),
+      line1: String(form.get(`${prefix}-address`) ?? ""),
+      line2: String(form.get(`${prefix}-apartment`) ?? "") || null,
+      postalCode: String(form.get(`${prefix}-zip`) ?? ""),
+    };
+  }
+
+  async function createPendingOrder() {
+    if (status !== "authenticated" || !user) {
+      router.push("/login");
+      throw new Error("Sign in before completing checkout.");
+    }
+    if (!detailsForm.current?.reportValidity()) {
+      throw new Error("Complete the required delivery information.");
+    }
+
+    const form = new FormData(detailsForm.current);
+    const shippingAddress = address(form, "shipping");
+    const billingAddress = billingOpen
+      ? address(form, "billing")
+      : shippingAddress;
+    const order = await createOrder({
+      email: String(form.get("checkout-email")),
+      phone: shippingAddress.phone,
+      customerNote: String(form.get("order-note") ?? "") || null,
+      couponCode: coupon.trim() || null,
+      shippingAddress,
+      billingAddress,
+      items: items.map((item) => ({
+        slug: item.slug,
+        quantity: item.quantity,
+        options: item.options,
+      })),
+    });
+    return order.id;
+  }
+
+  if (completedOrder) {
+    return (
+      <StorefrontShell>
+        <Breadcrumb title="Order confirmed" />
+        <main className="pc-checkout">
+          <div className="mx-auto max-w-2xl rounded-xl border border-emerald-200 bg-white p-8 text-center shadow-sm">
+            <span className="mx-auto grid size-14 place-items-center rounded-full bg-emerald-50 text-emerald-700">
+              <Check size={28} />
+            </span>
+            <h1 className="mt-5 text-2xl font-semibold text-slate-950">
+              Thank you for your order
+            </h1>
+            <p className="mt-2 text-slate-600">
+              Payment was received and order {completedOrder} is confirmed.
+            </p>
+            <button
+              type="button"
+              onClick={() => router.push("/my-account")}
+              className="mt-6 rounded-lg bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
+            >
+              View my account
+            </button>
+          </div>
+        </main>
+      </StorefrontShell>
+    );
   }
 
   return (
@@ -159,7 +248,11 @@ export default function CheckoutPage() {
         </header>
 
         <div className="pc-layout">
-          <div className="pc-details">
+          <form
+            ref={detailsForm}
+            className="pc-details"
+            onSubmit={(event) => event.preventDefault()}
+          >
             <section className="pc-card">
               <div className="pc-section-heading">
                 <span>1</span>
@@ -167,7 +260,7 @@ export default function CheckoutPage() {
                   <h2>Contact information</h2>
                   <p>We’ll send your receipt and delivery updates here.</p>
                 </div>
-                <a href="/login">Sign in</a>
+                {status !== "authenticated" && <a href="/login">Sign in</a>}
               </div>
               <div className="pc-fields">
                 <div className="pc-field-full">
@@ -177,6 +270,7 @@ export default function CheckoutPage() {
                     type="email"
                     autoComplete="email"
                     placeholder="you@example.com"
+                    defaultValue={user?.email}
                   />
                 </div>
               </div>
@@ -201,8 +295,8 @@ export default function CheckoutPage() {
               <label className="pc-check pc-option">
                 <input
                   type="checkbox"
-                  checked={shippingOpen}
-                  onChange={(event) => setShippingOpen(event.target.checked)}
+                  checked={billingOpen}
+                  onChange={(event) => setBillingOpen(event.target.checked)}
                 />
                 <span>
                   <strong>Use a different billing address</strong>
@@ -211,30 +305,9 @@ export default function CheckoutPage() {
                   </small>
                 </span>
               </label>
-              {shippingOpen && (
+              {billingOpen && (
                 <div className="pc-nested-fields">
-                  <DeliveryFields prefix="shipping" />
-                </div>
-              )}
-              <label className="pc-check pc-option">
-                <input
-                  type="checkbox"
-                  checked={accountOpen}
-                  onChange={(event) => setAccountOpen(event.target.checked)}
-                />
-                <span>
-                  <strong>Save my details for next time</strong>
-                  <small>Create an account after completing your order.</small>
-                </span>
-              </label>
-              {accountOpen && (
-                <div className="pc-nested-fields">
-                  <Field
-                    id="account-password"
-                    label="Create a password"
-                    type="password"
-                    autoComplete="new-password"
-                  />
+                  <DeliveryFields prefix="billing" />
                 </div>
               )}
               <div className="pc-field pc-note">
@@ -248,7 +321,7 @@ export default function CheckoutPage() {
                 />
               </div>
             </section>
-          </div>
+          </form>
 
           <aside className="pc-summary" aria-label="Order summary">
             <div className="pc-summary-card">
@@ -330,18 +403,29 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <dt>Shipping</dt>
-                  <dd className="pc-free">Free</dd>
+                  <dd className={shipping === 0 ? "pc-free" : undefined}>
+                    {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Sales tax</dt>
+                  <dd>Calculated from delivery address</dd>
                 </div>
                 <div className="pc-total">
                   <dt>
                     Total <small>USD</small>
                   </dt>
-                  <dd>${subtotal.toFixed(2)}</dd>
+                  <dd>${estimatedTotal.toFixed(2)}</dd>
                 </div>
               </dl>
 
               <div className="pc-payment">
-                <StripeCheckout items={items} total={subtotal} />
+                <StripeCheckout
+                  disabled={items.length === 0}
+                  estimatedTotal={estimatedTotal}
+                  createPendingOrder={createPendingOrder}
+                  onSuccess={setCompletedOrder}
+                />
                 <p>
                   By placing your order, you agree to our terms and privacy
                   policy.

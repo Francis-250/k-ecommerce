@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { getUsers } from "../controllers/user.controller";
-
+import * as controller from "../controllers/user.controller";
+import { requireAdmin, verifyToken } from "../middlewares/auth.middleware";
 const router = Router();
-
-router.get("/register", getUsers);
-
+router.get("/me", verifyToken, controller.getProfile);
+router.patch("/me", verifyToken, controller.updateProfile);
+router.get("/", verifyToken, requireAdmin, controller.listUsers);
+router.get("/:id", verifyToken, requireAdmin, controller.getUser);
+router.patch("/:id", verifyToken, requireAdmin, controller.updateUser);
+router.delete("/:id", verifyToken, requireAdmin, controller.deleteUser);
 export default router;

@@ -18,7 +18,9 @@ import {
   useCart,
   type CartItem as CartItemType,
 } from "@/features/storefront/cart";
-import { catalogProducts } from "@/features/storefront/shop/catalog-data";
+import { AuthAccountLink } from "@/features/auth/AuthAccountLink";
+import { useStorefrontAppearance } from "@/features/storefront/appearance/useStorefrontAppearance";
+import { useStorefrontCatalog } from "@/features/storefront/catalog/useStorefrontCatalog";
 
 const mainLinks = [
   { label: "Home", href: "/", children: [] },
@@ -64,35 +66,37 @@ const mainLinks = [
     ],
   },
 ] as const;
-const languageOptions = [
-  { label: "English", flag: "🇬🇧" },
-  { label: "French", flag: "🇫🇷" },
-] as const;
-
 export function StorefrontShell({ children }: { children: ReactNode }) {
   const { items, itemCount, subtotal, removeItem } = useCart();
-  const [languageOpen, setLanguageOpen] = useState(false);
-  const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [language, setLanguage] = useState("English");
-  const [currency, setCurrency] = useState("USD");
+  const appearance = useStorefrontAppearance();
+  const catalog = useStorefrontCatalog();
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
-  const selectedLanguage =
-    languageOptions.find((item) => item.label === language) ??
-    languageOptions[0];
   const searchSuggestions = useMemo(() => {
     const value = searchQuery.trim().toLowerCase();
     if (!value) return [];
-    return catalogProducts
+    const dynamicProducts =
+      catalog.data?.products.data
+        .filter((product) => Boolean(product.images[0]?.url))
+        .map((product) => ({
+          id: product.id,
+          slug: product.slug,
+          name: product.name,
+          category: product.category?.name ?? "Uncategorized",
+          audience: product.audience.toLowerCase(),
+          image: product.images[0]!.url,
+          price: Number(product.price),
+        })) ?? [];
+    return dynamicProducts
       .filter((product) =>
         [product.name, product.category, product.audience].some((field) =>
           field.toLowerCase().includes(value),
         ),
       )
       .slice(0, 5);
-  }, [searchQuery]);
+  }, [catalog.data?.products, searchQuery]);
 
   return (
     <>
@@ -103,98 +107,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
             <header className="header_area">
               <div className="header_top">
                 <div className="row align-items-center">
-                  <div className="col-lg-6 col-md-6">
-                    <div className="switcher">
-                      <ul>
-                        <li
-                          className={`languages${languageOpen ? " open" : ""}`}
-                        >
-                          <a
-                            href="#language-menu"
-                            aria-expanded={languageOpen}
-                            onClick={(event) => {
-                              event.preventDefault();
-                              setCurrencyOpen(false);
-                              setLanguageOpen((value) => !value);
-                            }}
-                          >
-                            <span className="language-flag" aria-hidden="true">
-                              {selectedLanguage.flag}
-                            </span>{" "}
-                            <span className="selector-full">{language}</span>
-                            <span className="selector-short">
-                              {language.slice(0, 2).toUpperCase()}
-                            </span>{" "}
-                            <ChevronDown size={14} aria-hidden="true" />
-                          </a>
-                          <ul
-                            id="language-menu"
-                            className={`dropdown_languages${languageOpen ? " open" : ""}`}
-                            hidden={!languageOpen}
-                          >
-                            {languageOptions.map((item) => (
-                              <li key={item.label}>
-                                <a
-                                  href={`#${item.label.toLowerCase()}`}
-                                  onClick={(event) => {
-                                    event.preventDefault();
-                                    setLanguage(item.label);
-                                    setLanguageOpen(false);
-                                  }}
-                                >
-                                  <span
-                                    className="language-flag"
-                                    aria-hidden="true"
-                                  >
-                                    {item.flag}
-                                  </span>{" "}
-                                  {item.label}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </li>
-                        <li
-                          className={`currency${currencyOpen ? " open" : ""}`}
-                        >
-                          <a
-                            href="#currency-menu"
-                            aria-expanded={currencyOpen}
-                            onClick={(event) => {
-                              event.preventDefault();
-                              setLanguageOpen(false);
-                              setCurrencyOpen((value) => !value);
-                            }}
-                          >
-                            <span className="selector-full">Currency: </span>
-                            {currency}{" "}
-                            <ChevronDown size={14} aria-hidden="true" />
-                          </a>
-                          <ul
-                            id="currency-menu"
-                            className={`dropdown_currency${currencyOpen ? " open" : ""}`}
-                            hidden={!currencyOpen}
-                          >
-                            {["USD", "EUR"].map((item) => (
-                              <li key={item}>
-                                <a
-                                  href={`#${item.toLowerCase()}`}
-                                  onClick={(event) => {
-                                    event.preventDefault();
-                                    setCurrency(item);
-                                    setCurrencyOpen(false);
-                                  }}
-                                >
-                                  {item}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div className="col-lg-6 col-md-6">
+                  <div className="col-12">
                     <div className="header_links">
                       <ul>
                         <li>
@@ -210,7 +123,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                           <Link href="/cart">My cart</Link>
                         </li>
                         <li>
-                          <Link href="/login">Login</Link>
+                          <AuthAccountLink />
                         </li>
                       </ul>
                     </div>
@@ -223,15 +136,17 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                   <div className="col-lg-3 col-md-3">
                     <div className="logo">
                       <Link href="/">
-                        <Image
-                          className="system-logo"
-                          src="/storefront/assets/img/logo/iras-styles-badge.png"
-                          alt="I-RAS STYLES International Fashion"
-                          width={1118}
-                          height={520}
-                          priority
-                          unoptimized
-                        />
+                        {appearance.data?.logo && (
+                          <Image
+                            className="system-logo"
+                            src={appearance.data.logo.url}
+                            alt={appearance.data.logo.alt}
+                            width={1118}
+                            height={520}
+                            priority
+                            unoptimized
+                          />
+                        )}
                         <span
                           className="site-wordmark"
                           aria-label="I-RAS STYLES"
@@ -639,10 +554,7 @@ export function Breadcrumb({
       <div>
         <ul className="m-0 p-0 leading-[48px]">
           <li className={itemClass}>
-            <Link
-              className="!text-[#222] hover:!text-[#e84c3d]"
-              href="/"
-            >
+            <Link className="!text-[#222] hover:!text-[#e84c3d]" href="/">
               Home
             </Link>
           </li>
@@ -656,9 +568,7 @@ export function Breadcrumb({
               </Link>
             </li>
           ))}
-          <li className={itemClass}>
-            {title}
-          </li>
+          <li className={itemClass}>{title}</li>
         </ul>
       </div>
     </div>

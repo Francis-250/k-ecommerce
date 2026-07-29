@@ -1,22 +1,57 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
+import type { JwtPayload } from "jsonwebtoken";
+import type { Role } from "@prisma/client";
 import { verifyJWT } from "../utils/helpers";
 
-export const verifyToken = async (
+type AuthToken = JwtPayload & {
+  sub?: string;
+  role?: string;
+};
+
+export const verifyToken = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const token = req.cookies?.token;
+  const jwtSecret = process.env.JWT_SECRET;
 
-  if (!token) {
-    res.status(404).json({ message: "No User Login Again" });
+  if (!token || !jwtSecret) {
+    return res.status(401).json({
+      success: false,
+      message: "You are not signed in",
+    });
   }
-  try {
-    const decodedToken = verifyJWT(token, process.env.JWT_SECRET!);
-    req.user = decodedToken;
-    next();
-  } catch (error) {
-    console.log(error);
-    res.status(401).json({ message: "Invalid token" });
+
+  const decodedToken = verifyJWT<AuthToken>(token, jwtSecret);
+
+  if (!decodedToken?.sub) {
+    res.clearCookie("token", { path: "/" });
+    return res.status(401).json({
+      success: false,
+      message: "Your session is invalid or has expired",
+    });
   }
+
+  req.auth = {
+    sub: decodedToken.sub,
+    role: decodedToken.role,
+  };
+
+  return next();
 };
+
+export const requireRoles =
+  (...roles: Role[]) =>
+  (req: Request, res: Response, next: NextFunction) => {
+    if (!req.auth || !roles.includes(req.auth.role as Role)) {
+      return res.status(403).json({
+        success: false,
+        message: "You do not have permission to perform this action",
+      });
+    }
+
+    return next();
+  };
+
+export const requireAdmin = requireRoles("ADMIN", "SUPER_ADMIN");

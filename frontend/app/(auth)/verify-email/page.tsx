@@ -1,22 +1,10 @@
-import {
-  AccountField,
-  AccountLink,
-  AuthPage,
-  Submit,
-} from "../_components/AuthPage";
+import { AccountLink, AuthPage } from "../_components/AuthPage";
+import { VerifyEmailForm } from "@/features/auth/AuthForms";
 export default function VerifyEmailPage() {
   return (
     <AuthPage title="Verify email">
       <h2>Verify email</h2>
-      <form>
-        <p>Enter the verification code sent to your email address.</p>
-        <AccountField
-          id="verification-code"
-          label="Verification code"
-          autoComplete="one-time-code"
-        />
-        <Submit>Verify email</Submit>
-      </form>
+      <VerifyEmailForm />
       <AccountLink href="/register">Return to registration</AccountLink>
     </AuthPage>
   );

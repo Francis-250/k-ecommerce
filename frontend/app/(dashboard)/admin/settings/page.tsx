@@ -1,10 +1,21 @@
 "use client";
 
-import { Bell, CreditCard, Globe2, Save, Store, UserRound } from "lucide-react";
+import {
+  Bell,
+  CreditCard,
+  Globe2,
+  ImageIcon,
+  Save,
+  Store,
+  UserRound,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AdminPageHeader } from "../_components/AdminPageHeader";
+import { ImageUploadField } from "../_components/AdminFormUI";
+import { StorefrontAppearanceSettings } from "../_components/StorefrontAppearanceSettings";
 const tabs = [
+  { id: "appearance", label: "Storefront", icon: ImageIcon },
   { id: "store", label: "Store details", icon: Store },
   { id: "regional", label: "Regional", icon: Globe2 },
   { id: "payments", label: "Payments", icon: CreditCard },
@@ -12,7 +23,7 @@ const tabs = [
   { id: "account", label: "Account", icon: UserRound },
 ];
 export default function SettingsPage() {
-  const [tab, setTab] = useState("store");
+  const [tab, setTab] = useState("appearance");
   return (
     <>
       <AdminPageHeader
@@ -28,7 +39,7 @@ export default function SettingsPage() {
             <button
               key={id}
               onClick={() => setTab(id)}
-              className={`flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-normal ${tab === id ? "bg-emerald-50 text-black" : "text-black hover:bg-slate-50"}`}
+              className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium transition ${tab === id ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}
             >
               <Icon size={17} />
               {label}
@@ -48,20 +59,28 @@ export default function SettingsPage() {
             </h2>
           </header>
           <div className="p-5">
+            {tab === "appearance" && <StorefrontAppearanceSettings />}
             {tab === "store" && (
-              <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
-                <Field label="Store name" defaultValue="I-RAS STYLES" />
-                <Field
-                  label="Support email"
-                  type="email"
-                  defaultValue="support@irasstyles.com"
-                />
-                <Field label="Phone number" defaultValue="+250 788 000 000" />
-                <Field label="Store domain" defaultValue="irasstyles.com" />
-                <Field
-                  label="Business address"
-                  wide
-                  defaultValue="KN Street, Kigali"
+              <div className="grid max-w-4xl gap-6 lg:grid-cols-[1fr_260px]">
+                <div className="grid content-start gap-4 sm:grid-cols-2">
+                  <Field label="Store name" defaultValue="I-RAS STYLES" />
+                  <Field
+                    label="Support email"
+                    type="email"
+                    defaultValue="support@irasstyles.com"
+                  />
+                  <Field label="Phone number" defaultValue="+1 202 555 0100" />
+                  <Field label="Store domain" defaultValue="irasstyles.com" />
+                  <Field
+                    label="Business address"
+                    wide
+                    defaultValue="New York, United States"
+                  />
+                </div>
+                <ImageUploadField
+                  label="Store logo"
+                  description="Preview the primary logo used in emails and administrative documents."
+                  aspect="logo"
                 />
               </div>
             )}
@@ -107,24 +126,32 @@ export default function SettingsPage() {
               </div>
             )}
             {tab === "account" && (
-              <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
-                <Field label="Full name" defaultValue="Admin User" />
-                <Field
-                  label="Email"
-                  type="email"
-                  defaultValue="admin@irasstyles.com"
+              <div className="grid max-w-4xl gap-6 lg:grid-cols-[1fr_240px]">
+                <div className="grid content-start gap-4 sm:grid-cols-2">
+                  <Field label="Full name" defaultValue="Admin User" />
+                  <Field
+                    label="Email"
+                    type="email"
+                    defaultValue="admin@irasstyles.com"
+                  />
+                  <Field label="Current password" type="password" />
+                  <Field label="New password" type="password" />
+                </div>
+                <ImageUploadField
+                  label="Profile image"
+                  description="Preview the avatar shown in the admin header."
                 />
-                <Field label="Current password" type="password" />
-                <Field label="New password" type="password" />
               </div>
             )}
           </div>
-          <footer className="flex justify-end border-t border-slate-200 px-5 py-4">
-            <button className="flex h-9 items-center gap-2 rounded-md bg-emerald-600 px-4 text-sm font-medium text-white">
-              <Save size={15} />
-              Save changes
-            </button>
-          </footer>
+          {tab !== "appearance" && (
+            <footer className="flex justify-end border-t border-slate-200 px-5 py-4">
+              <button className="flex min-h-10 items-center gap-2 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-slate-800">
+                <Save size={15} />
+                Save changes
+              </button>
+            </footer>
+          )}
         </form>
       </div>
     </>
@@ -152,7 +179,7 @@ function Field({
         id={id}
         type={type}
         defaultValue={defaultValue}
-        className="mt-2 h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 font-normal outline-none focus:border-emerald-500"
+        className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 font-normal shadow-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5"
       />
     </label>
   );
@@ -161,7 +188,7 @@ function Select({ label, options }: { label: string; options: string[] }) {
   return (
     <label className="text-sm font-medium text-slate-700">
       {label}
-      <select className="mt-2 h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 font-normal outline-none focus:border-emerald-500">
+      <select className="mt-2 min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 font-normal shadow-sm outline-none transition focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5">
         {options.map((option) => (
           <option key={option}>{option}</option>
         ))}
@@ -189,7 +216,7 @@ function Toggle({
       <input
         type="checkbox"
         defaultChecked={checked}
-        className="size-4 accent-emerald-600"
+        className="size-4 accent-slate-900"
       />
     </label>
   );

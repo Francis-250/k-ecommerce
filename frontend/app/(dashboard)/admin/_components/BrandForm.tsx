@@ -1,6 +1,18 @@
 "use client";
-import { Upload } from "lucide-react";
+
+import { BadgeCheck, Building2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  FormActions,
+  FormCard,
+  FormField,
+  FormGrid,
+  FormSelect,
+  FormTextarea,
+  ImageUploadField,
+  ToggleRow,
+} from "./AdminFormUI";
+
 export function BrandForm() {
   return (
     <form
@@ -8,43 +20,97 @@ export function BrandForm() {
         event.preventDefault();
         toast.success("Brand created");
       }}
-      className="grid gap-5 xl:grid-cols-[2fr_1fr]"
+      className="mx-auto max-w-5xl"
     >
-      <section className="rounded-lg border border-slate-200 bg-white p-5">
-        <h2 className="mb-4 font-semibold text-slate-800">Brand information</h2>
-        {["Brand name", "Handle", "Country", "Website"].map((label) => (
-          <label
-            key={label}
-            className="mb-4 block text-sm font-medium text-slate-700"
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-6">
+          <FormCard
+            title="Brand information"
+            description="Create the public identity customers see on product pages."
+            icon={<Building2 size={18} />}
           >
-            {label}
-            <input
-              required={label !== "Website"}
-              className="mt-2 h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 font-normal outline-none focus:border-emerald-500"
+            <div className="space-y-5">
+              <FormGrid>
+                <FormField
+                  label="Brand name"
+                  name="name"
+                  placeholder="I-RAS STYLES"
+                  required
+                />
+                <FormField
+                  label="URL handle"
+                  name="slug"
+                  placeholder="iras-styles"
+                  required
+                  hint="Lowercase letters, numbers, and hyphens."
+                />
+              </FormGrid>
+              <FormTextarea
+                label="Description"
+                rows={6}
+                placeholder="Tell customers about the brand, its origin, and design philosophy."
+                hint="A focused description improves brand discovery and product context."
+              />
+            </div>
+          </FormCard>
+
+          <FormCard title="Contact and origin">
+            <FormGrid>
+              <FormSelect label="Country or region" defaultValue="US">
+                <option value="US">United States</option>
+                <option value="RW">Rwanda</option>
+                <option value="GH">Ghana</option>
+                <option value="NG">Nigeria</option>
+              </FormSelect>
+              <FormField
+                label="Website"
+                type="url"
+                placeholder="https://example.com"
+                optional
+              />
+              <FormField
+                label="Contact email"
+                type="email"
+                placeholder="hello@example.com"
+                optional
+              />
+              <FormField
+                label="Established year"
+                type="number"
+                min="1800"
+                max="2100"
+                placeholder="2020"
+                optional
+              />
+            </FormGrid>
+          </FormCard>
+        </div>
+
+        <aside className="space-y-6 xl:sticky xl:top-20">
+          <FormCard
+            title="Brand logo"
+            description="Shown in brand listings and product attribution."
+          >
+            <ImageUploadField
+              label="Logo image"
+              description="Use a transparent PNG or WebP with generous spacing."
+              aspect="logo"
             />
-          </label>
-        ))}
-        <label className="block text-sm font-medium text-slate-700">
-          Description
-          <textarea
-            rows={4}
-            className="mt-2 w-full rounded-md border border-slate-200 bg-slate-50 p-3 font-normal outline-none focus:border-emerald-500"
-          />
-        </label>
-      </section>
-      <div className="space-y-5">
-        <section className="rounded-lg border border-slate-200 bg-white p-5">
-          <h2 className="mb-4 font-semibold text-slate-800">Brand logo</h2>
-          <label className="flex h-36 cursor-pointer flex-col items-center justify-center border border-dashed border-slate-300 text-sm text-slate-500">
-            <Upload size={23} />
-            <span className="mt-2">Upload logo</span>
-            <input type="file" className="sr-only" />
-          </label>
-        </section>
-        <button className="h-10 w-full rounded-md bg-emerald-600 text-sm font-medium text-white">
-          Save brand
-        </button>
+          </FormCard>
+          <FormCard title="Availability" icon={<BadgeCheck size={18} />}>
+            <ToggleRow
+              title="Active brand"
+              description="Allow this brand to appear on the storefront."
+              defaultChecked
+            />
+            <ToggleRow
+              title="Featured brand"
+              description="Make this brand eligible for homepage promotion."
+            />
+          </FormCard>
+        </aside>
       </div>
+      <FormActions cancelHref="/admin/brands" submitLabel="Create brand" />
     </form>
   );
 }

@@ -49,7 +49,7 @@ export function InventoryManagement() {
           </select>
           <button
             onClick={() => toast.success("Inventory changes saved")}
-            className="h-9 rounded-md bg-emerald-600 px-4 text-sm font-medium text-white"
+            className="min-h-10 rounded-lg bg-slate-950 px-4 text-sm font-semibold text-white transition hover:bg-slate-800"
           >
             Save changes
           </button>
@@ -84,7 +84,7 @@ export function InventoryManagement() {
                 setQuery(event.target.value);
                 setPage(1);
               }}
-              className="h-9 w-full rounded-md border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm outline-none focus:border-emerald-500"
+              className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-3 text-sm outline-none transition focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-900/5"
               placeholder="Search products or SKU"
             />
           </div>
@@ -157,7 +157,7 @@ export function InventoryManagement() {
                         onChange={(event) =>
                           update(product.index, Number(event.target.value))
                         }
-                        className="h-8 w-20 rounded-md border border-slate-200 bg-slate-50 px-2 outline-none focus:border-emerald-500"
+                        className="h-8 w-20 rounded-md border border-slate-200 bg-slate-50 px-2 outline-none focus:border-slate-900"
                       />
                     </td>
                     <td className="px-4 py-3">

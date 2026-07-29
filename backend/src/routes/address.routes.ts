@@ -1,0 +1,10 @@
+import { Router } from "express";
+import * as controller from "../controllers/address.controller";
+import { verifyToken } from "../middlewares/auth.middleware";
+const router = Router();
+router.use(verifyToken);
+router.get("/", controller.listAddresses);
+router.post("/", controller.createAddress);
+router.patch("/:id", controller.updateAddress);
+router.delete("/:id", controller.deleteAddress);
+export default router;

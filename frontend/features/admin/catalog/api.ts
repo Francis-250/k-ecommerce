@@ -1,0 +1,186 @@
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
+  "http://localhost:4000/api";
+
+export class CatalogApiError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
+    super(message);
+    this.name = "CatalogApiError";
+  }
+}
+
+export type Brand = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  logoUrl: string | null;
+  websiteUrl: string | null;
+  country: string | null;
+  isActive: boolean;
+};
+
+export type Category = {
+  id: string;
+  parentId: string | null;
+  name: string;
+  slug: string;
+  description: string | null;
+  imageUrl: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  _count: { products: number };
+};
+
+export type BrandInput = Pick<
+  Brand,
+  "name" | "slug" | "description" | "country" | "logoUrl" | "isActive"
+>;
+
+export type CategoryInput = Pick<
+  Category,
+  | "name"
+  | "slug"
+  | "description"
+  | "parentId"
+  | "isActive"
+  | "sortOrder"
+>;
+
+export type Coupon = {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  type: "PERCENTAGE" | "FIXED_AMOUNT" | "FREE_SHIPPING" | "BUY_X_GET_Y";
+  status: "DRAFT" | "ACTIVE" | "DISABLED" | "EXPIRED";
+  value: string | null;
+  currency: string;
+  minimumSubtotal: string | null;
+  minimumQuantity: number | null;
+  maximumDiscount: string | null;
+  usageLimit: number | null;
+  perCustomerLimit: number | null;
+  isAutomatic: boolean;
+  startsAt: string | null;
+  endsAt: string | null;
+  _count: { redemptions: number };
+};
+
+export type CouponInput = {
+  code: string;
+  name: string;
+  description: string | null;
+  type: Coupon["type"];
+  status: Coupon["status"];
+  value: number | null;
+  currency: "USD";
+  minimumSubtotal: number | null;
+  usageLimit: number | null;
+  perCustomerLimit: number | null;
+  isAutomatic: boolean;
+  startsAt: string | null;
+  endsAt: string | null;
+};
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${API_URL}${path}`, {
+    ...init,
+    credentials: "include",
+    headers: {
+      Accept: "application/json",
+      ...(init?.body ? { "Content-Type": "application/json" } : {}),
+      ...init?.headers,
+    },
+  });
+  const body = (await response.json().catch(() => ({}))) as T & {
+    message?: string;
+    error?: { fieldErrors?: Record<string, string[]> };
+  };
+  if (!response.ok) {
+    const fieldMessage = body.error?.fieldErrors
+      ? Object.values(body.error.fieldErrors).flat()[0]
+      : undefined;
+    throw new CatalogApiError(
+      fieldMessage ?? body.message ?? "The request could not be completed.",
+      response.status,
+    );
+  }
+  return body;
+}
+
+export const catalogApi = {
+  listBrands: () =>
+    request<{ brands: Brand[] }>("/brands?admin=true").then(
+      (body) => body.brands,
+    ),
+  createBrand: (input: BrandInput) =>
+    request<{ brand: Brand }>("/brands", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }).then((body) => body.brand),
+  updateBrand: (id: string, input: BrandInput) =>
+    request<{ brand: Brand }>(`/brands/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    }).then((body) => body.brand),
+  deleteBrand: (id: string) =>
+    request<void>(`/brands/${id}`, { method: "DELETE" }),
+  listCategories: () =>
+    request<{ categories: Category[] }>("/categories?admin=true").then(
+      (body) => body.categories,
+    ),
+  createCategory: (input: CategoryInput) =>
+    request<{ category: Category }>("/categories", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }).then((body) => body.category),
+  updateCategory: (id: string, input: CategoryInput) =>
+    request<{ category: Category }>(`/categories/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    }).then((body) => body.category),
+  deleteCategory: (id: string) =>
+    request<void>(`/categories/${id}`, { method: "DELETE" }),
+  listCoupons: () =>
+    request<{
+      data: Coupon[];
+      pagination: { page: number; limit: number; total: number; pages: number };
+    }>("/coupons?limit=100").then((body) => body.data),
+  createCoupon: (input: CouponInput) =>
+    request<{ coupon: Coupon }>("/coupons", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }).then((body) => body.coupon),
+  updateCoupon: (id: string, input: CouponInput) =>
+    request<{ coupon: Coupon }>(`/coupons/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    }).then((body) => body.coupon),
+  disableCoupon: (id: string) =>
+    request<void>(`/coupons/${id}`, { method: "DELETE" }),
+};
+
+function fileToDataUri(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Unable to read the image."));
+    reader.readAsDataURL(file);
+  });
+}
+
+export async function uploadBrandLogo(file: File) {
+  const dataUri = await fileToDataUri(file);
+  return request<{ image: { url: string } }>("/media/images", {
+    method: "POST",
+    body: JSON.stringify({
+      dataUri,
+      folder: "brands",
+      altText: file.name,
+    }),
+  }).then((body) => body.image.url);
+}

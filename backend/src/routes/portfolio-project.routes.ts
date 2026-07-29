@@ -1,0 +1,10 @@
+import { Router } from "express";
+import * as c from "../controllers/portfolio-project.controller";
+import { requireAdmin, verifyToken } from "../middlewares/auth.middleware";
+const router = Router();
+router.get("/", c.listPortfolioProjects);
+router.get("/:id", c.getPortfolioProject);
+router.post("/", verifyToken, requireAdmin, c.createPortfolioProject);
+router.patch("/:id", verifyToken, requireAdmin, c.updatePortfolioProject);
+router.delete("/:id", verifyToken, requireAdmin, c.deletePortfolioProject);
+export default router;

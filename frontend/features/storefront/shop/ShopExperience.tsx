@@ -7,18 +7,12 @@ import {
   Breadcrumb,
   StorefrontShell,
 } from "@/components/storefront/StorefrontShell";
-import { catalogProducts } from "./catalog-data";
+import { useStorefrontCatalog } from "@/features/storefront/catalog/useStorefrontCatalog";
+import { useStorefrontAppearance } from "@/features/storefront/appearance/useStorefrontAppearance";
+import type { CatalogProduct } from "./catalog-data";
 import { ProductResults } from "./ProductResults";
 
-const categories = [
-  "All",
-  "Accessories",
-  "Dresses",
-  "Tops",
-  "Handbags",
-] as const;
-type Category = (typeof categories)[number];
-const audiences = ["All", "Women", "Men"] as const;
+const audiences = ["All", "Women", "Men", "Unisex", "Kids"] as const;
 type Audience = (typeof audiences)[number];
 
 export function ShopExperience({
@@ -27,13 +21,15 @@ export function ShopExperience({
   query = "",
 }: {
   initialGender?: Audience;
-  initialCategory?: Category;
+  initialCategory?: string;
   query?: string;
 }) {
+  const catalog = useStorefrontCatalog();
+  const appearance = useStorefrontAppearance();
   const [view, setView] = useState<"grid" | "list">("grid");
-  const [category, setCategory] = useState<Category>(initialCategory);
+  const [category, setCategory] = useState(initialCategory);
   const [gender, setGender] = useState<Audience>(initialGender);
-  const [maxPrice, setMaxPrice] = useState(100);
+  const [maxPrice, setMaxPrice] = useState(Number.POSITIVE_INFINITY);
   const [sort, setSort] = useState("featured");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -49,13 +45,58 @@ export function ShopExperience({
       document.body.classList.remove("shop-filters-open");
     };
   }, [filtersOpen]);
+  const catalogProducts = useMemo<CatalogProduct[]>(
+    () =>
+      catalog.data?.products.data
+        .filter((product) => Boolean(product.images[0]?.url))
+        .map((product, index) => ({
+          id: index + 1,
+          slug: product.slug,
+          name: product.name,
+          price: Number(product.price),
+          category: product.category?.name ?? "Uncategorized",
+          audience:
+            product.audience === "WOMEN"
+              ? "Women"
+              : product.audience === "MEN"
+                ? "Men"
+                : product.audience === "KIDS"
+                  ? "Kids"
+                  : "Unisex",
+          image: product.images[0]!.url,
+          featured: product.isFeatured,
+          createdAt: product.createdAt,
+        })) ?? [],
+    [catalog.data?.products.data],
+  );
+  const categories = useMemo(
+    () => [
+      { name: "All", slug: "All", count: catalogProducts.length },
+      ...(catalog.data?.categories.map((item) => ({
+        name: item.name,
+        slug: item.slug,
+        count: item._count.products,
+      })) ?? []),
+    ],
+    [catalog.data?.categories, catalogProducts.length],
+  );
+  const priceCeiling = Math.max(
+    1,
+    Math.ceil(
+      Math.max(0, ...catalogProducts.map((product) => product.price)) / 10,
+    ) * 10,
+  );
+  const effectiveMaxPrice = Number.isFinite(maxPrice) ? maxPrice : priceCeiling;
   const products = useMemo(() => {
     const normalizedQuery = query.toLowerCase();
     const filtered = catalogProducts.filter(
       (product) =>
-        (category === "All" || product.category === category) &&
+        (category === "All" ||
+          catalog.data?.categories.find(
+            (item) => item.slug === category || item.name === category,
+          )?.name === product.category) &&
         (gender === "All" || product.audience === gender) &&
-        product.price <= maxPrice &&
+        product.price <= effectiveMaxPrice &&
         (!query ||
           [product.name, product.category, product.audience]
             .join(" ")
@@ -69,9 +110,19 @@ export function ShopExperience({
           ? b.price - a.price
           : sort === "name"
             ? a.name.localeCompare(b.name)
-            : a.id - b.id,
+            : Number(Boolean(b.featured)) - Number(Boolean(a.featured)) ||
+              new Date(b.createdAt ?? 0).getTime() -
+                new Date(a.createdAt ?? 0).getTime(),
     );
-  }, [category, gender, maxPrice, query, sort]);
+  }, [
+    catalog.data?.categories,
+    catalogProducts,
+    category,
+    effectiveMaxPrice,
+    gender,
+    query,
+    sort,
+  ]);
 
   return (
     <StorefrontShell>
@@ -120,26 +171,20 @@ export function ShopExperience({
               <div className="layere_categorie">
                 <ul>
                   {categories.map((item) => (
-                    <li key={item}>
+                    <li key={item.slug}>
                       <input
-                        id={`filter-${item}`}
+                        id={`filter-${item.slug}`}
                         type="radio"
                         name="category"
-                        checked={category === item}
-                        onChange={() => setCategory(item)}
+                        checked={
+                          category === item.slug ||
+                          (item.slug !== "All" && category === item.name)
+                        }
+                        onChange={() => setCategory(item.slug)}
                       />
-                      <label htmlFor={`filter-${item}`}>
-                        {item}
-                        <span>
-                          {" "}
-                          (
-                          {item === "All"
-                            ? catalogProducts.length
-                            : catalogProducts.filter(
-                                (product) => product.category === item,
-                              ).length}
-                          )
-                        </span>
+                      <label htmlFor={`filter-${item.slug}`}>
+                        {item.name}
+                        <span> ({item.count})</span>
                       </label>
                     </li>
                   ))}
@@ -182,13 +227,15 @@ export function ShopExperience({
             <div className="sidebar_widget price">
               <h2>Price</h2>
               <div className="ca_search_filters">
-                <label htmlFor="max-price">Up to ${maxPrice}</label>
+                <label htmlFor="max-price">
+                  Up to ${effectiveMaxPrice.toFixed(0)}
+                </label>
                 <input
                   id="max-price"
                   type="range"
-                  min="35"
-                  max="100"
-                  value={maxPrice}
+                  min="0"
+                  max={priceCeiling}
+                  value={effectiveMaxPrice}
                   onChange={(event) => setMaxPrice(Number(event.target.value))}
                 />
               </div>
@@ -199,7 +246,7 @@ export function ShopExperience({
                 onClick={() => {
                   setCategory("All");
                   setGender("All");
-                  setMaxPrice(100);
+                  setMaxPrice(Number.POSITIVE_INFINITY);
                   setSort("featured");
                 }}
                 className="button"
@@ -216,15 +263,20 @@ export function ShopExperience({
             </div>
           </aside>
           <div className="col-lg-9 col-md-12 shop-results-column">
-            <div className="banner_slider mb-35">
-              <Image
-                src="/storefront/assets/img/banner/bannner10.jpg"
-                alt="Discover the latest I-RAS STYLES collection"
-                width={870}
-                height={220}
-                priority
-              />
-            </div>
+            {appearance.data?.shopBanner ? (
+              <div className="banner_slider mb-35">
+                <Image
+                  src={appearance.data.shopBanner.url}
+                  alt={appearance.data.shopBanner.alt}
+                  width={870}
+                  height={220}
+                  priority
+                  unoptimized
+                />
+              </div>
+            ) : (
+              <div className="mb-35 h-[220px] animate-pulse bg-slate-100" />
+            )}
             <div className="shop_toolbar mb-35">
               <div className="list_button">
                 <ul className="nav" aria-label="Product display">
@@ -272,7 +324,29 @@ export function ShopExperience({
               </div>
             </div>
             <div className="shop-products-scroll">
-              <ProductResults products={products} view={view} />
+              {catalog.isPending ? (
+                <div
+                  className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
+                  aria-label="Loading products"
+                >
+                  {[1, 2, 3, 4, 5, 6].map((item) => (
+                    <div
+                      key={item}
+                      className="h-80 animate-pulse rounded bg-slate-100"
+                    />
+                  ))}
+                </div>
+              ) : catalog.isError ? (
+                <div className="error_form">
+                  <h2>Products could not be loaded</h2>
+                  <p>Check your connection and try again.</p>
+                  <button type="button" onClick={() => catalog.refetch()}>
+                    Try again
+                  </button>
+                </div>
+              ) : (
+                <ProductResults products={products} view={view} />
+              )}
             </div>
           </div>
         </div>

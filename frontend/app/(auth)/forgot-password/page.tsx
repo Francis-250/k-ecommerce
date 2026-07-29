@@ -1,26 +1,10 @@
-import {
-  AccountField,
-  AccountLink,
-  AuthPage,
-  Submit,
-} from "../_components/AuthPage";
+import { AccountLink, AuthPage } from "../_components/AuthPage";
+import { ForgotPasswordForm } from "@/features/auth/AuthForms";
 export default function ForgotPasswordPage() {
   return (
     <AuthPage title="Forgot password">
       <h2>Forgot password</h2>
-      <form>
-        <p>
-          Enter the email address linked to your account and we will send you a
-          password reset link.
-        </p>
-        <AccountField
-          id="email"
-          label="Email address"
-          type="email"
-          autoComplete="email"
-        />
-        <Submit>Send reset link</Submit>
-      </form>
+      <ForgotPasswordForm />
       <AccountLink href="/login">Back to login</AccountLink>
     </AuthPage>
   );

@@ -1,152 +1,209 @@
 "use client";
+
+import { CalendarDays, Percent, ShieldCheck, UsersRound } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+import {
+  ChoiceCard,
+  FormActions,
+  FormCard,
+  FormField,
+  FormGrid,
+  FormSelect,
+  ToggleRow,
+} from "./AdminFormUI";
+
 export function CouponForm() {
+  const [method, setMethod] = useState("code");
+  const [discountType, setDiscountType] = useState("percentage");
+  const [requirement, setRequirement] = useState("none");
+
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
         toast.success("Discount created");
       }}
-      className="grid gap-5 xl:grid-cols-[2fr_1fr]"
+      className="mx-auto max-w-5xl"
     >
-      <div className="space-y-5">
-        <Section title="Discount method">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Choice
-              title="Discount code"
-              description="Customers enter a code at checkout"
-              checked
-            />
-            <Choice
-              title="Automatic discount"
-              description="Applied automatically when eligible"
-            />
-          </div>
-        </Section>
-        <Section title="Value">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Select
-              label="Discount type"
-              options={[
-                "Percentage",
-                "Fixed amount",
-                "Free shipping",
-                "Buy X get Y",
-              ]}
-            />
-            <Field label="Discount value" type="number" />
-          </div>
-        </Section>
-        <Section title="Customer eligibility">
-          <Select
-            label="Eligible customers"
-            options={[
-              "All customers",
-              "Specific customer segments",
-              "Specific customers",
-            ]}
-          />
-        </Section>
-        <Section title="Minimum requirements">
-          <Select
-            label="Requirement"
-            options={[
-              "No minimum requirements",
-              "Minimum purchase amount",
-              "Minimum quantity of items",
-            ]}
-          />
-        </Section>
-      </div>
-      <div className="space-y-5">
-        <Section title="Code">
-          <Field label="Discount code" />
-          <button
-            type="button"
-            className="mt-3 text-sm font-medium text-emerald-700"
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-6">
+          <FormCard
+            title="Discount method"
+            description="Choose how customers receive this offer."
+            icon={<Percent size={18} />}
           >
-            Generate random code
-          </button>
-        </Section>
-        <Section title="Usage limits">
-          <label className="flex gap-3 text-sm">
-            <input type="checkbox" />
-            Limit number of times this discount can be used
-          </label>
-          <label className="mt-3 flex gap-3 text-sm">
-            <input type="checkbox" />
-            Limit to one use per customer
-          </label>
-        </Section>
-        <Section title="Active dates">
-          <Field label="Start date" type="date" />
-          <div className="mt-4">
-            <Field label="End date" type="date" />
-          </div>
-        </Section>
-        <button className="h-10 w-full rounded-md bg-emerald-600 text-sm font-medium text-white">
-          Save discount
-        </button>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <ChoiceCard
+                name="method"
+                value="code"
+                title="Discount code"
+                description="Customers enter a code during checkout."
+                checked={method === "code"}
+                onChange={() => setMethod("code")}
+              />
+              <ChoiceCard
+                name="method"
+                value="automatic"
+                title="Automatic discount"
+                description="Applied automatically when conditions are met."
+                checked={method === "automatic"}
+                onChange={() => setMethod("automatic")}
+              />
+            </div>
+            <div className="mt-5">
+              <FormField
+                label={method === "code" ? "Discount code" : "Internal title"}
+                placeholder={method === "code" ? "WELCOME10" : "Summer offer"}
+                required
+                hint={
+                  method === "code"
+                    ? "Customers will enter this code exactly as shown."
+                    : "Customers do not see this title."
+                }
+              />
+            </div>
+          </FormCard>
+
+          <FormCard title="Discount value">
+            <FormGrid>
+              <FormSelect
+                label="Discount type"
+                value={discountType}
+                onChange={(event) => setDiscountType(event.target.value)}
+              >
+                <option value="percentage">Percentage</option>
+                <option value="fixed">Fixed amount</option>
+                <option value="shipping">Free shipping</option>
+                <option value="buy-x-get-y">Buy X get Y</option>
+              </FormSelect>
+              {discountType !== "shipping" && (
+                <FormField
+                  label={
+                    discountType === "percentage"
+                      ? "Percentage"
+                      : "Discount amount"
+                  }
+                  type="number"
+                  min="0"
+                  max={discountType === "percentage" ? "100" : undefined}
+                  step="0.01"
+                  placeholder={discountType === "percentage" ? "10" : "15.00"}
+                  required
+                />
+              )}
+            </FormGrid>
+            {discountType === "buy-x-get-y" && (
+              <div className="mt-5 grid gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
+                <FormField
+                  label="Customer buys quantity"
+                  type="number"
+                  min="1"
+                  defaultValue="2"
+                />
+                <FormField
+                  label="Customer receives quantity"
+                  type="number"
+                  min="1"
+                  defaultValue="1"
+                />
+                <FormSelect label="Eligible products">
+                  <option>Any product</option>
+                  <option>Specific products</option>
+                  <option>Specific categories</option>
+                </FormSelect>
+                <FormSelect label="Discount on reward">
+                  <option>100% off</option>
+                  <option>Percentage off</option>
+                </FormSelect>
+              </div>
+            )}
+          </FormCard>
+
+          <FormCard
+            title="Customer eligibility"
+            description="Control who can redeem this offer."
+            icon={<UsersRound size={18} />}
+          >
+            <FormSelect label="Eligible customers">
+              <option>All customers</option>
+              <option>Specific customer segments</option>
+              <option>Specific customers</option>
+            </FormSelect>
+          </FormCard>
+
+          <FormCard title="Minimum requirements">
+            <FormSelect
+              label="Requirement"
+              value={requirement}
+              onChange={(event) => setRequirement(event.target.value)}
+            >
+              <option value="none">No minimum requirements</option>
+              <option value="amount">Minimum purchase amount</option>
+              <option value="quantity">Minimum quantity of items</option>
+            </FormSelect>
+            {requirement !== "none" && (
+              <div className="mt-5">
+                <FormField
+                  label={
+                    requirement === "amount"
+                      ? "Minimum amount"
+                      : "Minimum quantity"
+                  }
+                  type="number"
+                  min={requirement === "amount" ? "0" : "1"}
+                  step={requirement === "amount" ? "0.01" : "1"}
+                  placeholder={requirement === "amount" ? "75.00" : "2"}
+                  required
+                />
+              </div>
+            )}
+          </FormCard>
+        </div>
+
+        <aside className="space-y-6 xl:sticky xl:top-20">
+          <FormCard title="Usage limits" icon={<ShieldCheck size={18} />}>
+            <ToggleRow
+              title="Limit total redemptions"
+              description="Set a maximum number of uses across all customers."
+            />
+            <FormField
+              label="Maximum uses"
+              type="number"
+              min="1"
+              placeholder="500"
+              optional
+            />
+            <div className="mt-4">
+              <ToggleRow
+                title="One use per customer"
+                description="Prevent repeated use by the same account."
+              />
+            </div>
+          </FormCard>
+
+          <FormCard title="Active dates" icon={<CalendarDays size={18} />}>
+            <div className="space-y-5">
+              <FormField label="Start date" type="date" required />
+              <FormField label="Start time" type="time" defaultValue="00:00" />
+              <FormField label="End date" type="date" optional />
+              <FormField label="End time" type="time" optional />
+            </div>
+          </FormCard>
+
+          <FormCard title="Combinations">
+            <ToggleRow
+              title="Product discounts"
+              description="Combine with product-level discounts."
+            />
+            <ToggleRow
+              title="Shipping discounts"
+              description="Combine with free or reduced shipping."
+            />
+          </FormCard>
+        </aside>
       </div>
+      <FormActions cancelHref="/admin/coupons" submitLabel="Create discount" />
     </form>
-  );
-}
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-lg border border-slate-200 bg-white p-5">
-      <h2 className="mb-4 font-semibold text-slate-800">{title}</h2>
-      {children}
-    </section>
-  );
-}
-function Choice({
-  title,
-  description,
-  checked,
-}: {
-  title: string;
-  description: string;
-  checked?: boolean;
-}) {
-  return (
-    <label className="flex cursor-pointer gap-3 rounded-md border border-slate-200 p-4">
-      <input name="method" type="radio" defaultChecked={checked} />
-      <span>
-        <strong className="block text-sm font-medium text-slate-800">
-          {title}
-        </strong>
-        <small className="text-slate-500">{description}</small>
-      </span>
-    </label>
-  );
-}
-function Field({ label, type = "text" }: { label: string; type?: string }) {
-  return (
-    <label className="block text-sm font-medium text-slate-700">
-      {label}
-      <input
-        required
-        className="mt-2 h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 font-normal outline-none focus:border-emerald-500"
-        type={type}
-      />
-    </label>
-  );
-}
-function Select({ label, options }: { label: string; options: string[] }) {
-  return (
-    <label className="block text-sm font-medium text-slate-700">
-      {label}
-      <select className="mt-2 h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 font-normal outline-none focus:border-emerald-500">
-        {options.map((option) => (
-          <option key={option}>{option}</option>
-        ))}
-      </select>
-    </label>
   );
 }

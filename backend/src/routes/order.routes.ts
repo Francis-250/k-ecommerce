@@ -1,0 +1,11 @@
+import { Router } from "express";
+import * as controller from "../controllers/order.controller";
+import { requireAdmin, verifyToken } from "../middlewares/auth.middleware";
+const router = Router();
+router.use(verifyToken);
+router.get("/", controller.listOrders);
+router.post("/", controller.createOrder);
+router.get("/:id", controller.getOrder);
+router.post("/:id/cancel", controller.cancelOrder);
+router.patch("/:id", requireAdmin, controller.updateOrder);
+export default router;

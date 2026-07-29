@@ -1,0 +1,11 @@
+import { Router } from "express";
+import * as c from "../controllers/store-setting.controller";
+import { requireAdmin, verifyToken } from "../middlewares/auth.middleware";
+const router = Router();
+router.get("/storefront", c.getStorefrontAppearance);
+router.use(verifyToken, requireAdmin);
+router.put("/storefront", c.updateStorefrontAppearance);
+router.get("/", c.listStoreSettings);
+router.put("/:key", c.upsertStoreSetting);
+router.delete("/:key", c.deleteStoreSetting);
+export default router;

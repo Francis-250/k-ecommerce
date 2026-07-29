@@ -8,7 +8,6 @@ import {
   FolderTree,
   LayoutDashboard,
   LogOut,
-  PackageSearch,
   Settings,
   ShoppingBag,
   Tags,
@@ -19,12 +18,11 @@ import {
 
 const links = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Products", href: "/admin/products", icon: ShoppingBag },
-  { label: "Orders", href: "/admin/orders", icon: PackageSearch },
-  { label: "Customers", href: "/admin/users", icon: Users },
-  { label: "Inventory", href: "/admin/inventory", icon: Boxes },
-  { label: "Categories", href: "/admin/categories", icon: FolderTree },
   { label: "Brands", href: "/admin/brands", icon: Tags },
+  { label: "Categories", href: "/admin/categories", icon: FolderTree },
+  { label: "Products", href: "/admin/products", icon: ShoppingBag },
+  { label: "Inventory", href: "/admin/inventory", icon: Boxes },
+  { label: "Customers", href: "/admin/users", icon: Users },
   { label: "Coupons", href: "/admin/coupons", icon: TicketPercent },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
 ] as const;
@@ -57,10 +55,10 @@ export function AdminSidebar({
           >
             <Link
               href="/admin"
-              className="flex min-w-0 items-center gap-2.5"
+              className="flex min-w-0 items-center gap-2.5 !text-slate-900"
               aria-label="I-RAS STYLES admin dashboard"
             >
-              <span className="grid size-8 shrink-0 place-items-center rounded-md bg-emerald-600 text-xs font-semibold text-white">
+              <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-slate-950 text-xs font-semibold text-white shadow-sm">
                 IR
               </span>
               {!collapsed && (
@@ -101,14 +99,14 @@ export function AdminSidebar({
                   onClick={onCloseMobile}
                   className={`group flex h-10 items-center rounded-md text-sm transition-colors ${collapsed ? "justify-center px-0" : "gap-3 px-3"} ${
                     active
-                      ? "bg-emerald-50 font-normal text-black"
-                      : "font-normal text-black hover:bg-slate-100"
+                      ? "bg-slate-950 font-medium !text-white shadow-sm"
+                      : "font-normal !text-slate-600 hover:bg-slate-100 hover:!text-slate-950"
                   }`}
                 >
                   <Icon
                     size={18}
                     strokeWidth={1.75}
-                    className={active ? "text-black" : "text-black"}
+                    className={active ? "text-white" : "text-slate-500"}
                   />
                   {!collapsed && <span>{label}</span>}
                 </Link>
@@ -119,16 +117,20 @@ export function AdminSidebar({
           <div className="space-y-0.5 border-t border-slate-200 p-3">
             <Link
               href="/admin/settings"
-              className={`flex h-10 items-center rounded-md text-sm font-normal text-black hover:bg-slate-100 ${collapsed ? "justify-center" : "gap-3 px-3"}`}
+              className={`flex h-10 items-center rounded-md text-sm font-normal !text-slate-600 hover:bg-slate-100 hover:!text-slate-950 ${collapsed ? "justify-center" : "gap-3 px-3"}`}
             >
-              <Settings size={18} strokeWidth={1.75} className="text-black" />
+              <Settings
+                size={18}
+                strokeWidth={1.75}
+                className="text-slate-500"
+              />
               {!collapsed && <span>Settings</span>}
             </Link>
             <Link
               href="/login"
-              className={`flex h-10 items-center rounded-md text-sm font-normal text-black hover:bg-red-50 hover:text-red-600 ${collapsed ? "justify-center" : "gap-3 px-3"}`}
+              className={`flex h-10 items-center rounded-md text-sm font-normal !text-slate-600 hover:bg-red-50 hover:!text-red-600 ${collapsed ? "justify-center" : "gap-3 px-3"}`}
             >
-              <LogOut size={18} strokeWidth={1.75} className="text-black" />
+              <LogOut size={18} strokeWidth={1.75} className="text-slate-500" />
               {!collapsed && <span>Log out</span>}
             </Link>
           </div>

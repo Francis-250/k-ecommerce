@@ -1,0 +1,10 @@
+import { Router } from "express";
+import * as c from "../controllers/article.controller";
+import { requireAdmin, verifyToken } from "../middlewares/auth.middleware";
+const router = Router();
+router.get("/", c.listArticles);
+router.get("/:id", c.getArticle);
+router.post("/", verifyToken, requireAdmin, c.createArticle);
+router.patch("/:id", verifyToken, requireAdmin, c.updateArticle);
+router.delete("/:id", verifyToken, requireAdmin, c.deleteArticle);
+export default router;

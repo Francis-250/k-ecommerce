@@ -3,9 +3,11 @@ export type CatalogProduct = {
   slug: string;
   name: string;
   price: number;
-  category: "Accessories" | "Dresses" | "Tops" | "Handbags";
-  audience: "Women" | "Men";
+  category: string;
+  audience: "Women" | "Men" | "Unisex" | "Kids";
   image: string;
+  featured?: boolean;
+  createdAt?: string;
 };
 
 export const catalogProducts: CatalogProduct[] = [

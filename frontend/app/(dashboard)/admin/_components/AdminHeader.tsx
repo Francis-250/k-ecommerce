@@ -49,7 +49,7 @@ export function AdminHeader({
           strokeWidth={1.75}
         />
         <input
-          className="h-9 w-full rounded-md border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-700 outline-none placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500"
+          className="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:ring-4 focus:ring-slate-900/5"
           placeholder="Search products, orders..."
           aria-label="Search admin"
         />
@@ -73,7 +73,7 @@ export function AdminHeader({
       <div className="mx-1 hidden h-6 w-px bg-slate-200 sm:block" />
 
       <button className="flex shrink-0 items-center gap-2 rounded-md p-1 pr-2 hover:bg-slate-100">
-        <span className="grid size-8 place-items-center rounded-md bg-emerald-600 text-xs font-semibold text-white">
+        <span className="grid size-8 place-items-center rounded-lg bg-slate-950 text-xs font-semibold text-white">
           AD
         </span>
         <span className="hidden text-left xl:block">

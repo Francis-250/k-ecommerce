@@ -13,7 +13,14 @@ import {
   YAxis,
 } from "recharts";
 
-const sales = [
+export type SalesChartPoint = { month: string; value: number };
+export type ShipmentChartPoint = {
+  name: string;
+  value: number;
+  color: string;
+};
+
+const previewSales: SalesChartPoint[] = [
   { month: "Jan", value: 62 },
   { month: "Feb", value: 54 },
   { month: "Mar", value: 68 },
@@ -27,19 +34,23 @@ const sales = [
   { month: "Nov", value: 61 },
   { month: "Dec", value: 94 },
 ];
-const shipments = [
+const previewShipments: ShipmentChartPoint[] = [
   { name: "Delivered", value: 42, color: "#059669" },
   { name: "On delivery", value: 28, color: "#14b8a6" },
   { name: "Returned", value: 12, color: "#ef4444" },
   { name: "Canceled", value: 18, color: "#f59e0b" },
 ];
 
-export function SalesChart() {
+export function SalesChart({
+  data = previewSales,
+}: {
+  data?: SalesChartPoint[];
+}) {
   return (
     <div className="h-60 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
-          data={sales}
+          data={data}
           margin={{ top: 10, right: 8, left: -18, bottom: 0 }}
         >
           <defs>
@@ -63,7 +74,7 @@ export function SalesChart() {
             axisLine={false}
             tickLine={false}
             tick={{ fill: "#94a3b8", fontSize: 12 }}
-            tickFormatter={(value) => `${value}k`}
+            tickFormatter={(value) => `$${value}`}
           />
           <Tooltip
             cursor={{ stroke: "#059669", strokeDasharray: "4 4" }}
@@ -73,7 +84,7 @@ export function SalesChart() {
               boxShadow: "none",
               fontSize: 13,
             }}
-            formatter={(value) => [`$${value}K`, "Sales"]}
+            formatter={(value) => [`$${Number(value).toFixed(2)}`, "Sales"]}
           />
           <Area
             type="monotone"
@@ -94,14 +105,18 @@ export function SalesChart() {
   );
 }
 
-export function ShipmentChart() {
+export function ShipmentChart({
+  data = previewShipments,
+}: {
+  data?: ShipmentChartPoint[];
+}) {
   return (
     <div>
       <div className="mx-auto h-48 max-w-xs">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={shipments}
+              data={data}
               dataKey="value"
               nameKey="name"
               innerRadius={62}
@@ -110,12 +125,12 @@ export function ShipmentChart() {
               stroke="white"
               strokeWidth={2}
             >
-              {shipments.map((item) => (
+              {data.map((item) => (
                 <Cell key={item.name} fill={item.color} />
               ))}
             </Pie>
             <Tooltip
-              formatter={(value) => [`${value}%`, "Share"]}
+              formatter={(value) => [value, "Orders"]}
               contentStyle={{
                 borderRadius: 8,
                 border: "1px solid #e2e8f0",
@@ -127,7 +142,7 @@ export function ShipmentChart() {
         </ResponsiveContainer>
       </div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
-        {shipments.map((item) => (
+        {data.map((item) => (
           <div
             key={item.name}
             className="flex items-center gap-2 text-xs text-slate-600"

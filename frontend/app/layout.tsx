@@ -6,6 +6,8 @@ import "@/styles/interactions.css";
 import "@/styles/checkout.css";
 import { CartProvider } from "@/features/storefront/cart";
 import { Toaster } from "sonner";
+import { AuthInitializer } from "@/features/auth/AuthInitializer";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 export const metadata: Metadata = {
   title: { default: "I-RAS STYLES", template: "%s | I-RAS STYLES" },
@@ -29,10 +31,13 @@ export default function RootLayout({
         <link rel="stylesheet" href="/storefront/assets/css/responsive.css" />
       </head>
       <body>
-        <CartProvider>
-          {children}
-          <Toaster position="top-right" richColors closeButton />
-        </CartProvider>
+        <QueryProvider>
+          <CartProvider>
+            <AuthInitializer />
+            {children}
+            <Toaster position="top-right" richColors closeButton />
+          </CartProvider>
+        </QueryProvider>
       </body>
     </html>
   );
