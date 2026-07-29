@@ -624,15 +624,41 @@ function FooterColumn({
   );
 }
 
-export function Breadcrumb({ title }: { title: string }) {
+export function Breadcrumb({
+  title,
+  links = [],
+}: {
+  title: string;
+  links?: { label: string; href: string }[];
+}) {
+  const itemClass =
+    "inline-block pr-[15px] text-sm font-bold capitalize leading-[15px] text-[#D4AF4A]";
+
   return (
-    <div className="breadcrumbs_area">
-      <div className="breadcrumb_content">
-        <ul>
-          <li>
-            <Link href="/">Home</Link>
+    <div className="h-12 border-b-4 border-transparent bg-[#fffdf7] px-5 leading-[48px] [border-image:linear-gradient(90deg,#087554_0_25%,#e7b800_25%_50%,#bd3428_50%_75%,#176ca8_75%)_1] max-[991px]:px-[14px] max-[767px]:mt-[35px]">
+      <div>
+        <ul className="m-0 p-0 leading-[48px]">
+          <li className={itemClass}>
+            <Link
+              className="!text-[#222] hover:!text-[#e84c3d]"
+              href="/"
+            >
+              Home
+            </Link>
           </li>
-          <li>{title}</li>
+          {links.map((link) => (
+            <li className={itemClass} key={link.href}>
+              <Link
+                className="!text-[#222] hover:!text-[#e84c3d]"
+                href={link.href}
+              >
+                {link.label}
+              </Link>
+            </li>
+          ))}
+          <li className={itemClass}>
+            {title}
+          </li>
         </ul>
       </div>
     </div>

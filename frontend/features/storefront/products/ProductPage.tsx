@@ -1,5 +1,7 @@
-import Link from "next/link";
-import { StorefrontShell } from "@/components/storefront/StorefrontShell";
+import {
+  Breadcrumb,
+  StorefrontShell,
+} from "@/components/storefront/StorefrontShell";
 import { getRelatedProducts } from "./product-data";
 import { ProductCard } from "./ProductCard";
 import { ProductDetails } from "./ProductDetails";
@@ -13,19 +15,10 @@ export function ProductPage({ product }: { product: Product }) {
     <StorefrontShell>
       <main>
         <div className="container">
-          <div className="breadcrumbs_area">
-            <div className="breadcrumb_content">
-              <ul>
-                <li>
-                  <Link href="/">Home</Link>
-                </li>
-                <li>
-                  <Link href="/shop">Shop</Link>
-                </li>
-                <li>{product.name}</li>
-              </ul>
-            </div>
-          </div>
+          <Breadcrumb
+            title={product.name}
+            links={[{ label: "Shop", href: "/shop" }]}
+          />
           <section className="product_details">
             <div className="row">
               <div className="col-lg-5 col-md-6">
