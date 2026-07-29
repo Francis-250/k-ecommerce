@@ -3,6 +3,7 @@ import "./globals.css";
 import "@/styles/storefront.css";
 import "@/styles/auth.css";
 import "@/styles/interactions.css";
+import "@/styles/checkout.css";
 import { CartProvider } from "@/features/storefront/cart";
 import { Toaster } from "sonner";
 

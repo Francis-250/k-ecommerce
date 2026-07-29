@@ -34,3 +34,16 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# Stripe checkout
+
+Create `.env.local` and add your Stripe API keys:
+
+```bash
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+```
+
+Use Stripe test card `4242 4242 4242 4242`, any future expiration date,
+and any CVC while testing. Never expose `STRIPE_SECRET_KEY` in client code or
+commit it to source control.

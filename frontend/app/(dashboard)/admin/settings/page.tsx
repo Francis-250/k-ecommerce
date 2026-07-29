@@ -82,18 +82,9 @@ export default function SettingsPage() {
             {tab === "payments" && (
               <div className="max-w-3xl space-y-3">
                 <Toggle
-                  title="Card payments"
-                  description="Accept Visa and Mastercard payments."
+                  title="Stripe"
+                  description="Accept U.S. dollar credit and debit card payments securely through Stripe."
                   checked
-                />
-                <Toggle
-                  title="Mobile money"
-                  description="Accept MTN MoMo and Airtel Money."
-                  checked
-                />
-                <Toggle
-                  title="Cash on delivery"
-                  description="Allow customers to pay when orders arrive."
                 />
               </div>
             )}

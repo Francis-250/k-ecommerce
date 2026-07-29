@@ -2,386 +2,366 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { FileText } from "lucide-react";
+import {
+  Check,
+  LockKeyhole,
+  PackageCheck,
+  ShieldCheck,
+  Tag,
+  Truck,
+} from "lucide-react";
 import {
   Breadcrumb,
   StorefrontShell,
 } from "@/components/storefront/StorefrontShell";
 import { useCart } from "@/features/storefront/cart";
+import { StripeCheckout } from "@/features/storefront/checkout/StripeCheckout";
 import { toast } from "sonner";
 
-const countries = [
-  "bangladesh",
-  "Algeria",
-  "Afghanistan",
-  "Ghana",
-  "Albania",
-  "Bahrain",
-  "Colombia",
-  "Dominican Republic",
-];
+type FieldProps = {
+  id: string;
+  label: string;
+  type?: string;
+  autoComplete?: string;
+  placeholder?: string;
+  required?: boolean;
+};
 
-function TextField({
+function Field({
+  id,
   label,
   type = "text",
+  autoComplete,
   placeholder,
-}: {
-  label?: string;
-  type?: string;
-  placeholder?: string;
-}) {
+  required = true,
+}: FieldProps) {
   return (
-    <>
-      {label && (
-        <label>
-          {label} <span>*</span>
-        </label>
-      )}
-      <input type={type} placeholder={placeholder} />
-    </>
+    <label className="pc-field" htmlFor={id}>
+      <span>
+        {label}
+        {!required && <small>Optional</small>}
+      </span>
+      <input
+        id={id}
+        name={id}
+        type={type}
+        autoComplete={autoComplete}
+        placeholder={placeholder}
+        required={required}
+      />
+    </label>
   );
 }
 
-function AddressFields({ shipping = false }: { shipping?: boolean }) {
+function DeliveryFields({ prefix = "billing" }: { prefix?: string }) {
   return (
-    <div className="row">
-      <div className="col-lg-6 mb-30">
-        <TextField label="First Name" />
+    <div className="pc-fields">
+      <div className="pc-field pc-field-full">
+        <label htmlFor={`${prefix}-country`}>Country/Region</label>
+        <select
+          id={`${prefix}-country`}
+          name={`${prefix}-country`}
+          defaultValue="US"
+        >
+          <option value="US">United States</option>
+        </select>
       </div>
-      <div className="col-lg-6 mb-30">
-        <TextField label="Last Name" />
+      <Field
+        id={`${prefix}-first-name`}
+        label="First name"
+        autoComplete="given-name"
+      />
+      <Field
+        id={`${prefix}-last-name`}
+        label="Last name"
+        autoComplete="family-name"
+      />
+      <div className="pc-field-full">
+        <Field
+          id={`${prefix}-company`}
+          label="Company"
+          autoComplete="organization"
+          required={false}
+        />
       </div>
-      <div className="col-12 mb-30">
-        <label>Company Name</label>
-        <input type="text" />
-      </div>
-      <div className="col-12 mb-30">
-        <div className={shipping ? "select_form_select" : undefined}>
-          <label htmlFor={shipping ? "shipping-country" : "country"}>
-            country <span>*</span>
-          </label>
-          <select
-            name={shipping ? "shipping_country" : "country"}
-            id={shipping ? "shipping-country" : "country"}
-          >
-            {countries.map((country) => (
-              <option key={country}>{country}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-      <div className="col-12 mb-30">
-        <TextField
+      <div className="pc-field-full">
+        <Field
+          id={`${prefix}-address`}
           label="Street address"
+          autoComplete="address-line1"
           placeholder="House number and street name"
         />
       </div>
-      <div className="col-12 mb-30">
-        <input
-          aria-label="Apartment, suite or unit"
-          placeholder="Apartment, suite, unit etc. (optional)"
-          type="text"
+      <div className="pc-field-full">
+        <Field
+          id={`${prefix}-apartment`}
+          label="Apartment, suite, etc."
+          autoComplete="address-line2"
+          required={false}
         />
       </div>
-      <div className="col-12 mb-30">
-        <TextField label="Town / City" />
-      </div>
-      <div className="col-12 mb-30">
-        <TextField label="State / County" />
-      </div>
-      <div className="col-lg-6 mb-30">
-        <TextField label="Phone" type="tel" />
-      </div>
-      <div className={shipping ? "col-lg-6" : "col-lg-6 mb-30"}>
-        <TextField label="Email Address" type="email" />
-      </div>
+      <Field id={`${prefix}-city`} label="City" autoComplete="address-level2" />
+      <Field
+        id={`${prefix}-state`}
+        label="State"
+        autoComplete="address-level1"
+      />
+      <Field id={`${prefix}-zip`} label="ZIP code" autoComplete="postal-code" />
+      <Field
+        id={`${prefix}-phone`}
+        label="Phone"
+        type="tel"
+        autoComplete="tel"
+      />
     </div>
   );
 }
 
 export default function CheckoutPage() {
   const { items, subtotal } = useCart();
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [couponOpen, setCouponOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
   const [shippingOpen, setShippingOpen] = useState(false);
-  const [payment, setPayment] = useState("");
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [couponOpen, setCouponOpen] = useState(false);
+  const [coupon, setCoupon] = useState("");
+
+  function applyCoupon() {
+    if (!coupon.trim()) {
+      toast.error("Enter a coupon code first.");
+      return;
+    }
+    toast.info("Coupon received", {
+      description: "The code will be verified before your order is completed.",
+    });
+  }
 
   return (
     <StorefrontShell>
-      <Breadcrumb title="checkout" />
-      <div className="Checkout_section">
-        <div className="row">
-          <div className="col-12">
-            <div className="user-actions mb-20">
-              <h3>
-                <FileText size={16} aria-hidden="true" /> Returning customer?{" "}
-                <button
-                  className="Returning"
-                  type="button"
-                  aria-expanded={loginOpen}
-                  aria-controls="checkout_login"
-                  onClick={() => setLoginOpen(!loginOpen)}
-                >
-                  Click here to login
-                </button>
-              </h3>
-              <div
-                id="checkout_login"
-                className={`collapse${loginOpen ? " show" : ""}`}
-              >
-                <div className="checkout_info">
-                  <p>
-                    If you have shopped with us before, please enter your
-                    details in the boxes below. If you are a new customer please
-                    proceed to the Billing &amp; Shipping section.
-                  </p>
-                  <form action="#">
-                    <div className="form_group mb-20">
-                      <TextField label="Username or email" />
-                    </div>
-                    <div className="form_group mb-25">
-                      <TextField label="Password" type="password" />
-                    </div>
-                    <div className="form_group group_3">
-                      <input value="Login" type="submit" />
-                      <label htmlFor="remember_box">
-                        <input id="remember_box" type="checkbox" />
-                        <span> Remember me </span>
-                      </label>
-                    </div>
-                    <a href="#">Lost your password?</a>
-                  </form>
+      <Breadcrumb title="Checkout" />
+      <main className="pc-checkout">
+        <header className="pc-heading">
+          <div>
+            <span className="pc-eyebrow">
+              <LockKeyhole size={14} aria-hidden="true" />
+              Secure checkout
+            </span>
+            <h1>Complete your order</h1>
+            <p>Enter your delivery details and pay securely through Stripe.</p>
+          </div>
+          <div className="pc-progress" aria-label="Checkout progress">
+            <span className="is-complete">
+              <Check size={13} aria-hidden="true" /> Cart
+            </span>
+            <i />
+            <span className="is-current">Checkout</span>
+            <i />
+            <span>Confirmation</span>
+          </div>
+        </header>
+
+        <div className="pc-layout">
+          <div className="pc-details">
+            <section className="pc-card">
+              <div className="pc-section-heading">
+                <span>1</span>
+                <div>
+                  <h2>Contact information</h2>
+                  <p>We’ll send your receipt and delivery updates here.</p>
+                </div>
+                <a href="/login">Sign in</a>
+              </div>
+              <div className="pc-fields">
+                <div className="pc-field-full">
+                  <Field
+                    id="checkout-email"
+                    label="Email address"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                  />
                 </div>
               </div>
-            </div>
-            <div className="user-actions mb-20">
-              <h3>
-                <FileText size={16} aria-hidden="true" /> Returning customer?{" "}
+              <label className="pc-check">
+                <input type="checkbox" defaultChecked />
+                <span>Send me order and delivery updates by email.</span>
+              </label>
+            </section>
+
+            <section className="pc-card">
+              <div className="pc-section-heading">
+                <span>2</span>
+                <div>
+                  <h2>Delivery address</h2>
+                  <p>Currently shipping to addresses in the United States.</p>
+                </div>
+              </div>
+              <DeliveryFields />
+            </section>
+
+            <section className="pc-card pc-options">
+              <label className="pc-check pc-option">
+                <input
+                  type="checkbox"
+                  checked={shippingOpen}
+                  onChange={(event) => setShippingOpen(event.target.checked)}
+                />
+                <span>
+                  <strong>Use a different billing address</strong>
+                  <small>
+                    Enter an address different from the delivery address.
+                  </small>
+                </span>
+              </label>
+              {shippingOpen && (
+                <div className="pc-nested-fields">
+                  <DeliveryFields prefix="shipping" />
+                </div>
+              )}
+              <label className="pc-check pc-option">
+                <input
+                  type="checkbox"
+                  checked={accountOpen}
+                  onChange={(event) => setAccountOpen(event.target.checked)}
+                />
+                <span>
+                  <strong>Save my details for next time</strong>
+                  <small>Create an account after completing your order.</small>
+                </span>
+              </label>
+              {accountOpen && (
+                <div className="pc-nested-fields">
+                  <Field
+                    id="account-password"
+                    label="Create a password"
+                    type="password"
+                    autoComplete="new-password"
+                  />
+                </div>
+              )}
+              <div className="pc-field pc-note">
+                <label htmlFor="order-note">
+                  Order note <small>Optional</small>
+                </label>
+                <textarea
+                  id="order-note"
+                  name="order-note"
+                  placeholder="Add delivery instructions or a note about your order."
+                />
+              </div>
+            </section>
+          </div>
+
+          <aside className="pc-summary" aria-label="Order summary">
+            <div className="pc-summary-card">
+              <div className="pc-summary-title">
+                <h2>Order summary</h2>
+                <span>
+                  {items.length} {items.length === 1 ? "item" : "items"}
+                </span>
+              </div>
+
+              <div className="pc-items">
+                {items.length ? (
+                  items.map((item) => (
+                    <article className="pc-item" key={item.id}>
+                      <div className="pc-item-image">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={72}
+                          height={88}
+                        />
+                        <span>{item.quantity}</span>
+                      </div>
+                      <div className="pc-item-info">
+                        <h3>{item.name}</h3>
+                        {item.options && (
+                          <p>
+                            {Object.entries(item.options)
+                              .map(([name, value]) => `${name}: ${value}`)
+                              .join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                      <strong>
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </strong>
+                    </article>
+                  ))
+                ) : (
+                  <div className="pc-empty">
+                    <PackageCheck size={30} aria-hidden="true" />
+                    <p>Your cart is empty.</p>
+                    <a href="/shop">Continue shopping</a>
+                  </div>
+                )}
+              </div>
+
+              <div className="pc-coupon">
                 <button
-                  className="Returning"
                   type="button"
+                  onClick={() => setCouponOpen((current) => !current)}
                   aria-expanded={couponOpen}
-                  aria-controls="checkout_coupon"
-                  onClick={() => setCouponOpen(!couponOpen)}
                 >
-                  Click here to enter your code
+                  <Tag size={15} aria-hidden="true" />
+                  Have a coupon code?
                 </button>
-              </h3>
-              <div
-                id="checkout_coupon"
-                className={`collapse${couponOpen ? " show" : ""}`}
-              >
-                <div className="checkout_info">
-                  <form action="#">
-                    <label className="sr-only" htmlFor="checkout-coupon">
+                {couponOpen && (
+                  <div>
+                    <label className="sr-only" htmlFor="coupon-code">
                       Coupon code
                     </label>
                     <input
-                      id="checkout-coupon"
-                      placeholder="Coupon code"
-                      type="text"
+                      id="coupon-code"
+                      value={coupon}
+                      onChange={(event) => setCoupon(event.target.value)}
+                      placeholder="Enter code"
                     />
-                    <input value="Apply coupon" type="submit" />
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="checkout_form">
-          <div className="row">
-            <div className="col-lg-6 col-md-6">
-              <form action="#">
-                <h3>Billing Details</h3>
-                <AddressFields />
-                <div className="row">
-                  <div className="col-12 mb-30">
-                    <input
-                      id="account"
-                      type="checkbox"
-                      checked={accountOpen}
-                      onChange={(event) => setAccountOpen(event.target.checked)}
-                      aria-controls="collapseOne"
-                      aria-expanded={accountOpen}
-                    />
-                    <label htmlFor="account">Create an account?</label>
-                    <div
-                      id="collapseOne"
-                      className={`collapse one${accountOpen ? " show" : ""}`}
-                    >
-                      <div className="card-body1">
-                        <TextField
-                          label="Account password"
-                          type="password"
-                          placeholder="password"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-12 mb-30">
-                    <input
-                      id="address"
-                      type="checkbox"
-                      checked={shippingOpen}
-                      onChange={(event) =>
-                        setShippingOpen(event.target.checked)
-                      }
-                      aria-controls="collapsetwo"
-                      aria-expanded={shippingOpen}
-                    />
-                    <label className="righ_0" htmlFor="address">
-                      Ship to a different address?
-                    </label>
-                    <div
-                      id="collapsetwo"
-                      className={`collapse one${shippingOpen ? " show" : ""}`}
-                    >
-                      <AddressFields shipping />
-                    </div>
-                  </div>
-                  <div className="col-12">
-                    <div className="order-notes">
-                      <label htmlFor="order_note">Order Notes</label>
-                      <textarea
-                        id="order_note"
-                        placeholder="Notes about your order, e.g. special notes for delivery."
-                      />
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div className="col-lg-6 col-md-6">
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  if (items.length)
-                    toast.success("Order details are ready", {
-                      description:
-                        "Your cart products have been included in checkout.",
-                    });
-                }}
-              >
-                <h3>Your order</h3>
-                <div className="order_table table-responsive mb-30">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Product</th>
-                        <th>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.length ? (
-                        items.map((item) => (
-                          <tr key={item.id}>
-                            <td>
-                              {item.name} <strong>× {item.quantity}</strong>
-                              {item.options && (
-                                <small>
-                                  {Object.entries(item.options)
-                                    .map(([name, value]) => `${name}: ${value}`)
-                                    .join(" · ")}
-                                </small>
-                              )}
-                            </td>
-                            <td>${(item.price * item.quantity).toFixed(2)}</td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={2}>
-                            Your cart is empty. Add products before checking
-                            out.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                    <tfoot>
-                      <tr>
-                        <th>Cart Subtotal</th>
-                        <td>${subtotal.toFixed(2)}</td>
-                      </tr>
-                      <tr>
-                        <th>Shipping</th>
-                        <td>
-                          <strong>Free</strong>
-                        </td>
-                      </tr>
-                      <tr className="order_total">
-                        <th>Order Total</th>
-                        <td>
-                          <strong>${subtotal.toFixed(2)}</strong>
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-                <div className="payment_method">
-                  <div className="panel-default">
-                    <input
-                      id="payment"
-                      name="check_method"
-                      type="radio"
-                      checked={payment === "check"}
-                      onChange={() => setPayment("check")}
-                      aria-controls="method"
-                    />
-                    <label htmlFor="payment">Create an account?</label>
-                    <div
-                      id="method"
-                      className={`collapse one${payment === "check" ? " show" : ""}`}
-                    >
-                      <div className="card-body1">
-                        <p>
-                          Please send a check to Store Name, Store Street, Store
-                          Town, Store State / County, Store Postcode.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="panel-default">
-                    <input
-                      id="payment_defult"
-                      name="check_method"
-                      type="radio"
-                      checked={payment === "paypal"}
-                      onChange={() => setPayment("paypal")}
-                      aria-controls="collapsedefult"
-                    />
-                    <label htmlFor="payment_defult">
-                      PayPal{" "}
-                      <Image
-                        src="/storefront/assets/img/visha/papyel.png"
-                        alt="PayPal"
-                        width={120}
-                        height={35}
-                      />
-                    </label>
-                    <div
-                      id="collapsedefult"
-                      className={`collapse one${payment === "paypal" ? " show" : ""}`}
-                    >
-                      <div className="card-body1">
-                        <p>
-                          Pay via PayPal; you can pay with your credit card if
-                          you don&apos;t have a PayPal account.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="order_button">
-                    <button type="submit" disabled={!items.length}>
-                      {items.length ? "Place order" : "Cart is empty"}
+                    <button type="button" onClick={applyCoupon}>
+                      Apply
                     </button>
                   </div>
+                )}
+              </div>
+
+              <dl className="pc-totals">
+                <div>
+                  <dt>Subtotal</dt>
+                  <dd>${subtotal.toFixed(2)}</dd>
                 </div>
-              </form>
+                <div>
+                  <dt>Shipping</dt>
+                  <dd className="pc-free">Free</dd>
+                </div>
+                <div className="pc-total">
+                  <dt>
+                    Total <small>USD</small>
+                  </dt>
+                  <dd>${subtotal.toFixed(2)}</dd>
+                </div>
+              </dl>
+
+              <div className="pc-payment">
+                <StripeCheckout items={items} total={subtotal} />
+                <p>
+                  By placing your order, you agree to our terms and privacy
+                  policy.
+                </p>
+              </div>
+
+              <div className="pc-trust">
+                <span>
+                  <ShieldCheck size={18} aria-hidden="true" />
+                  Secure Stripe payment
+                </span>
+                <span>
+                  <Truck size={18} aria-hidden="true" />
+                  Free U.S. shipping
+                </span>
+              </div>
             </div>
-          </div>
+          </aside>
         </div>
-      </div>
+      </main>
     </StorefrontShell>
   );
 }

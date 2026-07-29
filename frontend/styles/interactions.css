@@ -12,6 +12,7 @@ button:focus-visible {
 }
 
 .storefront-african-border {
+  --storefront-side-border-width: 18px;
   display: none;
 }
 
@@ -55,7 +56,7 @@ button:focus-visible {
     z-index: 20;
     top: 0;
     bottom: 0;
-    width: calc((100vw - 1140px) / 2 - 15px);
+    width: var(--storefront-side-border-width);
     background-color: #082f35;
     background-image:
       linear-gradient(rgba(3, 25, 30, 0.88), rgba(3, 25, 30, 0.88)),

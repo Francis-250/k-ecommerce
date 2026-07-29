@@ -1,0 +1,79 @@
+
+generator client {
+  provider = "prisma-client-js"
+
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum OtpType {
+  REGISTRATION
+  RESET
+}
+
+model User {
+  id String @id @default(cuid())
+
+  email            String   @unique
+  password         String
+  emailVerified    Boolean  @default(false)
+  emailVerifiedAt  DateTime?
+
+  firstName String
+  lastName  String
+  username  String? @unique
+  bio       String?
+  phone      String? @unique
+  avatar     String?
+  
+
+  role Role @default(CUSTOMER)
+
+  isActive  Boolean   @default(true)
+  isBanned  Boolean   @default(false)
+  lastLogin DateTime?
+  addresses Address[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Address {
+  id String @id @default(cuid())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fullName   String
+  phone      String
+  country    String
+  province   String?
+  city       String
+  district   String?
+  sector     String?
+  street     String
+  postalCode String?
+  isDefault  Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model OtpCodes {
+  id String @id @default(cuid())
+
+  otp           String
+  otp_expiry    DateTime
+  otp_type      OtpType
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

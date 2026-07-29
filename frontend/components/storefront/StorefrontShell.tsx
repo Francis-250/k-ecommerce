@@ -515,8 +515,8 @@ function Footer() {
                     crafted accessories.
                   </p>
                   <p>
-                    We connect heritage-inspired design with modern style for
-                    a confident global community.
+                    We connect heritage-inspired design with modern style for a
+                    confident global community.
                   </p>
                 </div>
               </div>
