@@ -7,7 +7,7 @@ a:active {
 
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid #D4AF4A;
+  outline: 2px solid #d4af4a;
   outline-offset: 2px;
 }
 
@@ -91,10 +91,10 @@ button:focus-visible {
   }
 
   .footer_area {
-    width: 1164px;
-    max-width: 100%;
-    margin-right: auto;
-    margin-left: auto;
+    width: 100%;
+    max-width: none;
+    margin-right: 0;
+    margin-left: 0;
   }
 }
 
@@ -102,7 +102,7 @@ button:focus-visible {
   display: block;
   width: 100%;
   border: 0;
-  background: #D4AF4A;
+  background: #d4af4a;
   color: #fff;
   padding: 9px 12px;
   cursor: pointer;
@@ -125,7 +125,7 @@ button:focus-visible {
   white-space: nowrap;
 }
 .site-wordmark span {
-  color: #D4AF4A;
+  color: #d4af4a;
 }
 
 .logo .system-logo {
@@ -206,7 +206,7 @@ button:focus-visible {
   flex-wrap: nowrap !important;
 }
 .shopping_cart > a:hover {
-  color: #D4AF4A !important;
+  color: #d4af4a !important;
 }
 .shopping_cart > a .cart-chevron {
   margin-left: 2px;
@@ -235,7 +235,7 @@ button:focus-visible {
 .single_product .product_content a:hover,
 .product_list_item h3 a:hover,
 .shop_tab_product .product_content a:hover {
-  color: #D4AF4A !important;
+  color: #d4af4a !important;
 }
 .single_product .product_info a {
   color: #555 !important;
@@ -501,7 +501,7 @@ button:focus-visible {
   }
   .mobile-menu nav a:hover,
   .mobile-menu nav a:focus {
-    background: #D4AF4A !important;
+    background: #d4af4a !important;
     color: #fff !important;
   }
   .mobile-menu nav li ul {
@@ -792,7 +792,7 @@ button:focus-visible {
 .error_form a {
   display: inline-block;
   margin-top: 12px;
-  background: #D4AF4A;
+  background: #d4af4a;
   color: #fff;
   padding: 10px 18px;
 }
@@ -874,7 +874,7 @@ button:focus-visible {
   display: inline-block;
   margin-top: 12px;
   padding: 10px 20px;
-  background: #D4AF4A;
+  background: #d4af4a;
   color: #fff;
   text-transform: uppercase;
 }
@@ -1057,7 +1057,8 @@ button:focus-visible {
       var(--iras-gold) 25% 50%,
       var(--iras-red) 50% 75%,
       var(--iras-blue) 75%
-    ) 1;
+    )
+    1;
 }
 
 .section_title h2,
@@ -1077,7 +1078,9 @@ button:focus-visible {
   border-top: 3px solid var(--iras-green);
   background: #fff;
   box-shadow: 0 8px 20px rgba(8, 47, 53, 0.07);
-  transition: box-shadow 180ms ease, transform 180ms ease;
+  transition:
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
 .single_product:nth-child(4n + 2) {
