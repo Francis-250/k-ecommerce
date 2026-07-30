@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
@@ -16,6 +17,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { useGeneralStoreSettings } from "@/features/admin/hooks/useGeneralStoreSettings";
 
 const links = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -39,6 +41,14 @@ export function AdminSidebar({
   onCloseMobile: () => void;
 }) {
   const pathname = usePathname();
+  const settings = useGeneralStoreSettings();
+  const initials = (settings.storeName || "IR")
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <>
       {mobileOpen && (
@@ -58,14 +68,25 @@ export function AdminSidebar({
             <Link
               href="/admin"
               className="flex min-w-0 items-center gap-2.5 !text-slate-900"
-              aria-label="I-RAS STYLES admin dashboard"
+              aria-label={`${settings.storeName} admin dashboard`}
             >
-              <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-slate-950 text-xs font-semibold text-white shadow-sm">
-                IR
-              </span>
+              {settings.logoUrl ? (
+                <Image
+                  src={settings.logoUrl}
+                  alt={settings.storeName}
+                  width={32}
+                  height={32}
+                  unoptimized
+                  className="size-8 shrink-0 rounded-lg object-contain"
+                />
+              ) : (
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-slate-950 text-xs font-semibold text-white shadow-sm">
+                  {initials}
+                </span>
+              )}
               {!collapsed && (
                 <span className="truncate text-[15px] font-semibold text-slate-800">
-                  I-RAS STYLES
+                  {settings.storeName}
                 </span>
               )}
             </Link>

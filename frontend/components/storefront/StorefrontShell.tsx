@@ -21,6 +21,7 @@ import {
 import { AuthAccountLink } from "@/features/auth/AuthAccountLink";
 import { useStorefrontAppearance } from "@/features/storefront/appearance/useStorefrontAppearance";
 import { useStorefrontCatalog } from "@/features/storefront/catalog/useStorefrontCatalog";
+import { useGeneralStoreSettings } from "@/features/admin/hooks/useGeneralStoreSettings";
 
 const mainLinks = [
   { label: "Home", href: "/", children: [] },
@@ -70,10 +71,15 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   const { items, itemCount, subtotal, removeItem } = useCart();
   const appearance = useStorefrontAppearance();
   const catalog = useStorefrontCatalog();
+  const storeSettings = useGeneralStoreSettings();
   const [cartOpen, setCartOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
+
+  const displayLogoUrl = appearance.data?.logo?.url || storeSettings.logoUrl;
+  const displayLogoAlt = appearance.data?.logo?.alt || storeSettings.storeName;
+
   const searchSuggestions = useMemo(() => {
     const value = searchQuery.trim().toLowerCase();
     if (!value) return [];
@@ -136,11 +142,11 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                   <div className="col-lg-3 col-md-3">
                     <div className="logo">
                       <Link href="/">
-                        {appearance.data?.logo && (
+                        {displayLogoUrl && (
                           <Image
                             className="system-logo"
-                            src={appearance.data.logo.url}
-                            alt={appearance.data.logo.alt}
+                            src={displayLogoUrl}
+                            alt={displayLogoAlt ?? ""}
                             width={1118}
                             height={520}
                             priority
@@ -149,9 +155,9 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                         )}
                         <span
                           className="site-wordmark"
-                          aria-label="I-RAS STYLES"
+                          aria-label={storeSettings.storeName}
                         >
-                          I-RAS <span>STYLES</span>
+                          {storeSettings.storeName}
                         </span>
                       </Link>
                     </div>
@@ -415,6 +421,7 @@ function CartItem({
 }
 
 function Footer() {
+  const storeSettings = useGeneralStoreSettings();
   return (
     <footer className="footer_area">
       <div className="footer_top">
@@ -483,7 +490,7 @@ function Footer() {
                   </li>
                 </ul>
                 <p>
-                  Copyright © 2026 <Link href="/">I-RAS STYLES</Link>. All
+                  Copyright © 2026 <Link href="/">{storeSettings.storeName}</Link>. All
                   rights reserved.
                 </p>
               </div>

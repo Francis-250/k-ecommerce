@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   AlertOctagon,
   AlertTriangle,
@@ -23,6 +24,7 @@ import {
   useInventoryAlerts,
   useMarkAlertsAsRead,
 } from "@/features/admin/catalog/hooks";
+import { useGeneralStoreSettings } from "@/features/admin/hooks/useGeneralStoreSettings";
 
 export function AdminHeader({
   collapsed,
@@ -37,6 +39,14 @@ export function AdminHeader({
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  const settings = useGeneralStoreSettings();
+  const adminInitials = (settings.adminName || "AD")
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   const { data: alertsData, isLoading } = useInventoryAlerts();
   const markReadMutation = useMarkAlertsAsRead();
@@ -254,15 +264,26 @@ export function AdminHeader({
         <div className="mx-1 hidden h-6 w-px bg-slate-200 sm:block" />
 
         <button className="flex shrink-0 items-center gap-2 rounded-lg p-1 pr-2 hover:bg-slate-100 transition-colors">
-          <span className="grid size-8 place-items-center rounded-lg bg-slate-950 text-xs font-semibold text-white">
-            AD
-          </span>
+          {settings.adminAvatarUrl ? (
+            <Image
+              src={settings.adminAvatarUrl}
+              alt={settings.adminName}
+              width={32}
+              height={32}
+              unoptimized
+              className="size-8 rounded-lg object-cover"
+            />
+          ) : (
+            <span className="grid size-8 place-items-center rounded-lg bg-slate-950 text-xs font-semibold text-white">
+              {adminInitials}
+            </span>
+          )}
           <span className="hidden text-left xl:block">
             <span className="block text-sm font-medium leading-tight text-slate-800">
-              Admin User
+              {settings.adminName}
             </span>
             <span className="block text-[11px] leading-tight text-slate-500">
-              Store manager
+              {settings.adminEmail || "Store manager"}
             </span>
           </span>
           <ChevronDown
