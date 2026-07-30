@@ -39,17 +39,21 @@ type ApiResponse<T> = T & {
   message?: string;
 };
 
+import { getAuthToken } from "@/features/auth/api";
+
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
   "http://localhost:4000/api";
 
 async function request<T>(path: string, init: RequestInit): Promise<T> {
+  const token = getAuthToken();
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init.headers,
     },
   });

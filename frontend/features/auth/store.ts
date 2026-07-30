@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { authApi, AuthApiError, type AuthUser } from "./api";
+import { authApi, AuthApiError, setAuthToken, type AuthUser } from "./api";
 
 type AuthStatus = "idle" | "loading" | "authenticated" | "unauthenticated";
 
@@ -76,15 +76,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ status: "loading" });
 
     try {
-      await authApi.login({ email, password });
-      const response = await authApi.session();
+      const loginRes = await authApi.login({ email, password });
+      if (loginRes.token) {
+        setAuthToken(loginRes.token);
+      }
+
+      let user = loginRes.user ?? null;
+      if (!user) {
+        try {
+          const response = await authApi.session();
+          user = response.user ?? null;
+        } catch {
+          // ignore session fetch error if login returned success
+        }
+      }
+
       savePendingEmail("");
       set({
-        user: response.user ?? null,
-        status: "authenticated",
+        user,
+        status: user ? "authenticated" : "unauthenticated",
         pendingVerificationEmail: "",
       });
     } catch (error) {
+      setAuthToken(null);
       set({ user: null, status: "unauthenticated" });
       throw error;
     }
@@ -94,15 +108,29 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ status: "loading" });
 
     try {
-      await authApi.googleLogin(credential);
-      const response = await authApi.session();
+      const loginRes = await authApi.googleLogin(credential);
+      if (loginRes.token) {
+        setAuthToken(loginRes.token);
+      }
+
+      let user = loginRes.user ?? null;
+      if (!user) {
+        try {
+          const response = await authApi.session();
+          user = response.user ?? null;
+        } catch {
+          // ignore session fetch error if login returned success
+        }
+      }
+
       savePendingEmail("");
       set({
-        user: response.user ?? null,
-        status: "authenticated",
+        user,
+        status: user ? "authenticated" : "unauthenticated",
         pendingVerificationEmail: "",
       });
     } catch (error) {
+      setAuthToken(null);
       set({ user: null, status: "unauthenticated" });
       throw error;
     }
@@ -178,6 +206,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await authApi.logout();
     } finally {
+      setAuthToken(null);
       set({ user: null, status: "unauthenticated" });
     }
   },

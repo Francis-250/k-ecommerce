@@ -66,14 +66,20 @@ export class AdminApiError extends Error {
   }
 }
 
+import { getAuthToken } from "@/features/auth/api";
+
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
   "http://localhost:4000/api";
 
 async function get<T>(path: string): Promise<T> {
+  const token = getAuthToken();
   const response = await fetch(`${API_URL}${path}`, {
     credentials: "include",
-    headers: { Accept: "application/json" },
+    headers: {
+      Accept: "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
   });
   const body = (await response.json().catch(() => ({}))) as T & {
     message?: string;

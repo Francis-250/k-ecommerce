@@ -14,6 +14,7 @@ type ApiEnvelope<T = undefined> = {
   success: boolean;
   message?: string;
   user?: T;
+  token?: string;
   clientId?: string;
 };
 
@@ -27,6 +28,24 @@ export class AuthApiError extends Error {
   }
 }
 
+const TOKEN_KEY = "auth.token";
+
+export function getAuthToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+}
+
+export function setAuthToken(token: string | null) {
+  if (typeof window === "undefined") return;
+  if (token) {
+    localStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(TOKEN_KEY, token);
+  } else {
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+  }
+}
+
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
   "http://localhost:4000/api";
@@ -35,11 +54,13 @@ async function authRequest<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<ApiEnvelope<T>> {
+  const token = getAuthToken();
   const response = await fetch(`${API_URL}/auth${path}`, {
     ...init,
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init.headers,
     },
   });
@@ -70,7 +91,7 @@ export const authApi = {
   },
 
   login(input: { email: string; password: string }) {
-    return authRequest("/login", {
+    return authRequest<AuthUser>("/login", {
       method: "POST",
       body: JSON.stringify(input),
     });
@@ -81,7 +102,7 @@ export const authApi = {
   },
 
   googleLogin(credential: string) {
-    return authRequest("/google", {
+    return authRequest<AuthUser>("/google", {
       method: "POST",
       body: JSON.stringify({ credential }),
     });

@@ -67,7 +67,7 @@ export function LoginForm() {
           <Link href="/forgot-password">Lost your password?</Link>
         </div>
       </form>
-      <GoogleSignIn />
+      {/* <GoogleSignIn /> */}
     </>
   );
 }
