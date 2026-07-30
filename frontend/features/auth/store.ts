@@ -10,6 +10,7 @@ type RegisterInput = {
   lastName: string;
   email: string;
   password: string;
+  role?: "CUSTOMER" | "ADMIN";
 };
 
 type AuthState = {

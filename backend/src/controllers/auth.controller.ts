@@ -18,6 +18,7 @@ type RegisterBody = {
   password?: string;
   firstName?: string;
   lastName?: string;
+  role?: "CUSTOMER" | "STAFF" | "ADMIN" | "SUPER_ADMIN";
 };
 
 type LoginBody = {
@@ -250,6 +251,10 @@ export const register = async (
     }
 
     const plainOtp = generateOtp();
+    const role =
+      req.body.role === "ADMIN" || req.body.role === "SUPER_ADMIN"
+        ? req.body.role
+        : "CUSTOMER";
 
     const [newUser] = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -258,6 +263,7 @@ export const register = async (
           firstName,
           lastName,
           password: await hashPassword(password),
+          role,
         },
         select: {
           id: true,

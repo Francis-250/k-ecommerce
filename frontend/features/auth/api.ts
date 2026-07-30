@@ -83,6 +83,7 @@ export const authApi = {
     lastName: string;
     email: string;
     password: string;
+    role?: "CUSTOMER" | "ADMIN";
   }) {
     return authRequest<AuthUser>("/register", {
       method: "POST",

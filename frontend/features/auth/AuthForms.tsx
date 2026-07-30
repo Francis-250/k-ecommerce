@@ -80,6 +80,8 @@ export function RegisterForm() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const roleValue = String(form.get("role") ?? "CUSTOMER");
+    const role = roleValue === "ADMIN" ? "ADMIN" : "CUSTOMER";
 
     try {
       await register({
@@ -87,6 +89,7 @@ export function RegisterForm() {
         lastName: String(form.get("last-name")),
         email: String(form.get("email")).trim().toLowerCase(),
         password: String(form.get("password")),
+        role,
       });
       toast.success("Account created", {
         description: "Enter the verification code sent to your email.",
@@ -121,6 +124,20 @@ export function RegisterForm() {
         type="password"
         autoComplete="new-password"
       />
+      <div className="account-field mb-4">
+        <label htmlFor="role" className="block text-sm font-medium text-slate-700 mb-1">
+          Account Role
+        </label>
+        <select
+          id="role"
+          name="role"
+          defaultValue="ADMIN"
+          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
+        >
+          <option value="ADMIN">Administrator (Admin Dashboard Access)</option>
+          <option value="CUSTOMER">Customer (Storefront Access)</option>
+        </select>
+      </div>
       <Submit>
         {status === "loading" ? "Creating account..." : "Register"}
       </Submit>
