@@ -139,6 +139,9 @@ app.get("/health", (req: Request, res: Response) => {
 app.use(notFound);
 app.use(errorHandler);
 
+import { initInventoryCron } from "./services/inventory-cron";
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  initInventoryCron();
 });

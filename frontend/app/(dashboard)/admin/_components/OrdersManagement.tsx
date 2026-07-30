@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, Download, MoreHorizontal, Search } from "lucide-react";
+import { ChevronDown, Download, Eye, MoreHorizontal, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AdminPageHeader } from "./AdminPageHeader";
+import { CatalogModal } from "./CatalogModal";
 import { ADMIN_PAGE_SIZE, TablePagination } from "./TablePagination";
 
 const orders = [
@@ -59,10 +60,13 @@ const orders = [
   },
 ];
 
+type OrderItem = (typeof orders)[number];
+
 export function OrdersManagement() {
   const [query, setQuery] = useState("");
   const [view, setView] = useState("All");
   const [page, setPage] = useState(1);
+  const [viewingOrder, setViewingOrder] = useState<OrderItem | null>(null);
   const filtered = useMemo(
     () =>
       orders.filter(
@@ -181,12 +185,22 @@ export function OrdersManagement() {
                   </td>
                   <td className="px-3 py-3 text-slate-500">{order.items}</td>
                   <td className="px-3 py-3">
-                    <button
-                      className="grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-100"
-                      aria-label={`Actions for ${order.id}`}
-                    >
-                      <MoreHorizontal size={17} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setViewingOrder(order)}
+                        className="grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                        title="View order details drawer"
+                        aria-label={`View order ${order.id}`}
+                      >
+                        <Eye size={16} />
+                      </button>
+                      <button
+                        className="grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                        aria-label={`Actions for ${order.id}`}
+                      >
+                        <MoreHorizontal size={17} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -199,6 +213,67 @@ export function OrdersManagement() {
           onPageChange={setPage}
         />
       </section>
+
+      {/* View Order Details Drawer */}
+      {viewingOrder && (
+        <CatalogModal
+          title={`Order Details (${viewingOrder.id})`}
+          description={`Customer purchase details for ${viewingOrder.customer}`}
+          onClose={() => setViewingOrder(null)}
+        >
+          <div className="p-6 space-y-6">
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div>
+                <span className="font-mono text-xl font-bold text-slate-900 block">{viewingOrder.id}</span>
+                <p className="text-xs text-slate-500 mt-0.5">{viewingOrder.date} · {viewingOrder.channel}</p>
+              </div>
+              <div className="text-right">
+                <span className="text-2xl font-extrabold text-slate-900 block">{viewingOrder.total}</span>
+                <span className="text-xs text-slate-500">{viewingOrder.items}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="rounded-lg border border-slate-200 bg-white p-4">
+                <span className="text-xs text-slate-500 block">Customer</span>
+                <span className="font-semibold text-slate-900 mt-1 block">{viewingOrder.customer}</span>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-white p-4">
+                <span className="text-xs text-slate-500 block">Payment Status</span>
+                <div className="mt-1">
+                  <Status value={viewingOrder.payment} />
+                </div>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-white p-4">
+                <span className="text-xs text-slate-500 block">Fulfillment Status</span>
+                <div className="mt-1">
+                  <Status value={viewingOrder.fulfillment} />
+                </div>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-white p-4">
+                <span className="text-xs text-slate-500 block">Channel</span>
+                <span className="font-semibold text-slate-800 mt-1 block">{viewingOrder.channel}</span>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+              <button
+                type="button"
+                onClick={() => setViewingOrder(null)}
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Close
+              </button>
+              <Link
+                href={`/admin/orders/${viewingOrder.id.slice(1)}`}
+                className="inline-flex items-center gap-2 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              >
+                Open Full Order Page
+              </Link>
+            </div>
+          </div>
+        </CatalogModal>
+      )}
     </>
   );
 }

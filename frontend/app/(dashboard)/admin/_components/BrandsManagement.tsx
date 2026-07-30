@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import {
+  Eye,
   ImagePlus,
   LoaderCircle,
   Pencil,
@@ -46,6 +47,7 @@ export function BrandsManagement() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [editing, setEditing] = useState<Brand | null>(null);
+  const [viewingBrand, setViewingBrand] = useState<Brand | null>(null);
   const [form, setForm] = useState<BrandInput>(emptyBrand);
   const [modalOpen, setModalOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -232,6 +234,14 @@ export function BrandsManagement() {
                       <td className="px-4 py-3">
                         <div className="flex gap-1">
                           <button
+                            onClick={() => setViewingBrand(brand)}
+                            className="grid size-8 place-items-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                            aria-label={`View ${brand.name}`}
+                            title="View brand details"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <button
                             onClick={() => openEdit(brand)}
                             className="grid size-8 place-items-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                             aria-label={`Edit ${brand.name}`}
@@ -266,6 +276,88 @@ export function BrandsManagement() {
           </>
         )}
       </section>
+
+      {/* View Brand Details Drawer */}
+      {viewingBrand && (
+        <CatalogModal
+          title="Brand Details"
+          description="View brand identity and configuration."
+          onClose={() => setViewingBrand(null)}
+        >
+          <div className="p-6 space-y-6">
+            <div className="flex items-start gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              {viewingBrand.logoUrl ? (
+                <Image
+                  src={viewingBrand.logoUrl}
+                  alt={`${viewingBrand.name} logo`}
+                  width={64}
+                  height={64}
+                  unoptimized
+                  className="size-16 rounded-lg border border-slate-200 bg-white object-contain p-2 shadow-2xs"
+                />
+              ) : (
+                <span className="grid size-16 place-items-center rounded-lg bg-slate-200 text-lg font-bold text-slate-700">
+                  {viewingBrand.name.slice(0, 2).toUpperCase()}
+                </span>
+              )}
+              <div className="flex-1">
+                <h3 className="font-semibold text-slate-900 text-lg">{viewingBrand.name}</h3>
+                <p className="text-xs text-slate-500 font-mono mt-0.5">Slug: {viewingBrand.slug}</p>
+                <div className="mt-2.5">
+                  <span
+                    className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ${
+                      viewingBrand.isActive
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    {viewingBrand.isActive ? "Active brand" : "Inactive"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="rounded-lg border border-slate-200 bg-white p-4">
+                <span className="text-xs text-slate-500 block">Country of Origin</span>
+                <span className="font-semibold text-slate-800 mt-1 block">{viewingBrand.country || "Not specified"}</span>
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-white p-4">
+                <span className="text-xs text-slate-500 block">Website</span>
+                <span className="font-semibold text-slate-800 mt-1 block">{viewingBrand.websiteUrl || "—"}</span>
+              </div>
+            </div>
+
+            {viewingBrand.description && (
+              <div className="rounded-lg border border-slate-200 bg-white p-4">
+                <span className="text-xs text-slate-500 block mb-1">Description</span>
+                <p className="text-sm text-slate-700">{viewingBrand.description}</p>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+              <button
+                type="button"
+                onClick={() => setViewingBrand(null)}
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const b = viewingBrand;
+                  setViewingBrand(null);
+                  openEdit(b);
+                }}
+                className="inline-flex items-center gap-2 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              >
+                <Pencil size={15} /> Edit Brand
+              </button>
+            </div>
+          </div>
+        </CatalogModal>
+      )}
 
       {modalOpen && (
         <CatalogModal

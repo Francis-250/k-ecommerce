@@ -129,3 +129,41 @@ export function useCouponMutations() {
     }),
   };
 }
+
+export function useInventoryMutations() {
+  const queryClient = useQueryClient();
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: productsQueryKey });
+    queryClient.invalidateQueries({ queryKey: ["admin", "inventory-movements"] });
+    queryClient.invalidateQueries({ queryKey: ["admin", "inventory-alerts"] });
+  };
+  return {
+    adjustStock: useMutation({
+      mutationFn: (input: import("./api").InventoryMovementInput) =>
+        catalogApi.recordInventoryMovement(input),
+      onSuccess: refresh,
+    }),
+  };
+}
+
+export function useInventoryAlerts() {
+  return useQuery({
+    queryKey: ["admin", "inventory-alerts"] as const,
+    queryFn: catalogApi.getInventoryAlerts,
+    refetchInterval: 30000,
+  });
+}
+
+export function useMarkAlertsAsRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: catalogApi.markAlertsAsRead,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "inventory-alerts"] });
+    },
+  });
+}
+
+
+
+

@@ -53,3 +53,69 @@ export const updateInventory = async (req: Request, res: Response) => {
   });
   return res.json({ success: true, inventory });
 };
+
+import { runInventoryCronCheck } from "../services/inventory-cron";
+
+export const getInventoryAlerts = async (req: Request, res: Response) => {
+  try {
+    const setting = await prisma.storeSetting.findUnique({
+      where: { key: "inventory_notifications" },
+    });
+
+    if (!setting || !setting.value) {
+      const alerts = await runInventoryCronCheck();
+      return res.json({ success: true, alerts, count: alerts.length });
+    }
+
+    const data = setting.value as { alerts: unknown[]; lastChecked: string };
+    return res.json({
+      success: true,
+      alerts: data.alerts || [],
+      count: (data.alerts || []).length,
+      lastChecked: data.lastChecked,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: (error as Error).message });
+  }
+};
+
+export const markAlertsAsRead = async (req: Request, res: Response) => {
+  try {
+    const setting = await prisma.storeSetting.findUnique({
+      where: { key: "inventory_notifications" },
+    });
+
+    if (setting && setting.value) {
+      const data = setting.value as {
+        alerts: Record<string, unknown>[];
+        lastChecked: string;
+      };
+      const updatedAlerts = (data.alerts || []).map((alert) => ({
+        ...alert,
+        read: true,
+      }));
+
+      await prisma.storeSetting.update({
+        where: { key: "inventory_notifications" },
+        data: {
+          value: JSON.parse(
+            JSON.stringify({
+              alerts: updatedAlerts,
+              lastChecked: data.lastChecked,
+            }),
+          ),
+        },
+      });
+    }
+
+    return res.json({ success: true, message: "All alerts marked as read" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: (error as Error).message });
+  }
+};
+
+

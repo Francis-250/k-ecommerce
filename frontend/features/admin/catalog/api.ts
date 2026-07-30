@@ -128,10 +128,78 @@ export type ApiProduct = {
   category: { id: string; name: string; slug: string } | null;
   brand: { id: string; name: string; slug: string } | null;
   images: Array<{ id: string; url: string; altText: string | null }>;
+  variants?: Array<{
+    id: string;
+    sku: string;
+    name: string | null;
+    price: string | null;
+    inventory: {
+      id: string;
+      quantity: number;
+      reserved: number;
+      reorderPoint: number;
+      continueSelling: boolean;
+      location: string | null;
+    } | null;
+  }>;
   createdAt: string;
 };
 
+export type InventoryMovementInput = {
+  productId?: string;
+  variantId?: string;
+  type:
+    | "STOCK_IN"
+    | "STOCK_OUT"
+    | "SALE"
+    | "RETURN"
+    | "CORRECTION"
+    | "RESERVATION"
+    | "RESERVATION_RELEASE";
+  quantity: number;
+  note?: string | null;
+  referenceType?: string | null;
+  referenceId?: string | null;
+};
+
+export type InventoryAlert = {
+  id: string;
+  productId?: string;
+  variantId?: string;
+  couponId?: string;
+  title: string;
+  productName?: string;
+  sku?: string;
+  category?: string;
+  quantity?: number;
+  reorderPoint?: number;
+  type: "OUT_OF_STOCK" | "LOW_STOCK" | "EXPIRED_COUPON";
+  message: string;
+  link: string;
+  read?: boolean;
+  updatedAt: string;
+};
+
 export const catalogApi = {
+  getInventoryAlerts: () =>
+    request<{
+      success: boolean;
+      alerts: InventoryAlert[];
+      count: number;
+      lastChecked?: string;
+    }>("/inventory/alerts"),
+  markAlertsAsRead: () =>
+    request<{ success: boolean; message: string }>("/inventory/alerts/read", {
+      method: "POST",
+    }),
+  recordInventoryMovement: (input: InventoryMovementInput) =>
+    request<{ success: boolean; inventory: unknown; movement: unknown }>(
+      "/inventory-movements",
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      },
+    ),
   listProducts: () =>
     request<{
       data: ApiProduct[];

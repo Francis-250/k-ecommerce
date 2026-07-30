@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   ChevronLeft,
   ChevronRight,
+  Eye,
   Pencil,
   Search,
   SlidersHorizontal,
@@ -19,6 +20,7 @@ import {
   type CatalogProduct,
 } from "@/features/storefront/shop/catalog-data";
 import { AdminPageHeader } from "./AdminPageHeader";
+import { CatalogModal } from "./CatalogModal";
 import { ProductForm } from "./ProductForm";
 
 const PAGE_SIZE = 5;
@@ -39,6 +41,9 @@ export function ProductTable() {
   const [editingProduct, setEditingProduct] = useState<CatalogProduct | null>(
     null,
   );
+  const [viewingProduct, setViewingProduct] = useState<
+    (CatalogProduct & { status?: string }) | null
+  >(null);
 
   const products: (CatalogProduct & { status?: string })[] = useMemo(() => {
     if (!apiProducts) return catalogProducts.map(p => ({ ...p, status: "Active" }));
@@ -279,8 +284,16 @@ export function ProductTable() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
                       <button
+                        onClick={() => setViewingProduct(product)}
+                        className="grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
+                        title="View product details drawer"
+                        aria-label={`View ${product.name}`}
+                      >
+                        <Eye size={16} strokeWidth={1.75} />
+                      </button>
+                      <button
                         onClick={() => openEdit(product)}
-                        className="grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                        className="grid size-8 place-items-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
                         title="Edit product drawer"
                         aria-label={`Edit ${product.name}`}
                       >
@@ -288,7 +301,7 @@ export function ProductTable() {
                       </button>
                       <button
                         onClick={() => remove(product.id, product.name)}
-                        className="grid size-8 place-items-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-600"
+                        className="grid size-8 place-items-center rounded-md text-slate-400 hover:bg-red-50 hover:text-red-600 transition"
                         aria-label={`Delete ${product.name}`}
                       >
                         <Trash2 size={16} strokeWidth={1.75} />
@@ -366,6 +379,86 @@ export function ProductTable() {
           </div>
         )}
       </section>
+
+      {/* View Product Details Drawer */}
+      {viewingProduct && (
+        <CatalogModal
+          title="Product Details"
+          description="View product specifications, audience, and pricing."
+          onClose={() => setViewingProduct(null)}
+        >
+          <div className="p-6 space-y-6">
+            {/* Hero Header */}
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <Image
+                src={viewingProduct.image}
+                alt={viewingProduct.name}
+                width={112}
+                height={112}
+                className="size-28 rounded-lg border border-slate-200 object-cover shadow-xs shrink-0"
+              />
+              <div className="flex-1 space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    SKU-00{viewingProduct.id}
+                  </span>
+                  <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200">
+                    {viewingProduct.status || "Active"}
+                  </span>
+                </div>
+                <h2 className="text-xl font-semibold text-slate-900 leading-snug">
+                  {viewingProduct.name}
+                </h2>
+                <p className="text-base font-bold text-slate-900">
+                  ${viewingProduct.price.toFixed(2)}
+                </p>
+              </div>
+            </div>
+
+            {/* Clean Specifications Row Breakdown */}
+            <div className="border-t border-b border-slate-100 py-2 divide-y divide-slate-100 text-sm">
+              <div className="flex justify-between py-2.5">
+                <span className="text-slate-500">Category</span>
+                <span className="font-semibold text-slate-900">{viewingProduct.category}</span>
+              </div>
+              <div className="flex justify-between py-2.5">
+                <span className="text-slate-500">Target Audience</span>
+                <span className="font-semibold text-slate-900">{viewingProduct.audience}</span>
+              </div>
+              <div className="flex justify-between py-2.5">
+                <span className="text-slate-500">Price</span>
+                <span className="font-semibold text-slate-900">${viewingProduct.price.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between py-2.5">
+                <span className="text-slate-500">Status</span>
+                <span className="font-semibold text-slate-900">{viewingProduct.status || "Active"}</span>
+              </div>
+            </div>
+
+            {/* Footer Action Buttons */}
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setViewingProduct(null)}
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const p = viewingProduct;
+                  setViewingProduct(null);
+                  openEdit(p);
+                }}
+                className="inline-flex items-center gap-2 rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
+              >
+                <Pencil size={15} /> Edit Product
+              </button>
+            </div>
+          </div>
+        </CatalogModal>
+      )}
 
       {/* Render ProductForm side drawer when modalOpen is true */}
       {modalOpen && (

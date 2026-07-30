@@ -3,6 +3,8 @@ import * as controller from "../controllers/inventory.controller";
 import { requireAdmin, verifyToken } from "../middlewares/auth.middleware";
 const router = Router();
 router.use(verifyToken, requireAdmin);
+router.get("/alerts", controller.getInventoryAlerts);
+router.post("/alerts/read", controller.markAlertsAsRead);
 router.get("/", controller.listInventory);
 router.get("/:id", controller.getInventory);
 router.patch("/:id", controller.updateInventory);

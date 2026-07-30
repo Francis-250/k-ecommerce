@@ -30,7 +30,7 @@ export default function RootLayout({
         {/* eslint-disable-next-line @next/next/no-css-tags */}
         <link rel="stylesheet" href="/storefront/assets/css/responsive.css" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <QueryProvider>
           <CartProvider>
             <AuthInitializer />
