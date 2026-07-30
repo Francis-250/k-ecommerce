@@ -40,6 +40,7 @@ import newsletterSubscriberRoutes from "./routes/newsletter-subscriber.routes";
 import storeSettingRoutes from "./routes/store-setting.routes";
 import auditLogRoutes from "./routes/audit-log.routes";
 import otpCodeRoutes from "./routes/otp-code.routes";
+import analyticsRoutes from "./routes/analytics.routes";
 import { errorHandler, notFound } from "./middlewares/error.middleware";
 
 const app = express();
@@ -127,6 +128,7 @@ app.use("/api/newsletter-subscribers", newsletterSubscriberRoutes);
 app.use("/api/store-settings", storeSettingRoutes);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/otp-codes", otpCodeRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Welcome to the Ecommerce API" });

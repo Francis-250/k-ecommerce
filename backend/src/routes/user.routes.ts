@@ -5,6 +5,7 @@ const router = Router();
 router.get("/me", verifyToken, controller.getProfile);
 router.patch("/me", verifyToken, controller.updateProfile);
 router.get("/", verifyToken, requireAdmin, controller.listUsers);
+router.post("/", verifyToken, requireAdmin, controller.createUser);
 router.get("/:id", verifyToken, requireAdmin, controller.getUser);
 router.patch("/:id", verifyToken, requireAdmin, controller.updateUser);
 router.delete("/:id", verifyToken, requireAdmin, controller.deleteUser);

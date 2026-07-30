@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
 import { prisma } from "../lib/prisma";
+import { hashPassword } from "../utils/helpers";
 import {
   cloudinaryUrlSchema,
   idParamsSchema,
@@ -24,6 +25,17 @@ const adminSchema = profileSchema.extend({
   isBanned: z.boolean().optional(),
   taxExempt: z.boolean().optional(),
 });
+const createUserSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string().trim().min(1).max(80).optional(),
+  lastName: z.string().trim().min(1).max(80).optional(),
+  phone: z.string().trim().max(30).nullable().optional(),
+  password: z.string().min(6).optional(),
+  role: z.enum(["CUSTOMER", "STAFF", "ADMIN", "SUPER_ADMIN"]).optional().default("CUSTOMER"),
+  acceptsMarketing: z.boolean().optional().default(false),
+  taxExempt: z.boolean().optional().default(false),
+});
+
 const select = {
   id: true,
   email: true,
@@ -79,12 +91,47 @@ export const listUsers = async (req: Request, res: Response) => {
       where,
       skip,
       take: limit,
-      select,
+      select: {
+        ...select,
+        _count: { select: { orders: true } },
+        orders: { select: { total: true } },
+      },
       orderBy: { createdAt: "desc" },
     }),
     prisma.user.count({ where }),
   ]);
   return res.json(paginated(users, total, page, limit));
+};
+export const createUser = async (req: Request, res: Response) => {
+  const parsed = createUserSchema.safeParse(req.body);
+  if (!parsed.success) return validationError(res, parsed.error);
+
+  const existing = await prisma.user.findUnique({
+    where: { email: parsed.data.email.toLowerCase() },
+  });
+  if (existing) {
+    return res.status(409).json({ success: false, message: "A user with this email address already exists" });
+  }
+
+  const rawPassword = parsed.data.password || Math.random().toString(36).slice(-10) + "A1!";
+  const passwordHash = await hashPassword(rawPassword);
+
+  const user = await prisma.user.create({
+    data: {
+      email: parsed.data.email.toLowerCase(),
+      firstName: parsed.data.firstName ?? "",
+      lastName: parsed.data.lastName ?? "",
+      phone: parsed.data.phone,
+      password: passwordHash,
+      role: parsed.data.role,
+      isVerified: true,
+      acceptsMarketing: parsed.data.acceptsMarketing,
+      taxExempt: parsed.data.taxExempt,
+    },
+    select,
+  });
+
+  return res.status(201).json({ success: true, user });
 };
 export const getUser = async (req: Request, res: Response) => {
   const { id } = idParamsSchema.parse(req.params);

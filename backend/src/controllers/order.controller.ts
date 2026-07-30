@@ -62,8 +62,40 @@ const createSchema = z.object({
   phone: z.string().nullable().optional(),
   customerNote: z.string().max(3000).nullable().optional(),
   couponCode: z.string().trim().nullable().optional(),
+  status: z
+    .enum([
+      "DRAFT",
+      "PENDING_PAYMENT",
+      "PAID",
+      "PROCESSING",
+      "COMPLETED",
+      "CANCELLED",
+    ])
+    .optional(),
+  paymentStatus: z
+    .enum([
+      "REQUIRES_PAYMENT_METHOD",
+      "REQUIRES_CONFIRMATION",
+      "PROCESSING",
+      "SUCCEEDED",
+      "FAILED",
+      "CANCELLED",
+      "PARTIALLY_REFUNDED",
+      "REFUNDED",
+    ])
+    .optional(),
+  fulfillmentStatus: z
+    .enum([
+      "UNFULFILLED",
+      "PROCESSING",
+      "PARTIALLY_FULFILLED",
+      "FULFILLED",
+      "RETURNED",
+    ])
+    .optional(),
+  source: z.string().optional(),
   shippingAddress: addressSchema,
-  billingAddress: addressSchema,
+  billingAddress: addressSchema.optional(),
   items: z
     .array(
       z
@@ -87,6 +119,7 @@ const orderInclude = {
   refunds: true,
   couponRedemptions: { include: { coupon: true } },
   fulfillments: { include: { items: true } },
+  user: { select: { id: true, email: true, firstName: true, lastName: true } },
 } as const;
 export const listOrders = async (req: Request, res: Response) => {
   const { page, limit, skip } = pagination(req);
@@ -101,7 +134,7 @@ export const listOrders = async (req: Request, res: Response) => {
       where,
       skip,
       take: limit,
-      include: { _count: { select: { items: true } } },
+      include: orderInclude,
       orderBy: { createdAt: "desc" },
     }),
     prisma.order.count({ where }),
@@ -219,8 +252,10 @@ export const createOrder = async (req: Request, res: Response) => {
         email: parsed.data.email.toLowerCase(),
         phone: parsed.data.phone,
         customerNote: parsed.data.customerNote,
-        status: "PENDING_PAYMENT",
-        paymentStatus: "REQUIRES_PAYMENT_METHOD",
+        status: parsed.data.status ?? "PENDING_PAYMENT",
+        paymentStatus: parsed.data.paymentStatus ?? "REQUIRES_PAYMENT_METHOD",
+        fulfillmentStatus: parsed.data.fulfillmentStatus ?? "UNFULFILLED",
+        source: parsed.data.source ?? "ONLINE_STORE",
         subtotal,
         discountTotal,
         shippingTotal,
@@ -252,7 +287,7 @@ export const createOrder = async (req: Request, res: Response) => {
         addresses: {
           create: [
             { ...parsed.data.shippingAddress, type: "SHIPPING" },
-            { ...parsed.data.billingAddress, type: "BILLING" },
+            { ...(parsed.data.billingAddress ?? parsed.data.shippingAddress), type: "BILLING" },
           ],
         },
       },
