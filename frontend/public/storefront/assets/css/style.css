@@ -615,12 +615,18 @@
 /*categorie menu css end*/
 
 /* 2.6 wishlist block css here */
-.block_title h3 {
+.block_title h1,
+.block_title h2,
+.block_title h3,
+.block_title h4,
+.block_title h5,
+.block_title h6,
+.block_title > * {
 	color: #444444;
 	text-transform: uppercase;
 	font-size: 18px;
 	font-weight: 700;
-	line-height: 14px;
+	line-height: 1.4;
 	margin-bottom: 15px;
 	display: inline-block;
 	background: #fff;
@@ -632,13 +638,23 @@
 	margin-bottom: 31px;
 }
 
-.block_title h3 a {
+.block_title h1 a,
+.block_title h2 a,
+.block_title h3 a,
+.block_title h4 a,
+.block_title h5 a,
+.block_title h6 a {
 	line-height: 10px;
 }
 .block_title{
     position: relative
 }
-.block_title h3 a:hover{
+.block_title h1 a:hover,
+.block_title h2 a:hover,
+.block_title h3 a:hover,
+.block_title h4 a:hover,
+.block_title h5 a:hover,
+.block_title h6 a:hover{
      color: #e84c3d;
 }
 .block_title::before {

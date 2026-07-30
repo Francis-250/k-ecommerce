@@ -501,7 +501,12 @@
     .footer_social.text-right {
         text-align: center !important;
     }
-    .block_title h3 {
+    .block_title h1,
+    .block_title h2,
+    .block_title h3,
+    .block_title h4,
+    .block_title h5,
+    .block_title h6 {
         font-size: 15px;
     }
     .footer_widget {
@@ -712,7 +717,12 @@
     .product_d_inner .tab-content {
         padding: 20px 15px;
     }
-    .new_product_area.product_page .block_title h3 {
+    .new_product_area.product_page .block_title h1,
+    .new_product_area.product_page .block_title h2,
+    .new_product_area.product_page .block_title h3,
+    .new_product_area.product_page .block_title h4,
+    .new_product_area.product_page .block_title h5,
+    .new_product_area.product_page .block_title h6 {
         font-size: 12px;
         line-height: 22px;
     }
