@@ -321,7 +321,7 @@ export function CreateOrderDrawer({
           <label className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
             <UserRound size={15} /> 2. Customer Information
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium text-slate-700 block mb-1">Email Address *</label>
               <input
@@ -351,7 +351,7 @@ export function CreateOrderDrawer({
           <label className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
             <MapPin size={15} /> 3. Shipping Address
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium text-slate-700 block mb-1">First Name *</label>
               <input
@@ -388,7 +388,7 @@ export function CreateOrderDrawer({
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="text-xs font-medium text-slate-700 block mb-1">City *</label>
               <input

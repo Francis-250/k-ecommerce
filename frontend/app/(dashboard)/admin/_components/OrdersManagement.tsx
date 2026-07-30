@@ -282,7 +282,7 @@ export function OrdersManagement() {
             {/* Quick Status Control Bar */}
             <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Manage Order Status</span>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-medium text-slate-700 block mb-1">Payment Status</label>
                   <select
@@ -348,7 +348,7 @@ export function OrdersManagement() {
             </div>
 
             {/* Customer & Shipping Information */}
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div className="rounded-lg border border-slate-200 bg-white p-4">
                 <span className="text-xs text-slate-500 block">Customer Info</span>
                 <span className="font-semibold text-slate-900 mt-1 block">

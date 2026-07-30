@@ -266,7 +266,7 @@ export function CategoriesManagement() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div className="rounded-lg border border-slate-200 bg-white p-4">
                 <span className="text-xs text-slate-500 block">Assigned Products</span>
                 <span className="font-bold text-slate-900 text-lg mt-1 block">{viewingCategory._count?.products ?? 0}</span>

@@ -296,7 +296,7 @@ export function CustomersManagement() {
           }}
         >
           <form onSubmit={handleAddCustomerSubmit} className="p-6 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-medium text-slate-700 block mb-1">First Name</label>
                 <input
@@ -342,7 +342,7 @@ export function CustomersManagement() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs font-medium text-slate-700 block mb-1">Password</label>
                 <input
@@ -438,7 +438,7 @@ export function CustomersManagement() {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-1">
                 <span className="text-xs text-slate-500 block">Contact Info</span>
                 <p className="text-xs text-slate-800 flex items-center gap-1.5 pt-1">

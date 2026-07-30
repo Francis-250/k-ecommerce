@@ -317,7 +317,7 @@ export function BrandsManagement() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div className="rounded-lg border border-slate-200 bg-white p-4">
                 <span className="text-xs text-slate-500 block">Country of Origin</span>
                 <span className="font-semibold text-slate-800 mt-1 block">{viewingBrand.country || "Not specified"}</span>
