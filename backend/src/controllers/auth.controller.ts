@@ -348,9 +348,32 @@ export const login = async (
     }
 
     if (!existingUser.isVerified) {
+      const plainOtp = generateOtp();
+
+      await prisma.$transaction(async (tx) => {
+        await tx.otpCodes.deleteMany({
+          where: { userId: existingUser.id, otp_type: "REGISTRATION" },
+        });
+        await tx.otpCodes.create({
+          data: {
+            otp: await hashOtp(plainOtp),
+            otp_expiry: getOtpExpiry(10),
+            otp_type: "REGISTRATION",
+            userId: existingUser.id,
+          },
+        });
+      });
+
+      await sendEmail({
+        subject: "Your Verification Code",
+        to: email,
+        text: `Your verification code is: ${plainOtp}`,
+        html: generateOtpEmailHtml(plainOtp, "Your Verification Code"),
+      });
+
       return res.status(403).json({
         success: false,
-        message: "Verify your email before signing in",
+        message: "Verify your email before signing in. A new code has been sent to your email.",
       });
     }
 

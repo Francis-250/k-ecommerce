@@ -16,22 +16,35 @@ export function LoginForm() {
   const login = useAuthStore((state) => state.login);
   const status = useAuthStore((state) => state.status);
   const setAuthDrawerTab = useAuthStore((state) => state.setAuthDrawerTab);
+  const setPendingVerificationEmail = useAuthStore(
+    (state) => state.setPendingVerificationEmail,
+  );
   const closeAuthDrawer = useAuthStore((state) => state.closeAuthDrawer);
   const [showPassword, setShowPassword] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const email = String(form.get("email")).trim().toLowerCase();
 
     try {
       await login(
-        String(form.get("email")).trim(),
+        email,
         String(form.get("password")),
       );
       toast.success("Welcome back!");
       closeAuthDrawer();
     } catch (error) {
-      toast.error(errorMessage(error));
+      const msg = errorMessage(error);
+      toast.error(msg);
+
+      if (
+        error instanceof AuthApiError &&
+        (error.status === 403 || msg.toLowerCase().includes("verify"))
+      ) {
+        setPendingVerificationEmail(email);
+        setAuthDrawerTab("verify-email");
+      }
     }
   }
 
