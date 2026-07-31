@@ -120,7 +120,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
     } catch (error) {
       setAuthToken(null);
-      set({ user: null, status: "unauthenticated" });
+
+      const isUnverified =
+        error instanceof AuthApiError &&
+        (error.status === 403 ||
+          error.message.toLowerCase().includes("verify"));
+
+      if (isUnverified) {
+        savePendingEmail(email);
+        set({
+          user: null,
+          status: "unauthenticated",
+          pendingVerificationEmail: email,
+          authDrawerOpen: true,
+          authDrawerTab: "verify-email",
+        });
+      } else {
+        set({ user: null, status: "unauthenticated" });
+      }
+
       throw error;
     }
   },
