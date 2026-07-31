@@ -141,67 +141,132 @@ export default function MyAccountPage() {
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 md:gap-8">
             {/* Mobile Horizontal Pill Scroll Navigation / Desktop Vertical Menu */}
-            <aside className="w-full">
-              <nav className="flex flex-row md:flex-col overflow-x-auto md:overflow-visible gap-2 md:gap-0 border-b border-slate-200 pb-3 md:pb-0 md:border-b-0 md:border md:border-slate-200 md:rounded md:divide-y md:divide-slate-100 bg-white no-scrollbar">
+            <aside>
+              {/* Mobile Horizontal Pill Scroll */}
+              <div className="flex md:hidden overflow-x-auto gap-2 border-b border-slate-200 pb-3 bg-white no-scrollbar">
                 <button
                   type="button"
                   onClick={() => setActiveTab("dashboard")}
-                  className={`px-4 py-2 md:py-3 text-xs md:text-sm font-semibold rounded-full md:rounded-none whitespace-nowrap transition text-left shrink-0 ${
+                  className={`px-4 py-2 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
                     activeTab === "dashboard"
                       ? "bg-[#082f35] text-white"
-                      : "bg-slate-100 md:bg-transparent text-slate-700 hover:bg-slate-200 md:hover:bg-slate-50"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                   }`}
                 >
                   Dashboard
                 </button>
-
                 <button
                   type="button"
                   onClick={() => setActiveTab("orders")}
-                  className={`px-4 py-2 md:py-3 text-xs md:text-sm font-semibold rounded-full md:rounded-none whitespace-nowrap transition text-left shrink-0 ${
+                  className={`px-4 py-2 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
                     activeTab === "orders"
                       ? "bg-[#082f35] text-white"
-                      : "bg-slate-100 md:bg-transparent text-slate-700 hover:bg-slate-200 md:hover:bg-slate-50"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                   }`}
                 >
                   Orders {orders.length > 0 && `(${orders.length})`}
                 </button>
-
                 <button
                   type="button"
                   onClick={() => setActiveTab("addresses")}
-                  className={`px-4 py-2 md:py-3 text-xs md:text-sm font-semibold rounded-full md:rounded-none whitespace-nowrap transition text-left shrink-0 ${
+                  className={`px-4 py-2 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
                     activeTab === "addresses"
                       ? "bg-[#082f35] text-white"
-                      : "bg-slate-100 md:bg-transparent text-slate-700 hover:bg-slate-200 md:hover:bg-slate-50"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                   }`}
                 >
                   Addresses
                 </button>
-
                 <button
                   type="button"
                   onClick={() => setActiveTab("account-details")}
-                  className={`px-4 py-2 md:py-3 text-xs md:text-sm font-semibold rounded-full md:rounded-none whitespace-nowrap transition text-left shrink-0 ${
+                  className={`px-4 py-2 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
                     activeTab === "account-details"
                       ? "bg-[#082f35] text-white"
-                      : "bg-slate-100 md:bg-transparent text-slate-700 hover:bg-slate-200 md:hover:bg-slate-50"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                   }`}
                 >
                   Account Details
                 </button>
-
                 <button
                   type="button"
                   onClick={async () => {
                     await logout();
                     toast.success("Logged out successfully.");
                   }}
-                  className="px-4 py-2 md:py-3 text-xs md:text-sm font-semibold rounded-full md:rounded-none whitespace-nowrap text-red-600 bg-red-50 md:bg-transparent hover:bg-red-100 md:hover:bg-red-50 transition text-left shrink-0"
+                  className="px-4 py-2 text-xs font-semibold rounded-full whitespace-nowrap text-red-600 bg-red-50 hover:bg-red-100 transition shrink-0"
                 >
                   Logout
                 </button>
-              </nav>
+              </div>
+
+              {/* Desktop Classic Vertical Menu List */}
+              <ul className="hidden md:flex flex-col border border-slate-200 rounded divide-y divide-slate-100 text-sm font-medium text-slate-700 bg-white">
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("dashboard")}
+                    className={`w-full text-left px-4 py-3 transition ${
+                      activeTab === "dashboard"
+                        ? "bg-[#082f35] text-white font-semibold"
+                        : "hover:bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    Dashboard
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("orders")}
+                    className={`w-full text-left px-4 py-3 transition ${
+                      activeTab === "orders"
+                        ? "bg-[#082f35] text-white font-semibold"
+                        : "hover:bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    Orders {orders.length > 0 && `(${orders.length})`}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("addresses")}
+                    className={`w-full text-left px-4 py-3 transition ${
+                      activeTab === "addresses"
+                        ? "bg-[#082f35] text-white font-semibold"
+                        : "hover:bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    Addresses
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("account-details")}
+                    className={`w-full text-left px-4 py-3 transition ${
+                      activeTab === "account-details"
+                        ? "bg-[#082f35] text-white font-semibold"
+                        : "hover:bg-slate-50 text-slate-700"
+                    }`}
+                  >
+                    Account Details
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await logout();
+                      toast.success("Logged out successfully.");
+                    }}
+                    className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </ul>
             </aside>
 
             {/* Main Content Area */}
