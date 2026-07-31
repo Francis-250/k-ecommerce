@@ -509,18 +509,32 @@ export default function MyAccountPage() {
         </div>
       </section>
 
-      {/* Add Address Modal */}
+      {/* Add Address Side Drawer */}
       {showAddressModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-5 shadow-xl space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <h3 className="font-bold text-slate-900 text-base">
-                Add Address
-              </h3>
+        <>
+          <div
+            className="fixed inset-0 z-[1100] bg-slate-950/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowAddressModal(false)}
+            aria-hidden="true"
+          />
+          <aside
+            className="fixed top-0 bottom-0 right-0 z-[1101] w-full max-w-md h-full bg-white shadow-2xl flex flex-col overflow-hidden border-l border-slate-200"
+            aria-label="Add New Address"
+          >
+            <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-slate-50">
+              <div>
+                <h3 className="font-bold text-slate-900 text-base">
+                  Add New Address
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Save a shipping or billing address to your account.
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowAddressModal(false)}
-                className="text-slate-400 hover:text-slate-600"
+                className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm"
+                aria-label="Close drawer"
               >
                 <X size={18} />
               </button>
@@ -541,7 +555,7 @@ export default function MyAccountPage() {
                   postalCode: String(form.get("postalCode")).trim(),
                 });
               }}
-              className="space-y-3 text-xs"
+              className="flex-1 overflow-y-auto p-6 space-y-4 text-xs pb-24"
             >
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
@@ -551,19 +565,21 @@ export default function MyAccountPage() {
                   type="text"
                   name="fullName"
                   required
-                  className="w-full h-9 px-3 border border-slate-300 rounded text-sm"
+                  placeholder="e.g. Jane Doe"
+                  className="w-full h-10 px-3 border border-slate-300 rounded text-sm focus:outline-none focus:border-[#082f35]"
                 />
               </div>
 
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
-                  Phone *
+                  Phone Number *
                 </label>
                 <input
                   type="tel"
                   name="phone"
                   required
-                  className="w-full h-9 px-3 border border-slate-300 rounded text-sm"
+                  placeholder="e.g. +1 555 019 2834"
+                  className="w-full h-10 px-3 border border-slate-300 rounded text-sm focus:outline-none focus:border-[#082f35]"
                 />
               </div>
 
@@ -575,11 +591,12 @@ export default function MyAccountPage() {
                   type="text"
                   name="street"
                   required
-                  className="w-full h-9 px-3 border border-slate-300 rounded text-sm"
+                  placeholder="House number & street name"
+                  className="w-full h-10 px-3 border border-slate-300 rounded text-sm focus:outline-none focus:border-[#082f35]"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">
                     City *
@@ -588,7 +605,8 @@ export default function MyAccountPage() {
                     type="text"
                     name="city"
                     required
-                    className="w-full h-9 px-3 border border-slate-300 rounded text-sm"
+                    placeholder="New York"
+                    className="w-full h-10 px-3 border border-slate-300 rounded text-sm focus:outline-none focus:border-[#082f35]"
                   />
                 </div>
                 <div>
@@ -598,12 +616,13 @@ export default function MyAccountPage() {
                   <input
                     type="text"
                     name="province"
-                    className="w-full h-9 px-3 border border-slate-300 rounded text-sm"
+                    placeholder="NY"
+                    className="w-full h-10 px-3 border border-slate-300 rounded text-sm focus:outline-none focus:border-[#082f35]"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold text-slate-700 mb-1">
                     Country *
@@ -613,7 +632,7 @@ export default function MyAccountPage() {
                     name="country"
                     defaultValue="United States"
                     required
-                    className="w-full h-9 px-3 border border-slate-300 rounded text-sm"
+                    className="w-full h-10 px-3 border border-slate-300 rounded text-sm focus:outline-none focus:border-[#082f35]"
                   />
                 </div>
                 <div>
@@ -623,33 +642,34 @@ export default function MyAccountPage() {
                   <input
                     type="text"
                     name="postalCode"
-                    className="w-full h-9 px-3 border border-slate-300 rounded text-sm"
+                    placeholder="10001"
+                    className="w-full h-10 px-3 border border-slate-300 rounded text-sm focus:outline-none focus:border-[#082f35]"
                   />
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setShowAddressModal(false)}
-                  className="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded"
+                  className="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-semibold rounded hover:bg-slate-200"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createAddressMutation.isPending}
-                  className="px-4 py-1.5 bg-[#082f35] text-white text-xs font-semibold rounded inline-flex items-center gap-1"
+                  className="px-5 py-2 bg-[#082f35] text-white text-xs font-semibold rounded hover:bg-[#062429] inline-flex items-center gap-1.5 shadow"
                 >
                   {createAddressMutation.isPending && (
-                    <Loader2 className="animate-spin" size={13} />
+                    <Loader2 className="animate-spin" size={14} />
                   )}
                   Save Address
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </aside>
+        </>
       )}
 
       {/* Order Details Modal */}
