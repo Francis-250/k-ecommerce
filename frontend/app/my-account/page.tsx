@@ -140,14 +140,14 @@ export default function MyAccountPage() {
       <section className="py-6 sm:py-12 bg-white min-h-[600px] pb-28 md:pb-12">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 md:gap-8">
-            {/* Mobile Horizontal Pill Scroll Navigation / Desktop Vertical Menu */}
+            {/* Navigation Sidebar / Mobile Tab Bar */}
             <aside>
-              {/* Mobile Horizontal Pill Scroll */}
+              {/* Mobile Horizontal Tabs */}
               <div className="flex md:hidden overflow-x-auto gap-2 border-b border-slate-200 pb-3 bg-white no-scrollbar">
                 <button
                   type="button"
                   onClick={() => setActiveTab("dashboard")}
-                  className={`px-4 py-2 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
+                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
                     activeTab === "dashboard"
                       ? "bg-[#082f35] text-white"
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -158,7 +158,7 @@ export default function MyAccountPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("orders")}
-                  className={`px-4 py-2 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
+                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
                     activeTab === "orders"
                       ? "bg-[#082f35] text-white"
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -169,7 +169,7 @@ export default function MyAccountPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("addresses")}
-                  className={`px-4 py-2 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
+                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
                     activeTab === "addresses"
                       ? "bg-[#082f35] text-white"
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -180,7 +180,7 @@ export default function MyAccountPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("account-details")}
-                  className={`px-4 py-2 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
+                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap transition shrink-0 ${
                     activeTab === "account-details"
                       ? "bg-[#082f35] text-white"
                       : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -194,7 +194,7 @@ export default function MyAccountPage() {
                     await logout();
                     toast.success("Logged out successfully.");
                   }}
-                  className="px-4 py-2 text-xs font-semibold rounded-full whitespace-nowrap text-red-600 bg-red-50 hover:bg-red-100 transition shrink-0"
+                  className="px-3.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap text-red-600 bg-red-50 hover:bg-red-100 transition shrink-0"
                 >
                   Logout
                 </button>
@@ -282,7 +282,7 @@ export default function MyAccountPage() {
                         await logout();
                         toast.success("Logged out.");
                       }}
-                      className="text-[#087554] underline font-semibold hover:text-[#082f35]"
+                      className="text-[#082f35] underline font-semibold hover:text-black"
                     >
                       Log out
                     </button>
@@ -293,7 +293,7 @@ export default function MyAccountPage() {
                     <button
                       type="button"
                       onClick={() => setActiveTab("orders")}
-                      className="text-[#087554] font-semibold hover:underline"
+                      className="text-[#082f35] font-semibold hover:underline"
                     >
                       recent orders
                     </button>
@@ -301,7 +301,7 @@ export default function MyAccountPage() {
                     <button
                       type="button"
                       onClick={() => setActiveTab("addresses")}
-                      className="text-[#087554] font-semibold hover:underline"
+                      className="text-[#082f35] font-semibold hover:underline"
                     >
                       shipping and billing addresses
                     </button>
@@ -309,7 +309,7 @@ export default function MyAccountPage() {
                     <button
                       type="button"
                       onClick={() => setActiveTab("account-details")}
-                      className="text-[#087554] font-semibold hover:underline"
+                      className="text-[#082f35] font-semibold hover:underline"
                     >
                       edit your account details
                     </button>
@@ -331,7 +331,7 @@ export default function MyAccountPage() {
                       Loading orders...
                     </div>
                   ) : orders.length === 0 ? (
-                    <div className="border border-slate-200 rounded p-6 text-center text-slate-600 bg-slate-50/50">
+                    <div className="border border-slate-200 rounded p-6 text-center text-slate-600 bg-slate-50">
                       <p className="mb-3 text-xs sm:text-sm">No orders have been placed yet.</p>
                       <Link
                         href="/shop"
@@ -343,9 +343,9 @@ export default function MyAccountPage() {
                   ) : (
                     <>
                       {/* Desktop Table View */}
-                      <div className="hidden md:block overflow-x-auto border border-slate-200 rounded">
+                      <div className="hidden md:block border border-slate-200 rounded">
                         <table className="w-full text-left text-sm border-collapse">
-                          <thead className="bg-slate-100 text-slate-700 text-xs font-semibold uppercase border-b border-slate-200">
+                          <thead className="bg-slate-50 text-slate-700 text-xs font-semibold border-b border-slate-200">
                             <tr>
                               <th className="p-3">Order</th>
                               <th className="p-3">Date</th>
@@ -354,9 +354,9 @@ export default function MyAccountPage() {
                               <th className="p-3 text-right">Action</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-200">
+                          <tbody className="divide-y divide-slate-100">
                             {orders.map((order) => (
-                              <tr key={order.id} className="hover:bg-slate-50">
+                              <tr key={order.id} className="hover:bg-slate-50/60">
                                 <td className="p-3 font-semibold text-slate-900">
                                   #{order.orderNumber}
                                 </td>
@@ -364,7 +364,7 @@ export default function MyAccountPage() {
                                   {new Date(order.createdAt).toLocaleDateString()}
                                 </td>
                                 <td className="p-3">
-                                  <span className="inline-block px-2 py-0.5 text-xs font-semibold rounded bg-slate-100 border text-slate-700">
+                                  <span className="inline-block px-2 py-0.5 text-xs font-semibold rounded border border-slate-200 bg-white text-slate-700">
                                     {order.status}
                                   </span>
                                 </td>
@@ -386,18 +386,18 @@ export default function MyAccountPage() {
                         </table>
                       </div>
 
-                      {/* Mobile Responsive Cards */}
+                      {/* Mobile Cards */}
                       <div className="grid grid-cols-1 gap-3 md:hidden">
                         {orders.map((order) => (
                           <div
                             key={order.id}
-                            className="border border-slate-200 rounded-lg p-4 bg-white shadow-sm flex flex-col gap-2"
+                            className="border border-slate-200 rounded-lg p-3.5 bg-white flex flex-col gap-2"
                           >
                             <div className="flex items-center justify-between">
                               <span className="font-bold text-slate-900 text-sm">
                                 #{order.orderNumber}
                               </span>
-                              <span className="inline-block px-2 py-0.5 text-[11px] font-semibold rounded bg-slate-100 border text-slate-700 uppercase">
+                              <span className="inline-block px-2 py-0.5 text-[11px] font-semibold rounded border border-slate-200 bg-white text-slate-700 uppercase">
                                 {order.status}
                               </span>
                             </div>
@@ -450,7 +450,7 @@ export default function MyAccountPage() {
                       Loading addresses...
                     </div>
                   ) : addresses.length === 0 ? (
-                    <div className="border border-slate-200 rounded p-6 text-center text-slate-600 bg-slate-50/50">
+                    <div className="border border-slate-200 rounded p-6 text-center text-slate-600 bg-slate-50">
                       <p className="mb-3 text-xs sm:text-sm">You have not saved any addresses yet.</p>
                       <button
                         type="button"
@@ -471,7 +471,7 @@ export default function MyAccountPage() {
                             <div className="flex items-center justify-between mb-2">
                               <strong className="text-slate-900">{addr.fullName}</strong>
                               {addr.type && (
-                                <span className="text-[10px] uppercase font-bold text-slate-500 px-1.5 py-0.5 bg-slate-100 rounded">
+                                <span className="text-[10px] uppercase font-bold text-slate-500 px-1.5 py-0.5 border border-slate-200 rounded">
                                   {addr.type}
                                 </span>
                               )}
@@ -590,7 +590,7 @@ export default function MyAccountPage() {
                     <button
                       type="submit"
                       disabled={updateProfileMutation.isPending}
-                      className="w-full sm:w-auto px-5 py-2.5 bg-[#D4AF4A] hover:bg-[#c39e39] text-white font-semibold text-xs rounded transition inline-flex items-center justify-center gap-2"
+                      className="w-full sm:w-auto px-5 py-2.5 bg-[#082f35] hover:bg-[#062429] text-white font-semibold text-xs rounded transition inline-flex items-center justify-center gap-2"
                     >
                       {updateProfileMutation.isPending && (
                         <Loader2 className="animate-spin" size={14} />
@@ -609,12 +609,12 @@ export default function MyAccountPage() {
       {showAddressModal && (
         <>
           <div
-            className="fixed inset-0 z-[1100] bg-slate-950/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 z-[1100] bg-black/50 transition-opacity"
             onClick={() => setShowAddressModal(false)}
             aria-hidden="true"
           />
           <aside
-            className="fixed top-0 bottom-0 right-0 z-[1101] w-full max-w-md h-full bg-white shadow-2xl flex flex-col overflow-hidden border-l border-slate-200"
+            className="fixed top-0 bottom-0 right-0 z-[1101] w-full max-w-md h-full bg-white flex flex-col overflow-hidden border-l border-slate-200"
             aria-label="Add New Address"
           >
             <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 bg-slate-50">
@@ -629,7 +629,7 @@ export default function MyAccountPage() {
               <button
                 type="button"
                 onClick={() => setShowAddressModal(false)}
-                className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm"
+                className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900"
                 aria-label="Close drawer"
               >
                 <X size={18} />
@@ -755,7 +755,7 @@ export default function MyAccountPage() {
                 <button
                   type="submit"
                   disabled={createAddressMutation.isPending}
-                  className="px-5 py-2 bg-[#082f35] text-white text-xs font-semibold rounded hover:bg-[#062429] inline-flex items-center gap-1.5 shadow"
+                  className="px-5 py-2 bg-[#082f35] text-white text-xs font-semibold rounded hover:bg-[#062429] inline-flex items-center gap-1.5"
                 >
                   {createAddressMutation.isPending && (
                     <Loader2 className="animate-spin" size={14} />
@@ -772,12 +772,12 @@ export default function MyAccountPage() {
       {selectedOrder && (
         <>
           <div
-            className="fixed inset-0 z-[1100] bg-slate-950/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 z-[1100] bg-black/50 transition-opacity"
             onClick={() => setSelectedOrder(null)}
             aria-hidden="true"
           />
           <aside
-            className="fixed top-0 bottom-0 right-0 z-[1101] w-full max-w-lg h-full bg-white shadow-2xl flex flex-col overflow-hidden border-l border-slate-200"
+            className="fixed top-0 bottom-0 right-0 z-[1101] w-full max-w-lg h-full bg-white flex flex-col overflow-hidden border-l border-slate-200"
             aria-label={`Order #${selectedOrder.orderNumber}`}
           >
             <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 bg-slate-50">
@@ -797,7 +797,7 @@ export default function MyAccountPage() {
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm"
+                className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900"
                 aria-label="Close order details"
               >
                 <X size={18} />
@@ -860,11 +860,11 @@ export default function MyAccountPage() {
                   Payment Summary
                 </h4>
                 <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1.5 text-xs">
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-[#334155]">
                     <span>Subtotal</span>
                     <span>${Number(selectedOrder.subtotal).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-[#334155]">
                     <span>Shipping</span>
                     <span>${Number(selectedOrder.shippingTotal).toFixed(2)}</span>
                   </div>
