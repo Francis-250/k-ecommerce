@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/features/auth/store";
-import { customerApi, type CustomerAddress } from "@/features/customer/api";
+import { customerApi } from "@/features/customer/api";
 import { type ApiOrder } from "@/features/admin/orders/api";
 import {
   Breadcrumb,
@@ -108,9 +108,9 @@ export default function MyAccountPage() {
     return (
       <StorefrontShell>
         <Breadcrumb title="My Account" />
-        <section className="py-16 bg-white min-h-[450px] flex items-center justify-center">
+        <section className="py-12 sm:py-16 bg-white min-h-[450px] flex items-center justify-center pb-28 md:pb-16">
           <div className="max-w-md w-full mx-auto px-4 text-center">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
               My Account
             </h2>
             <p className="text-slate-600 mb-6 text-sm">
@@ -137,77 +137,71 @@ export default function MyAccountPage() {
   return (
     <StorefrontShell>
       <Breadcrumb title="My Account" />
-      <section className="py-12 bg-white min-h-[600px]">
+      <section className="py-6 sm:py-12 bg-white min-h-[600px] pb-28 md:pb-12">
         <div className="container mx-auto px-4 max-w-5xl">
-          <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8">
-            {/* Clean Sidebar Navigation */}
-            <aside>
-              <ul className="flex flex-col border border-slate-200 rounded divide-y divide-slate-100 text-sm font-medium text-slate-700 bg-white">
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("dashboard")}
-                    className={`w-full text-left px-4 py-3 transition ${
-                      activeTab === "dashboard"
-                        ? "bg-[#082f35] text-white font-semibold"
-                        : "hover:bg-slate-50 text-slate-700"
-                    }`}
-                  >
-                    Dashboard
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("orders")}
-                    className={`w-full text-left px-4 py-3 transition ${
-                      activeTab === "orders"
-                        ? "bg-[#082f35] text-white font-semibold"
-                        : "hover:bg-slate-50 text-slate-700"
-                    }`}
-                  >
-                    Orders {orders.length > 0 && `(${orders.length})`}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("addresses")}
-                    className={`w-full text-left px-4 py-3 transition ${
-                      activeTab === "addresses"
-                        ? "bg-[#082f35] text-white font-semibold"
-                        : "hover:bg-slate-50 text-slate-700"
-                    }`}
-                  >
-                    Addresses
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("account-details")}
-                    className={`w-full text-left px-4 py-3 transition ${
-                      activeTab === "account-details"
-                        ? "bg-[#082f35] text-white font-semibold"
-                        : "hover:bg-slate-50 text-slate-700"
-                    }`}
-                  >
-                    Account Details
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await logout();
-                      toast.success("Logged out successfully.");
-                    }}
-                    className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition"
-                  >
-                    Logout
-                  </button>
-                </li>
-              </ul>
+          <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-6 md:gap-8">
+            {/* Mobile Horizontal Pill Scroll Navigation / Desktop Vertical Menu */}
+            <aside className="w-full">
+              <nav className="flex flex-row md:flex-col overflow-x-auto md:overflow-visible gap-2 md:gap-0 border-b border-slate-200 pb-3 md:pb-0 md:border-b-0 md:border md:border-slate-200 md:rounded md:divide-y md:divide-slate-100 bg-white no-scrollbar">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("dashboard")}
+                  className={`px-4 py-2 md:py-3 text-xs md:text-sm font-semibold rounded-full md:rounded-none whitespace-nowrap transition text-left shrink-0 ${
+                    activeTab === "dashboard"
+                      ? "bg-[#082f35] text-white"
+                      : "bg-slate-100 md:bg-transparent text-slate-700 hover:bg-slate-200 md:hover:bg-slate-50"
+                  }`}
+                >
+                  Dashboard
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("orders")}
+                  className={`px-4 py-2 md:py-3 text-xs md:text-sm font-semibold rounded-full md:rounded-none whitespace-nowrap transition text-left shrink-0 ${
+                    activeTab === "orders"
+                      ? "bg-[#082f35] text-white"
+                      : "bg-slate-100 md:bg-transparent text-slate-700 hover:bg-slate-200 md:hover:bg-slate-50"
+                  }`}
+                >
+                  Orders {orders.length > 0 && `(${orders.length})`}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("addresses")}
+                  className={`px-4 py-2 md:py-3 text-xs md:text-sm font-semibold rounded-full md:rounded-none whitespace-nowrap transition text-left shrink-0 ${
+                    activeTab === "addresses"
+                      ? "bg-[#082f35] text-white"
+                      : "bg-slate-100 md:bg-transparent text-slate-700 hover:bg-slate-200 md:hover:bg-slate-50"
+                  }`}
+                >
+                  Addresses
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("account-details")}
+                  className={`px-4 py-2 md:py-3 text-xs md:text-sm font-semibold rounded-full md:rounded-none whitespace-nowrap transition text-left shrink-0 ${
+                    activeTab === "account-details"
+                      ? "bg-[#082f35] text-white"
+                      : "bg-slate-100 md:bg-transparent text-slate-700 hover:bg-slate-200 md:hover:bg-slate-50"
+                  }`}
+                >
+                  Account Details
+                </button>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await logout();
+                    toast.success("Logged out successfully.");
+                  }}
+                  className="px-4 py-2 md:py-3 text-xs md:text-sm font-semibold rounded-full md:rounded-none whitespace-nowrap text-red-600 bg-red-50 md:bg-transparent hover:bg-red-100 md:hover:bg-red-50 transition text-left shrink-0"
+                >
+                  Logout
+                </button>
+              </nav>
             </aside>
 
             {/* Main Content Area */}
@@ -215,7 +209,7 @@ export default function MyAccountPage() {
               {/* TAB 1: DASHBOARD */}
               {activeTab === "dashboard" && (
                 <div className="space-y-4">
-                  <p className="text-base">
+                  <p className="text-sm sm:text-base">
                     Hello <strong>{fullName}</strong> (not <strong>{fullName}</strong>?{" "}
                     <button
                       type="button"
@@ -223,13 +217,13 @@ export default function MyAccountPage() {
                         await logout();
                         toast.success("Logged out.");
                       }}
-                      className="text-[#087554] underline hover:text-[#082f35]"
+                      className="text-[#087554] underline font-semibold hover:text-[#082f35]"
                     >
                       Log out
                     </button>
                     )
                   </p>
-                  <p className="text-slate-600 leading-relaxed">
+                  <p className="text-slate-600 leading-relaxed text-xs sm:text-sm">
                     From your account dashboard you can easily view your{" "}
                     <button
                       type="button"
@@ -262,7 +256,7 @@ export default function MyAccountPage() {
               {/* TAB 2: ORDERS */}
               {activeTab === "orders" && (
                 <div className="space-y-4">
-                  <h2 className="text-lg font-bold text-slate-900 border-b border-slate-200 pb-2">
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900 border-b border-slate-200 pb-2">
                     Orders
                   </h2>
 
@@ -273,7 +267,7 @@ export default function MyAccountPage() {
                     </div>
                   ) : orders.length === 0 ? (
                     <div className="border border-slate-200 rounded p-6 text-center text-slate-600 bg-slate-50/50">
-                      <p className="mb-3">No orders have been placed yet.</p>
+                      <p className="mb-3 text-xs sm:text-sm">No orders have been placed yet.</p>
                       <Link
                         href="/shop"
                         className="inline-block px-4 py-2 bg-[#082f35] text-white text-xs font-semibold rounded hover:bg-[#062429]"
@@ -282,48 +276,85 @@ export default function MyAccountPage() {
                       </Link>
                     </div>
                   ) : (
-                    <div className="overflow-x-auto border border-slate-200 rounded">
-                      <table className="w-full text-left text-sm border-collapse">
-                        <thead className="bg-slate-100 text-slate-700 text-xs font-semibold uppercase border-b border-slate-200">
-                          <tr>
-                            <th className="p-3">Order</th>
-                            <th className="p-3">Date</th>
-                            <th className="p-3">Status</th>
-                            <th className="p-3">Total</th>
-                            <th className="p-3 text-right">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200">
-                          {orders.map((order) => (
-                            <tr key={order.id} className="hover:bg-slate-50">
-                              <td className="p-3 font-semibold text-slate-900">
-                                #{order.orderNumber}
-                              </td>
-                              <td className="p-3 text-slate-600 text-xs">
-                                {new Date(order.createdAt).toLocaleDateString()}
-                              </td>
-                              <td className="p-3">
-                                <span className="inline-block px-2 py-0.5 text-xs font-semibold rounded bg-slate-100 border text-slate-700">
-                                  {order.status}
-                                </span>
-                              </td>
-                              <td className="p-3 font-semibold text-slate-900">
-                                ${Number(order.total).toFixed(2)}
-                              </td>
-                              <td className="p-3 text-right">
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedOrder(order)}
-                                  className="px-3 py-1 bg-[#082f35] text-white text-xs font-semibold rounded hover:bg-[#062429]"
-                                >
-                                  View
-                                </button>
-                              </td>
+                    <>
+                      {/* Desktop Table View */}
+                      <div className="hidden md:block overflow-x-auto border border-slate-200 rounded">
+                        <table className="w-full text-left text-sm border-collapse">
+                          <thead className="bg-slate-100 text-slate-700 text-xs font-semibold uppercase border-b border-slate-200">
+                            <tr>
+                              <th className="p-3">Order</th>
+                              <th className="p-3">Date</th>
+                              <th className="p-3">Status</th>
+                              <th className="p-3">Total</th>
+                              <th className="p-3 text-right">Action</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          </thead>
+                          <tbody className="divide-y divide-slate-200">
+                            {orders.map((order) => (
+                              <tr key={order.id} className="hover:bg-slate-50">
+                                <td className="p-3 font-semibold text-slate-900">
+                                  #{order.orderNumber}
+                                </td>
+                                <td className="p-3 text-slate-600 text-xs">
+                                  {new Date(order.createdAt).toLocaleDateString()}
+                                </td>
+                                <td className="p-3">
+                                  <span className="inline-block px-2 py-0.5 text-xs font-semibold rounded bg-slate-100 border text-slate-700">
+                                    {order.status}
+                                  </span>
+                                </td>
+                                <td className="p-3 font-semibold text-slate-900">
+                                  ${Number(order.total).toFixed(2)}
+                                </td>
+                                <td className="p-3 text-right">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedOrder(order)}
+                                    className="px-3 py-1 bg-[#082f35] text-white text-xs font-semibold rounded hover:bg-[#062429]"
+                                  >
+                                    View
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Mobile Responsive Cards */}
+                      <div className="grid grid-cols-1 gap-3 md:hidden">
+                        {orders.map((order) => (
+                          <div
+                            key={order.id}
+                            className="border border-slate-200 rounded-lg p-4 bg-white shadow-sm flex flex-col gap-2"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-slate-900 text-sm">
+                                #{order.orderNumber}
+                              </span>
+                              <span className="inline-block px-2 py-0.5 text-[11px] font-semibold rounded bg-slate-100 border text-slate-700 uppercase">
+                                {order.status}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-slate-600">
+                              <span>Date: {new Date(order.createdAt).toLocaleDateString()}</span>
+                              <span className="font-bold text-slate-900 text-sm">
+                                ${Number(order.total).toFixed(2)}
+                              </span>
+                            </div>
+                            <div className="pt-2 border-t border-slate-100 flex justify-end">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedOrder(order)}
+                                className="w-full py-1.5 bg-[#082f35] text-white text-xs font-semibold rounded text-center"
+                              >
+                                View Details
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
                   )}
                 </div>
               )}
@@ -332,7 +363,7 @@ export default function MyAccountPage() {
               {activeTab === "addresses" && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-200 pb-2">
-                    <h2 className="text-lg font-bold text-slate-900">
+                    <h2 className="text-base sm:text-lg font-bold text-slate-900">
                       Addresses
                     </h2>
                     <button
@@ -355,7 +386,7 @@ export default function MyAccountPage() {
                     </div>
                   ) : addresses.length === 0 ? (
                     <div className="border border-slate-200 rounded p-6 text-center text-slate-600 bg-slate-50/50">
-                      <p className="mb-3">You have not saved any addresses yet.</p>
+                      <p className="mb-3 text-xs sm:text-sm">You have not saved any addresses yet.</p>
                       <button
                         type="button"
                         onClick={() => setShowAddressModal(true)}
@@ -410,7 +441,7 @@ export default function MyAccountPage() {
               {/* TAB 4: ACCOUNT DETAILS */}
               {activeTab === "account-details" && (
                 <div className="space-y-4">
-                  <h2 className="text-lg font-bold text-slate-900 border-b border-slate-200 pb-2">
+                  <h2 className="text-base sm:text-lg font-bold text-slate-900 border-b border-slate-200 pb-2">
                     Account details
                   </h2>
 
@@ -427,7 +458,7 @@ export default function MyAccountPage() {
                     }}
                     className="space-y-4 max-w-md"
                   >
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-semibold text-slate-700 mb-1">
                           First Name *
@@ -437,7 +468,7 @@ export default function MyAccountPage() {
                           name="firstName"
                           defaultValue={currentUser?.firstName || ""}
                           required
-                          className="w-full h-9 px-3 border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-[#082f35]"
+                          className="w-full h-10 sm:h-9 px-3 border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-[#082f35]"
                         />
                       </div>
                       <div>
@@ -449,7 +480,7 @@ export default function MyAccountPage() {
                           name="lastName"
                           defaultValue={currentUser?.lastName || ""}
                           required
-                          className="w-full h-9 px-3 border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-[#082f35]"
+                          className="w-full h-10 sm:h-9 px-3 border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-[#082f35]"
                         />
                       </div>
                     </div>
@@ -462,7 +493,7 @@ export default function MyAccountPage() {
                         type="email"
                         value={currentUser?.email || ""}
                         disabled
-                        className="w-full h-9 px-3 border border-slate-200 bg-slate-100 rounded text-sm text-slate-500 cursor-not-allowed"
+                        className="w-full h-10 sm:h-9 px-3 border border-slate-200 bg-slate-100 rounded text-sm text-slate-500 cursor-not-allowed"
                       />
                     </div>
 
@@ -475,7 +506,7 @@ export default function MyAccountPage() {
                         name="phone"
                         defaultValue={currentUser?.phone || ""}
                         placeholder="e.g. +1 555 123 4567"
-                        className="w-full h-9 px-3 border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-[#082f35]"
+                        className="w-full h-10 sm:h-9 px-3 border border-slate-300 rounded text-sm text-slate-900 focus:outline-none focus:border-[#082f35]"
                       />
                     </div>
 
@@ -494,7 +525,7 @@ export default function MyAccountPage() {
                     <button
                       type="submit"
                       disabled={updateProfileMutation.isPending}
-                      className="px-5 py-2 bg-[#D4AF4A] hover:bg-[#c39e39] text-white font-semibold text-xs rounded transition inline-flex items-center gap-2"
+                      className="w-full sm:w-auto px-5 py-2.5 bg-[#D4AF4A] hover:bg-[#c39e39] text-white font-semibold text-xs rounded transition inline-flex items-center justify-center gap-2"
                     >
                       {updateProfileMutation.isPending && (
                         <Loader2 className="animate-spin" size={14} />
@@ -521,12 +552,12 @@ export default function MyAccountPage() {
             className="fixed top-0 bottom-0 right-0 z-[1101] w-full max-w-md h-full bg-white shadow-2xl flex flex-col overflow-hidden border-l border-slate-200"
             aria-label="Add New Address"
           >
-            <div className="flex items-center justify-between p-5 border-b border-slate-200 bg-slate-50">
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 bg-slate-50">
               <div>
-                <h3 className="font-bold text-slate-900 text-base">
+                <h3 className="font-bold text-slate-900 text-sm sm:text-base">
                   Add New Address
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
                   Save a shipping or billing address to your account.
                 </p>
               </div>
@@ -555,7 +586,7 @@ export default function MyAccountPage() {
                   postalCode: String(form.get("postalCode")).trim(),
                 });
               }}
-              className="flex-1 overflow-y-auto p-6 space-y-4 text-xs pb-24"
+              className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-xs pb-28"
             >
               <div>
                 <label className="block font-semibold text-slate-700 mb-1">
@@ -674,10 +705,10 @@ export default function MyAccountPage() {
 
       {/* Order Details Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-lg w-full p-5 shadow-xl space-y-3">
+        <div className="fixed inset-0 z-[1100] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-lg w-full p-4 sm:p-5 shadow-xl space-y-3 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <h3 className="font-bold text-slate-900 text-base">
+              <h3 className="font-bold text-slate-900 text-sm sm:text-base">
                 Order #{selectedOrder.orderNumber}
               </h3>
               <button
@@ -726,7 +757,7 @@ export default function MyAccountPage() {
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="px-4 py-1.5 bg-slate-800 text-white text-xs font-semibold rounded"
+                className="w-full sm:w-auto px-4 py-2 bg-slate-800 text-white text-xs font-semibold rounded"
               >
                 Close
               </button>
