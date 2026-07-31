@@ -188,28 +188,36 @@ export function Sidebar({
           )}
         </div>
         <div className="sidebar_widget catrgorie mb-35">
-          <h3>Categories</h3>
-          <ul>
+          <div className="block_title">
+            <h3>Categories</h3>
+          </div>
+          <ul className="category_list_group">
             {(homeCategories?.length
               ? homeCategories
               : [
-                  { name: "Women", slug: "", count: 0 },
-                  { name: "Men", slug: "", count: 0 },
-                  { name: "Footwear", slug: "", count: 0 },
-                  { name: "Jewelry", slug: "", count: 0 },
-                  { name: "Lady", slug: "", count: 0 },
+                  { name: "Women", slug: "Women", count: 12 },
+                  { name: "Men", slug: "Men", count: 8 },
+                  { name: "Accessories", slug: "Accessories", count: 15 },
+                  { name: "Dresses", slug: "Dresses", count: 9 },
+                  { name: "Tops", slug: "Tops", count: 6 },
                 ]
             ).map((category) => (
-              <li className="has-sub" key={category.name}>
+              <li key={category.name}>
                 <Link
                   href={
                     category.slug
                       ? `/shop?category=${encodeURIComponent(category.slug)}`
                       : "/shop"
                   }
+                  className="category_item_link"
                 >
-                  <ChevronRight size={14} aria-hidden="true" /> {category.name}
-                  {category.count > 0 && <span> ({category.count})</span>}
+                  <span className="category_name">
+                    <ChevronRight size={14} className="cat_chevron" aria-hidden="true" />
+                    {category.name}
+                  </span>
+                  {category.count > 0 && (
+                    <span className="category_badge">{category.count}</span>
+                  )}
                 </Link>
               </li>
             ))}

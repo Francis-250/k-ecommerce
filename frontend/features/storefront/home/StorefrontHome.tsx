@@ -2,10 +2,73 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { StorefrontShell } from "@/components/storefront/StorefrontShell";
 import { ProductGrid, Sidebar } from "@/components/storefront/ProductCatalog";
 import { useStorefrontCatalog } from "@/features/storefront/catalog/useStorefrontCatalog";
 import { useStorefrontAppearance } from "@/features/storefront/appearance/useStorefrontAppearance";
+
+const categoryCardImages: Record<string, string> = {
+  Accessories: "/storefront/assets/img/cart/cart18.png",
+  Dresses: "/storefront/assets/img/cart/cart17.png",
+  Tops: "/storefront/assets/img/cart/cart19.png",
+  HandBags: "/storefront/assets/img/cart/cart18.png",
+  Women: "/storefront/assets/img/cart/cart17.png",
+  Men: "/storefront/assets/img/cart/cart19.png",
+};
+
+function CategoryGridSection({
+  categories,
+}: {
+  categories: Array<{ name: string; slug: string; count: number }>;
+}) {
+  const displayCategories = categories.length
+    ? categories
+    : [
+        { name: "Dresses", slug: "Dresses", count: 12 },
+        { name: "Accessories", slug: "Accessories", count: 18 },
+        { name: "Tops", slug: "Tops", count: 9 },
+        { name: "Handbags", slug: "HandBags", count: 7 },
+      ];
+
+  return (
+    <section className="home_category_cards_area mb-20">
+      <div className="block_title">
+        <h2>Popular Categories</h2>
+      </div>
+      <div className="row">
+        {displayCategories.slice(0, 4).map((cat, idx) => (
+          <div key={cat.name} className="col-lg-3 col-md-6 col-6 mb-20">
+            <Link
+              href={`/shop?category=${encodeURIComponent(cat.slug || cat.name)}`}
+              className="home_category_card"
+            >
+              <div className="category_card_img">
+                <Image
+                  src={
+                    categoryCardImages[cat.name] ||
+                    `/storefront/assets/img/cart/cart${17 + (idx % 3)}.png`
+                  }
+                  alt={cat.name}
+                  width={260}
+                  height={170}
+                  unoptimized
+                />
+              </div>
+              <div className="category_card_info">
+                <h3>{cat.name}</h3>
+                <p>
+                  {cat.count > 0 ? `${cat.count} Items` : "Shop Now"}{" "}
+                  <ChevronRight size={13} aria-hidden="true" />
+                </p>
+              </div>
+            </Link>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 type HomeProduct = {
   id: number;
@@ -145,6 +208,7 @@ export function StorefrontHome() {
             ) : (
               <div className="mb-10 h-[420px] animate-pulse bg-slate-100" />
             )}
+            <CategoryGridSection categories={categories} />
             {catalog.isPending ? (
               <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-3">
                 {[1, 2, 3].map((item) => (
