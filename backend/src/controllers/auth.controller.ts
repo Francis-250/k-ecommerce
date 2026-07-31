@@ -9,7 +9,7 @@ import {
   validateOtp,
   validatePassword,
 } from "../utils/helpers";
-import { sendEmail } from "../lib/mailer";
+import { generateOtpEmailHtml, sendEmail } from "../lib/mailer";
 import { OAuth2Client } from "google-auth-library";
 import { randomBytes } from "node:crypto";
 
@@ -278,7 +278,7 @@ export const register = async (
       await tx.otpCodes.create({
         data: {
           otp: await hashOtp(plainOtp),
-          otp_expiry: getOtpExpiry(5),
+          otp_expiry: getOtpExpiry(10),
           otp_type: "REGISTRATION",
           userId: user.id,
         },
@@ -291,6 +291,7 @@ export const register = async (
       subject: "Your Verification Code",
       to: email,
       text: `Your verification code is: ${plainOtp}`,
+      html: generateOtpEmailHtml(plainOtp, "Your Verification Code"),
     });
 
     return res.status(201).json({
@@ -471,3 +472,69 @@ export const verifyOtp = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const resendOtp = async (req: Request, res: Response) => {
+  try {
+    const email = req.body.email?.trim().toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "This account is already verified",
+      });
+    }
+
+    const plainOtp = generateOtp();
+
+    await prisma.$transaction(async (tx) => {
+      await tx.otpCodes.deleteMany({
+        where: { userId: user.id, otp_type: "REGISTRATION" },
+      });
+      await tx.otpCodes.create({
+        data: {
+          otp: await hashOtp(plainOtp),
+          otp_expiry: getOtpExpiry(10),
+          otp_type: "REGISTRATION",
+          userId: user.id,
+        },
+      });
+    });
+
+    await sendEmail({
+      subject: "Your Verification Code",
+      to: email,
+      text: `Your verification code is: ${plainOtp}`,
+      html: generateOtpEmailHtml(plainOtp, "Your Verification Code"),
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Verification code sent to your email",
+    });
+  } catch (error) {
+    console.error("Resend OTP error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+

@@ -116,6 +116,13 @@ export const authApi = {
     });
   },
 
+  resendOtp(email: string) {
+    return authRequest("/resend-otp", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  },
+
   forgotPassword(email: string) {
     return authRequest("/forgot-password", {
       method: "POST",

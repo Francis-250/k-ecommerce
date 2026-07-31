@@ -234,9 +234,12 @@ export function RegisterForm() {
 
 export function VerifyEmailForm() {
   const verifyEmail = useAuthStore((state) => state.verifyEmail);
+  const resendOtp = useAuthStore((state) => state.resendOtp);
   const pendingEmail = useAuthStore((state) => state.pendingVerificationEmail);
   const status = useAuthStore((state) => state.status);
   const setAuthDrawerTab = useAuthStore((state) => state.setAuthDrawerTab);
+  const [resending, setResending] = useState(false);
+  const [emailInput, setEmailInput] = useState(pendingEmail);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -254,6 +257,24 @@ export function VerifyEmailForm() {
     }
   }
 
+  async function handleResend() {
+    if (!emailInput) {
+      toast.error("Please enter your email address to resend code.");
+      return;
+    }
+    setResending(true);
+    try {
+      await resendOtp(emailInput.trim().toLowerCase());
+      toast.success("Verification code resent!", {
+        description: "Please check your email inbox (and spam folder).",
+      });
+    } catch (error) {
+      toast.error(errorMessage(error));
+    } finally {
+      setResending(false);
+    }
+  }
+
   return (
     <form onSubmit={submit} className="auth_drawer_form">
       <p className="auth_info_desc">
@@ -268,7 +289,8 @@ export function VerifyEmailForm() {
             id="drawer-verify-email"
             name="email"
             type="email"
-            defaultValue={pendingEmail}
+            value={emailInput}
+            onChange={(e) => setEmailInput(e.target.value)}
             placeholder="your.email@example.com"
             autoComplete="email"
             required
@@ -277,7 +299,18 @@ export function VerifyEmailForm() {
       </div>
 
       <div className="auth_field">
-        <label htmlFor="drawer-otp">Verification Code</label>
+        <div className="auth_field_header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+          <label htmlFor="drawer-otp">Verification Code</label>
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resending || status === "loading"}
+            className="forgot_password_btn"
+            style={{ fontSize: "0.8rem" }}
+          >
+            {resending ? "Sending..." : "Resend Code"}
+          </button>
+        </div>
         <div className="auth_input_wrap">
           <Lock size={16} className="input_icon" aria-hidden="true" />
           <input

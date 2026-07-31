@@ -34,6 +34,7 @@ type AuthState = {
   googleLogin: (credential: string) => Promise<void>;
   register: (input: RegisterInput) => Promise<void>;
   verifyEmail: (email: string, otp: string) => Promise<void>;
+  resendOtp: (email: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   resetPassword: (
     email: string,
@@ -182,6 +183,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({
         status: "unauthenticated",
         pendingVerificationEmail: "",
+      });
+    } catch (error) {
+      set({ status: "unauthenticated" });
+      throw error;
+    }
+  },
+
+  resendOtp: async (email) => {
+    set({ status: "loading" });
+
+    try {
+      await authApi.resendOtp(email);
+      savePendingEmail(email);
+      set({
+        status: "unauthenticated",
+        pendingVerificationEmail: email,
       });
     } catch (error) {
       set({ status: "unauthenticated" });

@@ -4,6 +4,7 @@ import {
   googleLogin,
   login,
   register,
+  resendOtp,
   verifyOtp,
 } from "../controllers/auth.controller";
 import { getSession, logout } from "../controllers/session.controller";
@@ -20,6 +21,7 @@ router.post("/login", login);
 router.get("/google/config", getGoogleClientConfig);
 router.post("/google", googleLogin);
 router.post("/verify-email", verifyOtp);
+router.post("/resend-otp", resendOtp);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.get("/me", verifyToken, getSession);

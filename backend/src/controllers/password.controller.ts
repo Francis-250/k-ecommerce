@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
-import { sendEmail } from "../lib/mailer";
+import { generateOtpEmailHtml, sendEmail } from "../lib/mailer";
 import {
   generateOtp,
   getOtpExpiry,
@@ -56,6 +56,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     to: user.email,
     subject: "Reset your password",
     text: `Your password reset code is: ${plainOtp}. It expires in 15 minutes.`,
+    html: generateOtpEmailHtml(plainOtp, "Password Reset Code"),
   });
 
   return res.status(200).json(recoveryResponse);
