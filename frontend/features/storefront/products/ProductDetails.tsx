@@ -14,6 +14,7 @@ export function ProductDetails({ product }: { product: Product }) {
       product.options.map((option) => [option.name, option.values[0]]),
     ),
   );
+
   return (
     <div className="product_d_right">
       <span className="product-category">{product.category}</span>

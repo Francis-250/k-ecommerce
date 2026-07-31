@@ -2,19 +2,24 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ChevronDown,
+  ChevronRight,
   CircleX,
   Camera,
+  Heart,
   Menu,
   MessageCircle,
+  Phone,
   Search,
   ShoppingCart,
+  User,
   Users,
   X,
 } from "lucide-react";
 import {
+  CartDrawer,
   useCart,
   type CartItem as CartItemType,
 } from "@/features/storefront/cart";
@@ -67,18 +72,32 @@ const mainLinks = [
     ],
   },
 ] as const;
+
 export function StorefrontShell({ children }: { children: ReactNode }) {
-  const { items, itemCount, subtotal, removeItem } = useCart();
+  const { items, itemCount, subtotal, openCartDrawer, removeItem } = useCart();
   const appearance = useStorefrontAppearance();
   const catalog = useStorefrontCatalog();
   const storeSettings = useGeneralStoreSettings();
-  const [cartOpen, setCartOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
 
   const displayLogoUrl = appearance.data?.logo?.url || storeSettings.logoUrl;
   const displayLogoAlt = appearance.data?.logo?.alt || storeSettings.storeName;
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.classList.add("mobile-nav-open");
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.classList.remove("mobile-nav-open");
+    };
+  }, [mobileOpen]);
 
   const searchSuggestions = useMemo(() => {
     const value = searchQuery.trim().toLowerCase();
@@ -104,6 +123,10 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
       .slice(0, 5);
   }, [catalog.data?.products, searchQuery]);
 
+  const toggleSubmenu = (label: string) => {
+    setOpenSubmenu((prev) => (prev === label ? null : label));
+  };
+
   return (
     <>
       <div className="storefront-african-border" aria-hidden="true" />
@@ -126,7 +149,13 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                           <Link href="/my-account">My account</Link>
                         </li>
                         <li>
-                          <Link href="/cart">My cart</Link>
+                          <button
+                            type="button"
+                            className="header-top-cart-btn"
+                            onClick={openCartDrawer}
+                          >
+                            My cart
+                          </button>
                         </li>
                         <li>
                           <AuthAccountLink />
@@ -139,30 +168,61 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
 
               <div className="header_middel">
                 <div className="row align-items-center">
-                  <div className="col-lg-3 col-md-3">
-                    <div className="logo">
-                      <Link href="/">
-                        {displayLogoUrl && (
-                          <Image
-                            className="system-logo"
-                            src={displayLogoUrl}
-                            alt={displayLogoAlt ?? ""}
-                            width={1118}
-                            height={520}
-                            priority
-                            unoptimized
-                          />
+                  <div className="col-lg-3 col-md-4 col-12 logo-col">
+                    <div className="header_middel_left d-flex align-items-center justify-content-between">
+                      <button
+                        type="button"
+                        className="mobile-menu-toggle d-lg-none"
+                        aria-expanded={mobileOpen}
+                        aria-controls="mobile-navigation"
+                        aria-label="Toggle Navigation Menu"
+                        onClick={() => setMobileOpen((value) => !value)}
+                      >
+                        {mobileOpen ? (
+                          <X size={20} aria-hidden="true" />
+                        ) : (
+                          <Menu size={20} aria-hidden="true" />
                         )}
-                        <span
-                          className="site-wordmark"
-                          aria-label={storeSettings.storeName}
+                        <span>MENU</span>
+                      </button>
+                      <div className="logo">
+                        <Link href="/">
+                          {displayLogoUrl ? (
+                            <Image
+                              className="system-logo"
+                              src={displayLogoUrl}
+                              alt={displayLogoAlt ?? ""}
+                              width={1118}
+                              height={520}
+                              priority
+                              unoptimized
+                            />
+                          ) : (
+                            <span
+                              className="site-wordmark"
+                              aria-label={storeSettings.storeName}
+                            >
+                              {storeSettings.storeName}
+                            </span>
+                          )}
+                        </Link>
+                      </div>
+                      <div className="mobile-quick-cart d-lg-none">
+                        <button
+                          type="button"
+                          className="mobile-cart-badge-link"
+                          aria-label={`Cart with ${itemCount} items`}
+                          onClick={openCartDrawer}
                         >
-                          {storeSettings.storeName}
-                        </span>
-                      </Link>
+                          <ShoppingCart size={22} aria-hidden="true" />
+                          {itemCount > 0 && (
+                            <span className="mobile-cart-count">{itemCount}</span>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="col-lg-9 col-md-9">
+                  <div className="col-lg-9 col-md-8 col-12">
                     <div className="header_right_info">
                       <div className="search_bar">
                         <form action="/shop" role="search">
@@ -231,15 +291,12 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                           </div>
                         )}
                       </div>
-                      <div
-                        className={`shopping_cart${cartOpen ? " open" : ""}`}
-                      >
+                      <div className="shopping_cart d-none d-lg-block">
                         <a
-                          href="#mini-cart"
-                          aria-expanded={cartOpen}
+                          href="#cart-drawer"
                           onClick={(event) => {
                             event.preventDefault();
-                            setCartOpen((value) => !value);
+                            openCartDrawer();
                           }}
                         >
                           <ShoppingCart
@@ -255,51 +312,17 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                             aria-hidden="true"
                           />
                         </a>
-                        <div
-                          id="mini-cart"
-                          className="mini_cart"
-                          hidden={!cartOpen}
-                        >
-                          {items.length === 0 ? (
-                            <p>Your cart is empty.</p>
-                          ) : (
-                            items
-                              .slice(0, 3)
-                              .map((item) => (
-                                <CartItem
-                                  key={item.id}
-                                  item={item}
-                                  onRemove={() => removeItem(item.id)}
-                                />
-                              ))
-                          )}
-                          <div className="shipping_price">
-                            <span>Shipping</span>
-                            <span>Free</span>
-                          </div>
-                          <div className="total_price">
-                            <span>Total</span>
-                            <span className="prices">
-                              ${subtotal.toFixed(2)}
-                            </span>
-                          </div>
-                          <div className="cart_button">
-                            <Link href={items.length ? "/checkout" : "/shop"}>
-                              {items.length ? "Check out" : "Shop now"}
-                            </Link>
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="header_bottom">
+              <div className="header_bottom d-none d-lg-block">
                 <div className="row">
                   <div className="col-12">
                     <div className="main_menu_inner">
-                      <div className="main_menu d-none d-lg-block">
+                      <div className="main_menu">
                         <nav aria-label="Main navigation">
                           <ul>
                             {mainLinks.map((item, index) => (
@@ -326,62 +349,133 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                           </ul>
                         </nav>
                       </div>
-                      <div className="mobile-menu d-lg-none">
-                        <button
-                          type="button"
-                          className="mobile-menu-toggle"
-                          aria-expanded={mobileOpen}
-                          aria-controls="mobile-navigation"
-                          onClick={() => setMobileOpen((value) => !value)}
-                        >
-                          <span>MENU</span>
-                          {mobileOpen ? (
-                            <X size={20} aria-hidden="true" />
-                          ) : (
-                            <Menu size={20} aria-hidden="true" />
-                          )}
-                        </button>
-                        {mobileOpen && (
-                          <nav
-                            id="mobile-navigation"
-                            aria-label="Mobile navigation"
-                          >
-                            <ul>
-                              {mainLinks.map((item) => (
-                                <li key={item.label}>
-                                  <Link
-                                    href={item.href}
-                                    onClick={() => setMobileOpen(false)}
-                                  >
-                                    {item.label}
-                                  </Link>
-                                  <ul>
-                                    {item.children.map(([label, href]) => (
-                                      <li key={label}>
-                                        <Link
-                                          href={href}
-                                          onClick={() => setMobileOpen(false)}
-                                        >
-                                          {label}
-                                        </Link>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </li>
-                              ))}
-                            </ul>
-                          </nav>
-                        )}
-                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </header>
+
+            {/* Mobile Navigation Slide-Over Drawer */}
+            <div
+              className={`mobile-nav-backdrop ${mobileOpen ? "is-open" : ""}`}
+              onClick={() => setMobileOpen(false)}
+              aria-hidden="true"
+            />
+            <aside
+              id="mobile-navigation"
+              className={`mobile-nav-drawer ${mobileOpen ? "is-open" : ""}`}
+              aria-label="Mobile Navigation"
+              aria-hidden={!mobileOpen}
+            >
+              <div className="mobile-drawer-header">
+                <div className="mobile-drawer-brand">
+                  {displayLogoUrl ? (
+                    <Image
+                      src={displayLogoUrl}
+                      alt={displayLogoAlt ?? ""}
+                      width={120}
+                      height={40}
+                      unoptimized
+                    />
+                  ) : (
+                    <span className="site-wordmark">
+                      {storeSettings.storeName}
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  className="mobile-drawer-close"
+                  aria-label="Close navigation menu"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <X size={22} aria-hidden="true" />
+                </button>
+              </div>
+
+              <div className="mobile-drawer-pattern-accent" aria-hidden="true" />
+
+              <div className="mobile-drawer-body">
+                <nav className="mobile-drawer-nav" aria-label="Mobile Menu">
+                  <ul>
+                    {mainLinks.map((item) => {
+                      const hasChildren = item.children.length > 0;
+                      const isOpen = openSubmenu === item.label;
+                      return (
+                        <li key={item.label} className={hasChildren ? "has-children" : undefined}>
+                          <div className="mobile-nav-item">
+                            <Link
+                              href={item.href}
+                              onClick={() => setMobileOpen(false)}
+                            >
+                              {item.label}
+                            </Link>
+                            {hasChildren && (
+                              <button
+                                type="button"
+                                className="mobile-submenu-toggle"
+                                aria-label={`Toggle ${item.label} submenu`}
+                                aria-expanded={isOpen}
+                                onClick={() => toggleSubmenu(item.label)}
+                              >
+                                <ChevronRight
+                                  size={18}
+                                  className={`arrow-icon ${isOpen ? "rotate-90" : ""}`}
+                                  aria-hidden="true"
+                                />
+                              </button>
+                            )}
+                          </div>
+                          {hasChildren && isOpen && (
+                            <ul className="mobile-submenu">
+                              {item.children.map(([label, href]) => (
+                                <li key={label}>
+                                  <Link
+                                    href={href}
+                                    onClick={() => setMobileOpen(false)}
+                                  >
+                                    {label}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </nav>
+
+                <div className="mobile-drawer-footer">
+                  <div className="mobile-drawer-quicklinks">
+                    <Link href="/my-account" onClick={() => setMobileOpen(false)}>
+                      <User size={16} aria-hidden="true" /> My Account
+                    </Link>
+                    <Link href="/wishlist" onClick={() => setMobileOpen(false)}>
+                      <Heart size={16} aria-hidden="true" /> Wishlist
+                    </Link>
+                    <button
+                      type="button"
+                      className="drawer-quick-cart-btn"
+                      onClick={() => {
+                        setMobileOpen(false);
+                        openCartDrawer();
+                      }}
+                    >
+                      <ShoppingCart size={16} aria-hidden="true" /> Cart ({itemCount})
+                    </button>
+                    <Link href="/contact" onClick={() => setMobileOpen(false)}>
+                      <Phone size={16} aria-hidden="true" /> Contact Support
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </aside>
             {children}
           </div>
         </div>
       </div>
+      <CartDrawer />
       <Footer />
     </>
   );

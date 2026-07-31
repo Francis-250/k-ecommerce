@@ -14,6 +14,10 @@ type CartContextValue = {
   items: CartItem[];
   itemCount: number;
   subtotal: number;
+  cartDrawerOpen: boolean;
+  setCartDrawerOpen: (open: boolean) => void;
+  openCartDrawer: () => void;
+  closeCartDrawer: () => void;
   addItem: (item: AddCartItem) => void;
   updateQuantity: (id: string, quantity: number) => void;
   removeItem: (id: string) => void;
@@ -32,13 +36,12 @@ function itemId(item: AddCartItem) {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
 
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(CART_STORAGE_KEY);
       if (saved) {
-        // Restoring browser state after hydration avoids server/client markup differences.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setItems(JSON.parse(saved) as CartItem[]);
       }
     } catch {
@@ -62,7 +65,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         (total, item) => total + item.price * item.quantity,
         0,
       ),
-      addItem: (item) =>
+      cartDrawerOpen,
+      setCartDrawerOpen,
+      openCartDrawer: () => setCartDrawerOpen(true),
+      closeCartDrawer: () => setCartDrawerOpen(false),
+      addItem: (item) => {
         updateItems((current) => {
           const id = itemId(item);
           const quantity = Math.max(1, item.quantity ?? 1);
@@ -74,7 +81,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 : entry,
             );
           return [...current, { ...item, id, quantity }];
-        }),
+        });
+        setCartDrawerOpen(true);
+      },
       updateQuantity: (id, quantity) =>
         updateItems((current) =>
           current.map((item) =>
@@ -87,7 +96,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         updateItems((current) => current.filter((item) => item.id !== id)),
       clearCart: () => updateItems(() => []),
     }),
-    [items],
+    [items, cartDrawerOpen],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

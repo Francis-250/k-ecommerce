@@ -17,29 +17,12 @@ export function ProductGallery({
 
   return (
     <div className="product_tab fix">
-      <div className="product_tab_button">
-        <ul className="nav" aria-label={`${name} images`}>
-          {images.map((item, index) => (
-            <li key={item.src}>
-              <button
-                type="button"
-                className={active === index ? "active" : ""}
-                onClick={() => setActive(index)}
-                aria-label={`Show image ${index + 1}`}
-                aria-pressed={active === index}
-              >
-                <Image src={item.src} alt="" width={90} height={100} />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
       <div className="tab-content produc_tab_c">
         <div className="tab-pane fade show active">
           <div className="modal_img">
             <Image
               src={current.src}
-              alt={current.alt}
+              alt={current.alt || name}
               width={560}
               height={680}
               priority
@@ -57,6 +40,25 @@ export function ProductGallery({
           </div>
         </div>
       </div>
+      {images.length > 1 && (
+        <div className="product_tab_button">
+          <ul className="nav" aria-label={`${name} images`}>
+            {images.map((item, index) => (
+              <li key={item.src}>
+                <button
+                  type="button"
+                  className={active === index ? "active" : ""}
+                  onClick={() => setActive(index)}
+                  aria-label={`Show image ${index + 1}`}
+                  aria-pressed={active === index}
+                >
+                  <Image src={item.src} alt="" width={90} height={100} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
