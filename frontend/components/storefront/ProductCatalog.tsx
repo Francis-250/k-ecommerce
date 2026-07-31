@@ -65,27 +65,34 @@ export function ProductCard({
         </div>
 
         {/* Product Info */}
-        <div className="p-3.5 flex flex-col justify-between flex-1 bg-white border-t border-slate-100">
+        <div className="p-3 flex flex-col justify-between flex-1 bg-white border-t border-slate-100">
           <div>
             {product.category && (
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-0.5">
                 {product.category}
               </span>
             )}
-            <h3 className="text-sm font-semibold text-slate-900 line-clamp-1 group-hover:text-[#082f35] transition-colors mb-1.5">
-              <Link href={`/products/${product.slug}`}>{product.name}</Link>
+            <h3 className="mb-1">
+              <Link
+                href={`/products/${product.slug}`}
+                className="text-xs sm:text-[13px] font-medium text-slate-800 hover:text-[#082f35] no-underline transition-colors block leading-snug line-clamp-1"
+                style={{ color: "#1e293b", textDecoration: "none" }}
+              >
+                {product.name}
+              </Link>
             </h3>
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-2">
-            <span className="text-base font-bold text-slate-900">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-1">
+            <span className="text-sm sm:text-base font-bold text-slate-900">
               {product.price}
             </span>
             <Link
               href={`/products/${product.slug}`}
-              className="text-xs font-semibold text-[#082f35] hover:underline flex items-center gap-0.5"
+              className="text-[11px] font-semibold text-[#082f35] hover:underline flex items-center gap-0.5 no-underline"
+              style={{ color: "#082f35", textDecoration: "none" }}
             >
-              Details <ChevronRight size={13} />
+              Details <ChevronRight size={12} />
             </Link>
           </div>
         </div>
