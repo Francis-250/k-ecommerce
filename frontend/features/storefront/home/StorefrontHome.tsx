@@ -32,38 +32,61 @@ function CategoryGridSection({
       ];
 
   return (
-    <section className="home_category_cards_area mb-20">
-      <div className="block_title">
-        <h2>Popular Categories</h2>
+    <section className="mb-14">
+      <div className="flex items-center justify-between mb-6 pb-2 border-b border-slate-200">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+            Popular Categories
+          </h2>
+          <p className="text-xs text-slate-500">Explore our curated collections</p>
+        </div>
+        <Link
+          href="/shop"
+          className="text-xs font-bold text-[#082f35] hover:underline flex items-center gap-1"
+        >
+          Shop All <ChevronRight size={14} />
+        </Link>
       </div>
-      <div className="row">
+
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {displayCategories.slice(0, 4).map((cat, idx) => (
-          <div key={cat.name} className="col-lg-3 col-md-6 col-6 mb-20">
-            <Link
-              href={`/shop?category=${encodeURIComponent(cat.slug || cat.name)}`}
-              className="home_category_card"
-            >
-              <div className="category_card_img">
-                <Image
-                  src={
-                    categoryCardImages[cat.name] ||
-                    `/storefront/assets/img/cart/cart${17 + (idx % 3)}.png`
-                  }
-                  alt={cat.name}
-                  width={260}
-                  height={170}
-                  unoptimized
-                />
+          <Link
+            key={cat.name}
+            href={`/shop?category=${encodeURIComponent(cat.slug || cat.name)}`}
+            className="group relative h-44 sm:h-52 rounded-xl overflow-hidden bg-slate-900 block border border-slate-200 shadow-sm hover:shadow-md transition-all"
+          >
+            {/* Background Image */}
+            <Image
+              src={
+                categoryCardImages[cat.name] ||
+                `/storefront/assets/img/cart/cart${17 + (idx % 3)}.png`
+              }
+              alt={cat.name}
+              fill
+              className="object-cover opacity-85 group-hover:opacity-95 group-hover:scale-105 transition-all duration-500 ease-out"
+              unoptimized
+            />
+
+            {/* Dark Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
+
+            {/* Category Info Overlay */}
+            <div className="absolute inset-0 p-4 flex flex-col justify-between z-10">
+              <div className="flex justify-end">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 bg-white/20 backdrop-blur-md text-white rounded-full border border-white/20">
+                  {cat.count > 0 ? `${cat.count} Items` : "Explore"}
+                </span>
               </div>
-              <div className="category_card_info">
-                <h3>{cat.name}</h3>
-                <p>
-                  {cat.count > 0 ? `${cat.count} Items` : "Shop Now"}{" "}
-                  <ChevronRight size={13} aria-hidden="true" />
+              <div>
+                <h3 className="text-lg font-bold text-white group-hover:translate-x-1 transition-transform">
+                  {cat.name}
+                </h3>
+                <p className="text-xs text-slate-200 flex items-center gap-1 font-medium mt-0.5">
+                  Browse Collection <ChevronRight size={13} className="group-hover:translate-x-1 transition-transform" />
                 </p>
               </div>
-            </Link>
-          </div>
+            </div>
+          </Link>
         ))}
       </div>
     </section>

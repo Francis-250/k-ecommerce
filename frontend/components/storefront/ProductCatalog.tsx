@@ -13,55 +13,81 @@ export function ProductCard({
   product?: Product;
   column?: string;
 }) {
+  const numericPrice = Number(product.price.replace(/[^0-9.]/g, "")) || 0;
+  const imagePath = product.image.replace(
+    "/storefront/img/",
+    "/storefront/assets/img/",
+  );
+
   return (
-    <div className={column}>
-      <div className="single_product">
-        <div className="product_thumb">
-          <Link href={`/products/${product.slug}`}>
+    <div className={`${column} mb-6`}>
+      <div className="group relative bg-white rounded-xl border border-slate-200/80 overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-slate-300 hover:shadow-md h-full">
+        {/* Product Image Container */}
+        <div className="relative aspect-square w-full overflow-hidden bg-slate-50 flex items-center justify-center p-3">
+          <Link href={`/products/${product.slug}`} className="w-full h-full block relative">
             <Image
-              src={product.image.replace(
-                "/storefront/img/",
-                "/storefront/assets/img/",
-              )}
+              src={imagePath}
               alt={product.name}
-              width={270}
-              height={270}
+              fill
+              className="object-contain p-2 group-hover:scale-105 transition-transform duration-500 ease-out"
               unoptimized
             />
           </Link>
-          <div className={product.featured ? "hot_img" : "img_icone"}>
-            <span>{product.featured ? "Hot" : "New"}</span>
+
+          {/* Badge */}
+          <div className="absolute top-2.5 left-2.5 pointer-events-none z-10">
+            <span
+              className={`inline-block px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full text-white shadow-sm ${
+                product.featured
+                  ? "bg-[#D4AF4A]"
+                  : "bg-[#082f35]"
+              }`}
+            >
+              {product.featured ? "Hot" : "New"}
+            </span>
           </div>
-          <div className="product_action">
+
+          {/* Floating Hover Add to Cart Button */}
+          <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-10">
             <AddToCartButton
               item={{
                 slug: product.slug,
                 name: product.name,
-                price: Number(product.price.replace(/[^0-9.]/g, "")),
+                price: numericPrice,
                 image: product.image,
               }}
             >
-              <>
-                <ShoppingCart size={16} aria-hidden="true" /> Add to cart
-              </>
+              <span className="w-full py-2 bg-[#082f35] hover:bg-[#062429] text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-2 shadow-sm transition cursor-pointer">
+                <ShoppingCart size={14} aria-hidden="true" /> Add to cart
+              </span>
             </AddToCartButton>
           </div>
         </div>
-        <div className="product_content">
-          <span className="product_price">{product.price}</span>
-          <h3 className="product_title">
-            <Link href={`/products/${product.slug}`}>{product.name}</Link>
-          </h3>
-        </div>
-        <div className="product_info">
-          <ul>
-            <li>
-              <Link href="/wishlist">Add to Wishlist</Link>
-            </li>
-            <li>
-              <Link href={`/products/${product.slug}`}>View Detail</Link>
-            </li>
-          </ul>
+
+        {/* Product Info */}
+        <div className="p-3.5 flex flex-col justify-between flex-1 bg-white border-t border-slate-100">
+          <div>
+            {product.category && (
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+                {product.category}
+              </span>
+            )}
+            <h3 className="text-sm font-semibold text-slate-900 line-clamp-1 group-hover:text-[#082f35] transition-colors mb-1.5">
+              <Link href={`/products/${product.slug}`}>{product.name}</Link>
+            </h3>
+          </div>
+
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-2">
+            <span className="text-base font-bold text-slate-900">
+              {product.price}
+            </span>
+            <Link
+              href={`/products/${product.slug}`}
+              className="text-xs font-semibold text-[#082f35] hover:underline flex items-center gap-0.5"
+            >
+              Details <ChevronRight size={13} />
+            </Link>
+          </div>
         </div>
       </div>
     </div>
