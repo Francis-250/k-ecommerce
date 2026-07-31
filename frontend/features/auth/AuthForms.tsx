@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { toast } from "sonner";
 import { AuthApiError } from "./api";
@@ -13,6 +14,7 @@ function errorMessage(error: unknown) {
 }
 
 export function LoginForm() {
+  const router = useRouter();
   const login = useAuthStore((state) => state.login);
   const status = useAuthStore((state) => state.status);
   const setAuthDrawerTab = useAuthStore((state) => state.setAuthDrawerTab);
@@ -34,6 +36,12 @@ export function LoginForm() {
       );
       toast.success("Welcome back!");
       closeAuthDrawer();
+      const currentUser = useAuthStore.getState().user;
+      if (currentUser?.role === "ADMIN" || currentUser?.role === "SUPER_ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     } catch (error) {
       const msg = errorMessage(error);
       toast.error(msg);

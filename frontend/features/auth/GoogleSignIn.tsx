@@ -64,7 +64,7 @@ export function GoogleSignIn() {
         router.push(
           user?.role === "ADMIN" || user?.role === "SUPER_ADMIN"
             ? "/admin"
-            : "/my-account",
+            : "/",
         );
       } catch (error) {
         toast.error(googleErrorMessage(error));

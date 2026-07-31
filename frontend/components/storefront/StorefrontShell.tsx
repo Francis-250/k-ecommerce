@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 import {
   ChevronDown,
   ChevronRight,
@@ -11,6 +12,7 @@ import {
   Camera,
   Heart,
   Home,
+  LogOut,
   Mail,
   MapPin,
   Menu,
@@ -84,6 +86,8 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   const { items, itemCount, subtotal, openCartDrawer, removeItem } = useCart();
   const authUser = useAuthStore((state) => state.user);
   const openAuthDrawer = useAuthStore((state) => state.openAuthDrawer);
+  const logout = useAuthStore((state) => state.logout);
+  const router = useRouter();
   const appearance = useStorefrontAppearance();
   const catalog = useStorefrontCatalog();
   const storeSettings = useGeneralStoreSettings();
@@ -461,12 +465,18 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                 <div className="mobile-drawer-footer">
                   <div className="mobile-drawer-quicklinks">
                     {authUser ? (
-                      <Link
-                        href="/my-account"
-                        onClick={() => setMobileOpen(false)}
+                      <button
+                        type="button"
+                        className="drawer-quick-cart-btn text-red-600"
+                        onClick={async () => {
+                          setMobileOpen(false);
+                          await logout();
+                          toast.success("Logged out successfully");
+                          router.push("/");
+                        }}
                       >
-                        <User size={16} aria-hidden="true" /> My Account
-                      </Link>
+                        <LogOut size={16} aria-hidden="true" /> Logout ({authUser.firstName})
+                      </button>
                     ) : (
                       <button
                         type="button"

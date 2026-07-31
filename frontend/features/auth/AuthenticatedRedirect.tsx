@@ -15,7 +15,7 @@ export function AuthenticatedRedirect() {
     router.replace(
       user.role === "ADMIN" || user.role === "SUPER_ADMIN"
         ? "/admin"
-        : "/my-account",
+        : "/",
     );
   }, [router, status, user]);
 
