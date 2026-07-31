@@ -48,6 +48,7 @@ export function GoogleSignIn() {
   const button = useRef<HTMLDivElement>(null);
   const [scriptReady, setScriptReady] = useState(false);
   const googleLogin = useAuthStore((state) => state.googleLogin);
+  const closeAuthDrawer = useAuthStore((state) => state.closeAuthDrawer);
   const config = useQuery({
     queryKey: ["auth", "google-config"],
     queryFn: authApi.googleConfig,
@@ -60,6 +61,7 @@ export function GoogleSignIn() {
       try {
         await googleLogin(credential);
         toast.success("Signed in with Google");
+        closeAuthDrawer();
         const user = useAuthStore.getState().user;
         router.push(
           user?.role === "ADMIN" || user?.role === "SUPER_ADMIN"
@@ -70,7 +72,7 @@ export function GoogleSignIn() {
         toast.error(googleErrorMessage(error));
       }
     },
-    [googleLogin, router],
+    [closeAuthDrawer, googleLogin, router],
   );
 
   useEffect(() => {

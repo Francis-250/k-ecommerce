@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { toast } from "sonner";
 import { AuthApiError } from "./api";
+import { GoogleSignIn } from "./GoogleSignIn";
 import { useAuthStore } from "./store";
 
 function errorMessage(error: unknown) {
@@ -128,6 +129,8 @@ export function LoginForm() {
           Create Account
         </button>
       </div>
+
+      <GoogleSignIn />
     </form>
   );
 }
@@ -249,6 +252,8 @@ export function RegisterForm() {
           Sign In
         </button>
       </div>
+
+      <GoogleSignIn />
     </form>
   );
 }
