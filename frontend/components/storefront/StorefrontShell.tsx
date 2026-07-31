@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   ChevronDown,
@@ -9,12 +10,14 @@ import {
   CircleX,
   Camera,
   Heart,
+  Home,
   Mail,
   MapPin,
   Menu,
   MessageCircle,
   Phone,
   Search,
+  ShoppingBag,
   ShoppingCart,
   User,
   Users,
@@ -186,21 +189,6 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                 <div className="row align-items-center">
                   <div className="col-lg-3 col-md-4 col-12 logo-col">
                     <div className="header_middel_left d-flex align-items-center justify-content-between">
-                      <button
-                        type="button"
-                        className="mobile-menu-toggle d-lg-none"
-                        aria-expanded={mobileOpen}
-                        aria-controls="mobile-navigation"
-                        aria-label="Toggle Navigation Menu"
-                        onClick={() => setMobileOpen((value) => !value)}
-                      >
-                        {mobileOpen ? (
-                          <X size={20} aria-hidden="true" />
-                        ) : (
-                          <Menu size={20} aria-hidden="true" />
-                        )}
-                        <span>MENU</span>
-                      </button>
                       <div className="logo">
                         <Link href="/">
                           {displayLogoUrl ? (
@@ -518,8 +506,78 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
       </div>
       <CartDrawer />
       <AuthDrawer />
+      <MobileBottomBar onOpenMenu={() => setMobileOpen(true)} />
       <Footer />
     </>
+  );
+}
+
+function MobileBottomBar({ onOpenMenu }: { onOpenMenu: () => void }) {
+  const { itemCount, openCartDrawer } = useCart();
+  const authUser = useAuthStore((state) => state.user);
+  const openAuthDrawer = useAuthStore((state) => state.openAuthDrawer);
+  const pathname = usePathname();
+
+  return (
+    <nav className="mobile_bottom_bar d-md-none" aria-label="Mobile Navigation Bar">
+      <button
+        type="button"
+        className="mobile_tab_item"
+        onClick={onOpenMenu}
+        aria-label="Open Navigation Menu"
+      >
+        <Menu size={20} aria-hidden="true" />
+        <span>Menu</span>
+      </button>
+
+      <Link
+        href="/shop"
+        className={`mobile_tab_item ${pathname?.startsWith("/shop") ? "active" : ""}`}
+      >
+        <ShoppingBag size={20} aria-hidden="true" />
+        <span>Shop</span>
+      </Link>
+
+      <Link
+        href="/wishlist"
+        className={`mobile_tab_item ${pathname === "/wishlist" ? "active" : ""}`}
+      >
+        <Heart size={20} aria-hidden="true" />
+        <span>Wishlist</span>
+      </Link>
+
+      <button
+        type="button"
+        className="mobile_tab_item cart_tab_item"
+        onClick={openCartDrawer}
+        aria-label={`Cart with ${itemCount} items`}
+      >
+        <div className="cart_icon_wrap">
+          <ShoppingCart size={20} aria-hidden="true" />
+          {itemCount > 0 && <span className="mobile_cart_badge">{itemCount}</span>}
+        </div>
+        <span>Cart</span>
+      </button>
+
+      {authUser ? (
+        <Link
+          href="/my-account"
+          className={`mobile_tab_item ${pathname === "/my-account" ? "active" : ""}`}
+        >
+          <User size={20} aria-hidden="true" />
+          <span>Account</span>
+        </Link>
+      ) : (
+        <button
+          type="button"
+          className="mobile_tab_item"
+          onClick={() => openAuthDrawer("login")}
+        >
+          <User size={20} aria-hidden="true" />
+          <span>Login</span>
+        </button>
+      )}
+    </nav>
   );
 }
 

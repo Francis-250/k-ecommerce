@@ -388,7 +388,7 @@ button:focus-visible {
   .logo {
     width: auto;
     margin: 0;
-    text-align: center;
+    text-align: left;
     padding: 0;
   }
   .logo img {
@@ -396,7 +396,7 @@ button:focus-visible {
     max-height: 42px !important;
     width: auto !important;
     object-fit: contain;
-    margin: 0 auto;
+    margin: 0;
   }
   .header_right_info {
     display: flex;
@@ -2917,4 +2917,91 @@ body.auth-drawer-open {
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 10px;
+}
+
+/* Mobile Bottom Navigation Bar */
+.mobile_bottom_bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #ffffff;
+  border-top: 1px solid #e5e5e5;
+  box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 58px;
+  padding: 0 4px;
+}
+
+@media (min-width: 768px) {
+  .mobile_bottom_bar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .header_top {
+    display: none !important;
+  }
+
+  body,
+  .pos_page {
+    padding-bottom: 58px !important;
+  }
+}
+
+.mobile_tab_item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 100%;
+  color: #666666 !important;
+  text-decoration: none !important;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.2s ease;
+}
+
+.mobile_tab_item:hover,
+.mobile_tab_item.active {
+  color: #087554 !important;
+}
+
+.mobile_tab_item span {
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.cart_tab_item .cart_icon_wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile_cart_badge {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background: #e84c3d;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
