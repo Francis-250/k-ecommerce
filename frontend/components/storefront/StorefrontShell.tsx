@@ -9,6 +9,8 @@ import {
   CircleX,
   Camera,
   Heart,
+  Mail,
+  MapPin,
   Menu,
   MessageCircle,
   Phone,
@@ -24,6 +26,8 @@ import {
   type CartItem as CartItemType,
 } from "@/features/storefront/cart";
 import { AuthAccountLink } from "@/features/auth/AuthAccountLink";
+import { AuthDrawer } from "@/features/auth/AuthDrawer";
+import { useAuthStore } from "@/features/auth/store";
 import { useStorefrontAppearance } from "@/features/storefront/appearance/useStorefrontAppearance";
 import { useStorefrontCatalog } from "@/features/storefront/catalog/useStorefrontCatalog";
 import { useGeneralStoreSettings } from "@/features/admin/hooks/useGeneralStoreSettings";
@@ -75,6 +79,8 @@ const mainLinks = [
 
 export function StorefrontShell({ children }: { children: ReactNode }) {
   const { items, itemCount, subtotal, openCartDrawer, removeItem } = useCart();
+  const authUser = useAuthStore((state) => state.user);
+  const openAuthDrawer = useAuthStore((state) => state.openAuthDrawer);
   const appearance = useStorefrontAppearance();
   const catalog = useStorefrontCatalog();
   const storeSettings = useGeneralStoreSettings();
@@ -146,12 +152,22 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                           <Link href="/wishlist">My wishlist</Link>
                         </li>
                         <li>
-                          <Link href="/my-account">My account</Link>
+                          {authUser ? (
+                            <Link href="/my-account">My account</Link>
+                          ) : (
+                            <button
+                              type="button"
+                              className="header-top-link-btn"
+                              onClick={() => openAuthDrawer("login")}
+                            >
+                              My account
+                            </button>
+                          )}
                         </li>
                         <li>
                           <button
                             type="button"
-                            className="header-top-cart-btn"
+                            className="header-top-link-btn"
                             onClick={openCartDrawer}
                           >
                             My cart
@@ -216,7 +232,9 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                         >
                           <ShoppingCart size={22} aria-hidden="true" />
                           {itemCount > 0 && (
-                            <span className="mobile-cart-count">{itemCount}</span>
+                            <span className="mobile-cart-count">
+                              {itemCount}
+                            </span>
                           )}
                         </button>
                       </div>
@@ -393,7 +411,10 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                 </button>
               </div>
 
-              <div className="mobile-drawer-pattern-accent" aria-hidden="true" />
+              <div
+                className="mobile-drawer-pattern-accent"
+                aria-hidden="true"
+              />
 
               <div className="mobile-drawer-body">
                 <nav className="mobile-drawer-nav" aria-label="Mobile Menu">
@@ -402,7 +423,10 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                       const hasChildren = item.children.length > 0;
                       const isOpen = openSubmenu === item.label;
                       return (
-                        <li key={item.label} className={hasChildren ? "has-children" : undefined}>
+                        <li
+                          key={item.label}
+                          className={hasChildren ? "has-children" : undefined}
+                        >
                           <div className="mobile-nav-item">
                             <Link
                               href={item.href}
@@ -448,9 +472,25 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
 
                 <div className="mobile-drawer-footer">
                   <div className="mobile-drawer-quicklinks">
-                    <Link href="/my-account" onClick={() => setMobileOpen(false)}>
-                      <User size={16} aria-hidden="true" /> My Account
-                    </Link>
+                    {authUser ? (
+                      <Link
+                        href="/my-account"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        <User size={16} aria-hidden="true" /> My Account
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        className="drawer-quick-cart-btn"
+                        onClick={() => {
+                          setMobileOpen(false);
+                          openAuthDrawer("login");
+                        }}
+                      >
+                        <User size={16} aria-hidden="true" /> Login / Register
+                      </button>
+                    )}
                     <Link href="/wishlist" onClick={() => setMobileOpen(false)}>
                       <Heart size={16} aria-hidden="true" /> Wishlist
                     </Link>
@@ -462,7 +502,8 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                         openCartDrawer();
                       }}
                     >
-                      <ShoppingCart size={16} aria-hidden="true" /> Cart ({itemCount})
+                      <ShoppingCart size={16} aria-hidden="true" /> Cart (
+                      {itemCount})
                     </button>
                     <Link href="/contact" onClick={() => setMobileOpen(false)}>
                       <Phone size={16} aria-hidden="true" /> Contact Support
@@ -476,6 +517,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
         </div>
       </div>
       <CartDrawer />
+      <AuthDrawer />
       <Footer />
     </>
   );
@@ -518,93 +560,127 @@ function Footer() {
   const storeSettings = useGeneralStoreSettings();
   return (
     <footer className="footer_area">
+      <div className="footer_pattern_top" aria-hidden="true" />
       <div className="footer_top">
         <div className="container">
           <div className="row">
-            <div className="col-lg-3 col-md-6 col-sm-6">
+            {/* Column 1: Store Brand & Contact Info */}
+            <div className="col-lg-4 col-md-6 col-sm-12 mb-30">
               <div className="footer_widget">
-                <h3>About us</h3>
+                <h3 className="footer_brand_title">
+                  {storeSettings.storeName}
+                </h3>
+                <p className="footer_about_text">
+                  Celebrating African creativity through contemporary fashion,
+                  expressive prints, and premium handcrafted accessories.
+                </p>
                 <div className="footer_widget_contect">
                   <p>
-                    I-RAS STYLES celebrates African creativity through
-                    contemporary fashion, expressive prints and thoughtfully
-                    crafted accessories.
+                    <MapPin
+                      size={17}
+                      className="contact_icon"
+                      aria-hidden="true"
+                    />
+                    <span>6305 Ames Ave STE B, Omaha, NE 68104</span>
                   </p>
                   <p>
-                    We connect heritage-inspired design with modern style for a
-                    confident global community.
+                    <Mail
+                      size={17}
+                      className="contact_icon"
+                      aria-hidden="true"
+                    />
+                    <a href="mailto:evrasiteka4@gmail.com">
+                      evrasiteka4@gmail.com
+                    </a>
+                  </p>
+                  <p>
+                    <Phone
+                      size={17}
+                      className="contact_icon"
+                      aria-hidden="true"
+                    />
+                    <a href="tel:+17125249287">+1 (712) 524-9287</a>
                   </p>
                 </div>
               </div>
             </div>
+
+            {/* Column 2: Customer Care */}
             <FooterColumn
-              title="My Account"
+              title="Customer Care"
               links={[
-                ["Your Account", "/my-account"],
-                ["My orders", "/my-account"],
-                ["My addresses", "/my-account"],
-                ["Login", "/login"],
+                ["My Account", "/my-account"],
+                ["Track Orders", "/my-account"],
+                ["Wishlist", "/wishlist"],
+                ["Contact Support", "/contact"],
               ]}
+              colClass="col-lg-2 col-md-6 col-sm-6 mb-30"
             />
+
+            {/* Column 3: Quick Navigation */}
             <FooterColumn
-              title="Informations"
+              title="Information"
               links={[
-                ["Specials", "/shop"],
-                ["Our store(s)!", "/contact"],
-                ["Terms and conditions", "/about"],
-                ["About us", "/about"],
+                ["All Products", "/shop"],
+                ["About Us", "/about"],
+                ["Portfolio", "/portfolio"],
+                ["Blog & Stories", "/blog"],
               ]}
+              colClass="col-lg-3 col-md-6 col-sm-6 mb-30"
             />
-            <FooterColumn
-              title="Extras"
-              links={[
-                ["Brands", "/shop"],
-                ["Gift Vouchers", "/shop"],
-                ["Affiliates", "/about"],
-                ["Privacy policy", "/about"],
-              ]}
-            />
+
+            {/* Column 4: Store Guarantee */}
+            <div className="col-lg-3 col-md-6 col-sm-12 mb-30">
+              <div className="footer_widget">
+                <h3>Store Guarantee</h3>
+                <ul className="footer_features_list">
+                  <li>
+                    <span className="feature_bullet">•</span> Authentic African
+                    Crafts
+                  </li>
+                  <li>
+                    <span className="feature_bullet">•</span> Worldwide Express
+                    Shipping
+                  </li>
+                  <li>
+                    <span className="feature_bullet">•</span> Secure Checkout
+                    Guarantee
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
       <div className="footer_bottom">
         <div className="container">
           <div className="row align-items-center">
-            <div className="col-lg-6 col-md-6">
+            <div className="col-lg-7 col-md-6">
               <div className="copyright_area">
-                <ul>
-                  <li>
-                    <Link href="/about">About us</Link>
-                  </li>
-                  <li>
-                    <Link href="/contact">Customer Service</Link>
-                  </li>
-                  <li>
-                    <Link href="/about">Privacy Policy</Link>
-                  </li>
-                </ul>
                 <p>
-                  Copyright © 2026 <Link href="/">{storeSettings.storeName}</Link>. All
-                  rights reserved.
+                  Copyright © 2026{" "}
+                  <Link href="/">{storeSettings.storeName}</Link>. All rights
+                  reserved.
                 </p>
               </div>
             </div>
-            <div className="col-lg-6 col-md-6">
-              <div className="footer_social text-right">
+            <div className="col-lg-5 col-md-6">
+              <div className="footer_social">
                 <ul>
                   <li>
                     <a href="#facebook" aria-label="Facebook">
-                      <Users size={17} aria-hidden="true" />
+                      <Users size={16} aria-hidden="true" />
                     </a>
                   </li>
                   <li>
                     <a href="#instagram" aria-label="Instagram">
-                      <Camera size={17} aria-hidden="true" />
+                      <Camera size={16} aria-hidden="true" />
                     </a>
                   </li>
                   <li>
                     <a href="#twitter" aria-label="Twitter">
-                      <MessageCircle size={17} aria-hidden="true" />
+                      <MessageCircle size={16} aria-hidden="true" />
                     </a>
                   </li>
                 </ul>
@@ -620,12 +696,14 @@ function Footer() {
 function FooterColumn({
   title,
   links,
+  colClass = "col-lg-3 col-md-6 col-sm-6",
 }: {
   title: string;
   links: readonly (readonly [string, string])[];
+  colClass?: string;
 }) {
   return (
-    <div className="col-lg-3 col-md-6 col-sm-6">
+    <div className={colClass}>
       <div className="footer_widget">
         <h3>{title}</h3>
         <ul>

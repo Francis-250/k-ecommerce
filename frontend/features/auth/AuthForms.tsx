@@ -1,13 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { toast } from "sonner";
-import { AccountField, Submit } from "@/app/(auth)/_components/AuthPage";
 import { AuthApiError } from "./api";
 import { useAuthStore } from "./store";
-import { GoogleSignIn } from "./GoogleSignIn";
 
 function errorMessage(error: unknown) {
   return error instanceof AuthApiError
@@ -16,9 +13,11 @@ function errorMessage(error: unknown) {
 }
 
 export function LoginForm() {
-  const router = useRouter();
   const login = useAuthStore((state) => state.login);
   const status = useAuthStore((state) => state.status);
+  const setAuthDrawerTab = useAuthStore((state) => state.setAuthDrawerTab);
+  const closeAuthDrawer = useAuthStore((state) => state.closeAuthDrawer);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,175 +25,300 @@ export function LoginForm() {
 
     try {
       await login(
-        String(form.get("login-email")),
-        String(form.get("login-password")),
+        String(form.get("email")).trim(),
+        String(form.get("password")),
       );
-      toast.success("Welcome back");
-      const user = useAuthStore.getState().user;
-      router.push(
-        user?.role === "ADMIN" || user?.role === "SUPER_ADMIN"
-          ? "/admin"
-          : "/my-account",
-      );
+      toast.success("Welcome back!");
+      closeAuthDrawer();
     } catch (error) {
       toast.error(errorMessage(error));
     }
   }
 
   return (
-    <>
-      <form onSubmit={submit}>
-        <AccountField
-          id="login-email"
-          label="Username or email"
-          type="email"
-          autoComplete="email"
-        />
-        <AccountField
-          id="login-password"
-          label="Password"
-          type="password"
-
-          autoComplete="current-password"
-        />
-        <div className="login_submit">
-          <button type="submit" disabled={status === "loading"}>
-            {status === "loading" ? "Signing in..." : "Login"}
-          </button>
-          <label htmlFor="remember">
-            <input id="remember" type="checkbox" /> Remember me
-          </label>
-          <Link href="/forgot-password">Lost your password?</Link>
+    <form onSubmit={submit} className="auth_drawer_form">
+      <div className="auth_field">
+        <label htmlFor="drawer-login-email">Email or Username</label>
+        <div className="auth_input_wrap">
+          <Mail size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-login-email"
+            name="email"
+            type="email"
+            placeholder="your.email@example.com"
+            autoComplete="email"
+            required
+          />
         </div>
-      </form>
-      {/* <GoogleSignIn /> */}
-    </>
+      </div>
+
+      <div className="auth_field">
+        <label htmlFor="drawer-login-password">Password</label>
+        <div className="auth_input_wrap">
+          <Lock size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-login-password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
+            autoComplete="current-password"
+            required
+          />
+          <button
+            type="button"
+            className="toggle_password_btn"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
+      </div>
+
+      <div className="auth_options_row">
+        <label htmlFor="drawer-remember" className="remember_label">
+          <input id="drawer-remember" type="checkbox" />
+          <span>Remember me</span>
+        </label>
+        <button
+          type="button"
+          className="forgot_password_btn"
+          onClick={() => setAuthDrawerTab("forgot-password")}
+        >
+          Forgot password?
+        </button>
+      </div>
+
+      <button
+        type="submit"
+        className="auth_primary_btn"
+        disabled={status === "loading"}
+      >
+        {status === "loading" ? "Signing in..." : "Sign In"}
+      </button>
+
+      <div className="auth_switch_footer">
+        <span>Don't have an account?</span>{" "}
+        <button
+          type="button"
+          className="switch_tab_btn"
+          onClick={() => setAuthDrawerTab("register")}
+        >
+          Create Account
+        </button>
+      </div>
+    </form>
   );
 }
 
 export function RegisterForm() {
-  const router = useRouter();
   const register = useAuthStore((state) => state.register);
   const status = useAuthStore((state) => state.status);
+  const setAuthDrawerTab = useAuthStore((state) => state.setAuthDrawerTab);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const roleValue = String(form.get("role") ?? "CUSTOMER");
-    const role = roleValue === "ADMIN" ? "ADMIN" : "CUSTOMER";
 
     try {
       await register({
-        firstName: String(form.get("first-name")),
-        lastName: String(form.get("last-name")),
+        firstName: String(form.get("first-name")).trim(),
+        lastName: String(form.get("last-name")).trim(),
         email: String(form.get("email")).trim().toLowerCase(),
         password: String(form.get("password")),
-        role,
+        role: "CUSTOMER", // Role selection removed, default to CUSTOMER
       });
-      toast.success("Account created", {
+      toast.success("Account created!", {
         description: "Enter the verification code sent to your email.",
       });
-      router.push("/verify-email");
+      setAuthDrawerTab("verify-email");
     } catch (error) {
       toast.error(errorMessage(error));
     }
   }
 
   return (
-    <form onSubmit={submit}>
-      <AccountField
-        id="first-name"
-        label="First name"
-        autoComplete="given-name"
-      />
-      <AccountField
-        id="last-name"
-        label="Last name"
-        autoComplete="family-name"
-      />
-      <AccountField
-        id="email"
-        label="Email address"
-        type="email"
-        autoComplete="email"
-      />
-      <AccountField
-        id="password"
-        label="Password"
-        type="password"
-        autoComplete="new-password"
-      />
-      <div className="account-field mb-4">
-        <label htmlFor="role" className="block text-sm font-medium text-slate-700 mb-1">
-          Account Role
-        </label>
-        <select
-          id="role"
-          name="role"
-          defaultValue="ADMIN"
-          className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-amber-500 focus:outline-none"
-        >
-          <option value="ADMIN">Administrator (Admin Dashboard Access)</option>
-          <option value="CUSTOMER">Customer (Storefront Access)</option>
-        </select>
+    <form onSubmit={submit} className="auth_drawer_form">
+      <div className="auth_field_row">
+        <div className="auth_field">
+          <label htmlFor="drawer-first-name">First Name</label>
+          <div className="auth_input_wrap">
+            <User size={16} className="input_icon" aria-hidden="true" />
+            <input
+              id="drawer-first-name"
+              name="first-name"
+              type="text"
+              placeholder="First name"
+              autoComplete="given-name"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="auth_field">
+          <label htmlFor="drawer-last-name">Last Name</label>
+          <div className="auth_input_wrap">
+            <User size={16} className="input_icon" aria-hidden="true" />
+            <input
+              id="drawer-last-name"
+              name="last-name"
+              type="text"
+              placeholder="Last name"
+              autoComplete="family-name"
+              required
+            />
+          </div>
+        </div>
       </div>
-      <Submit>
-        {status === "loading" ? "Creating account..." : "Register"}
-      </Submit>
+
+      <div className="auth_field">
+        <label htmlFor="drawer-register-email">Email Address</label>
+        <div className="auth_input_wrap">
+          <Mail size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-register-email"
+            name="email"
+            type="email"
+            placeholder="your.email@example.com"
+            autoComplete="email"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="auth_field">
+        <label htmlFor="drawer-register-password">Password</label>
+        <div className="auth_input_wrap">
+          <Lock size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-register-password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Create password"
+            autoComplete="new-password"
+            required
+          />
+          <button
+            type="button"
+            className="toggle_password_btn"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        className="auth_primary_btn"
+        disabled={status === "loading"}
+      >
+        {status === "loading" ? "Creating Account..." : "Create Account"}
+      </button>
+
+      <div className="auth_switch_footer">
+        <span>Already have an account?</span>{" "}
+        <button
+          type="button"
+          className="switch_tab_btn"
+          onClick={() => setAuthDrawerTab("login")}
+        >
+          Sign In
+        </button>
+      </div>
     </form>
   );
 }
 
 export function VerifyEmailForm() {
-  const router = useRouter();
   const verifyEmail = useAuthStore((state) => state.verifyEmail);
   const pendingEmail = useAuthStore((state) => state.pendingVerificationEmail);
   const status = useAuthStore((state) => state.status);
+  const setAuthDrawerTab = useAuthStore((state) => state.setAuthDrawerTab);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const email = String(form.get("verification-email")).trim().toLowerCase();
+    const email = String(form.get("email")).trim().toLowerCase();
 
     try {
-      await verifyEmail(email, String(form.get("verification-code")).trim());
-      toast.success("Email verified", {
-        description: "You can now sign in to your account.",
+      await verifyEmail(email, String(form.get("otp")).trim());
+      toast.success("Email verified successfully!", {
+        description: "You can now sign in with your credentials.",
       });
-      router.push("/login");
+      setAuthDrawerTab("login");
     } catch (error) {
       toast.error(errorMessage(error));
     }
   }
 
   return (
-    <form onSubmit={submit}>
-      <p>Enter the verification code sent to your email address.</p>
-      <AccountField
-        key={pendingEmail}
-        id="verification-email"
-        label="Email address"
-        type="email"
-        autoComplete="email"
-        defaultValue={pendingEmail}
-      />
-      <AccountField
-        id="verification-code"
-        label="Verification code"
-        autoComplete="one-time-code"
-        inputMode="numeric"
-      />
-      <Submit>{status === "loading" ? "Verifying..." : "Verify email"}</Submit>
+    <form onSubmit={submit} className="auth_drawer_form">
+      <p className="auth_info_desc">
+        We sent a verification code to your email. Enter it below to verify your account.
+      </p>
+
+      <div className="auth_field">
+        <label htmlFor="drawer-verify-email">Email Address</label>
+        <div className="auth_input_wrap">
+          <Mail size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-verify-email"
+            name="email"
+            type="email"
+            defaultValue={pendingEmail}
+            placeholder="your.email@example.com"
+            autoComplete="email"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="auth_field">
+        <label htmlFor="drawer-otp">Verification Code</label>
+        <div className="auth_input_wrap">
+          <Lock size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-otp"
+            name="otp"
+            type="text"
+            placeholder="Enter code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            required
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        className="auth_primary_btn"
+        disabled={status === "loading"}
+      >
+        {status === "loading" ? "Verifying..." : "Verify Email"}
+      </button>
+
+      <div className="auth_switch_footer">
+        <button
+          type="button"
+          className="switch_tab_btn"
+          onClick={() => setAuthDrawerTab("login")}
+        >
+          ← Back to Sign In
+        </button>
+      </div>
     </form>
   );
 }
 
 export function ForgotPasswordForm() {
-  const router = useRouter();
   const requestPasswordReset = useAuthStore(
     (state) => state.requestPasswordReset,
   );
   const status = useAuthStore((state) => state.status);
+  const setAuthDrawerTab = useAuthStore((state) => state.setAuthDrawerTab);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -203,39 +327,63 @@ export function ForgotPasswordForm() {
 
     try {
       await requestPasswordReset(email);
-      toast.success("Check your email", {
-        description: "Enter the password reset code we sent you.",
+      toast.success("Reset code sent!", {
+        description: "Check your email for the password reset code.",
       });
-      router.push("/reset-password");
+      setAuthDrawerTab("reset-password");
     } catch (error) {
       toast.error(errorMessage(error));
     }
   }
 
   return (
-    <form onSubmit={submit}>
-      <p>
-        Enter the email address linked to your account and we will send you a
-        password reset code.
+    <form onSubmit={submit} className="auth_drawer_form">
+      <p className="auth_info_desc">
+        Enter the email address associated with your account and we will send you a reset code.
       </p>
-      <AccountField
-        id="email"
-        label="Email address"
-        type="email"
-        autoComplete="email"
-      />
-      <Submit>
-        {status === "loading" ? "Sending code..." : "Send reset code"}
-      </Submit>
+
+      <div className="auth_field">
+        <label htmlFor="drawer-forgot-email">Email Address</label>
+        <div className="auth_input_wrap">
+          <Mail size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-forgot-email"
+            name="email"
+            type="email"
+            placeholder="your.email@example.com"
+            autoComplete="email"
+            required
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        className="auth_primary_btn"
+        disabled={status === "loading"}
+      >
+        {status === "loading" ? "Sending Code..." : "Send Reset Code"}
+      </button>
+
+      <div className="auth_switch_footer">
+        <button
+          type="button"
+          className="switch_tab_btn"
+          onClick={() => setAuthDrawerTab("login")}
+        >
+          ← Back to Sign In
+        </button>
+      </div>
     </form>
   );
 }
 
 export function ResetPasswordForm() {
-  const router = useRouter();
   const resetPassword = useAuthStore((state) => state.resetPassword);
   const pendingEmail = useAuthStore((state) => state.pendingVerificationEmail);
   const status = useAuthStore((state) => state.status);
+  const setAuthDrawerTab = useAuthStore((state) => state.setAuthDrawerTab);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -250,50 +398,108 @@ export function ResetPasswordForm() {
 
     try {
       await resetPassword(
-        String(form.get("reset-email")).trim().toLowerCase(),
-        String(form.get("reset-code")).trim(),
+        String(form.get("email")).trim().toLowerCase(),
+        String(form.get("otp")).trim(),
         password,
       );
-      toast.success("Password updated", {
+      toast.success("Password reset successfully!", {
         description: "Sign in with your new password.",
       });
-      router.push("/login");
+      setAuthDrawerTab("login");
     } catch (error) {
       toast.error(errorMessage(error));
     }
   }
 
   return (
-    <form onSubmit={submit}>
-      <AccountField
-        key={pendingEmail}
-        id="reset-email"
-        label="Email address"
-        type="email"
-        autoComplete="email"
-        defaultValue={pendingEmail}
-      />
-      <AccountField
-        id="reset-code"
-        label="Reset code"
-        autoComplete="one-time-code"
-        inputMode="numeric"
-      />
-      <AccountField
-        id="password"
-        label="New password"
-        type="password"
-        autoComplete="new-password"
-      />
-      <AccountField
-        id="confirm-password"
-        label="Confirm password"
-        type="password"
-        autoComplete="new-password"
-      />
-      <Submit>
-        {status === "loading" ? "Updating password..." : "Reset password"}
-      </Submit>
+    <form onSubmit={submit} className="auth_drawer_form">
+      <div className="auth_field">
+        <label htmlFor="drawer-reset-email">Email Address</label>
+        <div className="auth_input_wrap">
+          <Mail size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-reset-email"
+            name="email"
+            type="email"
+            defaultValue={pendingEmail}
+            placeholder="your.email@example.com"
+            autoComplete="email"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="auth_field">
+        <label htmlFor="drawer-reset-otp">Reset Code</label>
+        <div className="auth_input_wrap">
+          <Lock size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-reset-otp"
+            name="otp"
+            type="text"
+            placeholder="Enter code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            required
+          />
+        </div>
+      </div>
+
+      <div className="auth_field">
+        <label htmlFor="drawer-new-password">New Password</label>
+        <div className="auth_input_wrap">
+          <Lock size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-new-password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="New password"
+            autoComplete="new-password"
+            required
+          />
+          <button
+            type="button"
+            className="toggle_password_btn"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
+      </div>
+
+      <div className="auth_field">
+        <label htmlFor="drawer-confirm-password">Confirm Password</label>
+        <div className="auth_input_wrap">
+          <Lock size={16} className="input_icon" aria-hidden="true" />
+          <input
+            id="drawer-confirm-password"
+            name="confirm-password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Confirm new password"
+            autoComplete="new-password"
+            required
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        className="auth_primary_btn"
+        disabled={status === "loading"}
+      >
+        {status === "loading" ? "Updating Password..." : "Update Password"}
+      </button>
+
+      <div className="auth_switch_footer">
+        <button
+          type="button"
+          className="switch_tab_btn"
+          onClick={() => setAuthDrawerTab("login")}
+        >
+          ← Back to Sign In
+        </button>
+      </div>
     </form>
   );
 }

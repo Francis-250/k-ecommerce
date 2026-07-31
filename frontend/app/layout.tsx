@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "@/styles/storefront.css";
 import "@/styles/auth.css";
@@ -8,6 +8,11 @@ import { CartProvider } from "@/features/storefront/cart";
 import { Toaster } from "sonner";
 import { AuthInitializer } from "@/features/auth/AuthInitializer";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   title: { default: "I-RAS STYLES", template: "%s | I-RAS STYLES" },

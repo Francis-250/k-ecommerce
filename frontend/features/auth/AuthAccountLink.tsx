@@ -8,11 +8,12 @@ export function AuthAccountLink() {
   const user = useAuthStore((state) => state.user);
   const status = useAuthStore((state) => state.status);
   const logout = useAuthStore((state) => state.logout);
+  const openAuthDrawer = useAuthStore((state) => state.openAuthDrawer);
 
   if (status === "authenticated" && user) {
     return (
       <a
-        href="/login"
+        href="#logout"
         onClick={async (event) => {
           event.preventDefault();
           await logout();
@@ -24,5 +25,13 @@ export function AuthAccountLink() {
     );
   }
 
-  return <Link href="/login">Login</Link>;
+  return (
+    <button
+      type="button"
+      className="header-top-link-btn"
+      onClick={() => openAuthDrawer("login")}
+    >
+      Login
+    </button>
+  );
 }

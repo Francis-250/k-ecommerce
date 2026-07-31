@@ -5,11 +5,13 @@ import {
 } from "@/components/storefront/StorefrontShell";
 import { LoginForm } from "@/features/auth/AuthForms";
 import { AuthenticatedRedirect } from "@/features/auth/AuthenticatedRedirect";
+import { AuthDrawerAutoOpen } from "@/features/auth/AuthDrawerAutoOpen";
 
 export default function LoginPage() {
   return (
     <StorefrontShell>
       <AuthenticatedRedirect />
+      <AuthDrawerAutoOpen tab="login" />
       <Breadcrumb title="Login" />
       <div className="customer_login">
         <div className="row">

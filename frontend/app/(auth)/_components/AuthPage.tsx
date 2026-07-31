@@ -5,15 +5,21 @@ import {
   StorefrontShell,
 } from "@/components/storefront/StorefrontShell";
 
+import { AuthDrawerAutoOpen } from "@/features/auth/AuthDrawerAutoOpen";
+import type { AuthDrawerTab } from "@/features/auth/store";
+
 export function AuthPage({
   title,
+  tab = "login",
   children,
 }: {
   title: string;
+  tab?: AuthDrawerTab;
   children: ReactNode;
 }) {
   return (
     <StorefrontShell>
+      <AuthDrawerAutoOpen tab={tab} />
       <Breadcrumb title={title} />
       <div className="customer_login">
         <div className="row">

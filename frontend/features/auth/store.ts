@@ -13,10 +13,22 @@ type RegisterInput = {
   role?: "CUSTOMER" | "ADMIN";
 };
 
+export type AuthDrawerTab =
+  | "login"
+  | "register"
+  | "verify-email"
+  | "forgot-password"
+  | "reset-password";
+
 type AuthState = {
   user: AuthUser | null;
   status: AuthStatus;
   pendingVerificationEmail: string;
+  authDrawerOpen: boolean;
+  authDrawerTab: AuthDrawerTab;
+  openAuthDrawer: (tab?: AuthDrawerTab) => void;
+  closeAuthDrawer: () => void;
+  setAuthDrawerTab: (tab: AuthDrawerTab) => void;
   initialize: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   googleLogin: (credential: string) => Promise<void>;
@@ -48,6 +60,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   status: "idle",
   pendingVerificationEmail: "",
+  authDrawerOpen: false,
+  authDrawerTab: "login",
+
+  openAuthDrawer: (tab = "login") =>
+    set({ authDrawerOpen: true, authDrawerTab: tab }),
+  closeAuthDrawer: () => set({ authDrawerOpen: false }),
+  setAuthDrawerTab: (tab) => set({ authDrawerTab: tab }),
 
   initialize: async () => {
     if (get().status !== "idle") return;
