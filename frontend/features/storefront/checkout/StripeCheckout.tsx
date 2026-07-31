@@ -82,44 +82,49 @@ function PaymentForm({
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="mb-5 flex items-start justify-between gap-4">
-        <div>
-          <h2 id="stripe-payment-title" className="text-xl font-semibold">
-            Secure Stripe payment
-          </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Complete your ${payment.amount.toFixed(2)} payment securely.
-          </p>
+    <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between">
+      <div>
+        <div className="mb-4 flex items-start justify-between gap-4 border-b border-slate-100 pb-3">
+          <div>
+            <h2 id="stripe-payment-title" className="text-lg sm:text-xl font-semibold text-slate-900">
+              Secure Stripe payment
+            </h2>
+            <p className="mt-0.5 text-xs sm:text-sm text-slate-500">
+              Complete your ${payment.amount.toFixed(2)} payment securely.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={submitting}
+            aria-label="Close Stripe payment"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 shadow-sm disabled:opacity-50"
+          >
+            <X size={19} aria-hidden="true" />
+          </button>
+        </div>
+        <PaymentElement
+          options={{ layout: "tabs", paymentMethodOrder: ["card"] }}
+        />
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-slate-100 space-y-3 pb-8 sm:pb-0">
+        <div className="order_button">
+          <button type="submit" disabled={!stripe || submitting} className="w-full">
+            {submitting
+              ? "Processing payment..."
+              : `Pay $${payment.amount.toFixed(2)} with Stripe`}
+          </button>
         </div>
         <button
           type="button"
           onClick={onClose}
           disabled={submitting}
-          aria-label="Close Stripe payment"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+          className="w-full rounded border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
         >
-          <X size={19} aria-hidden="true" />
+          Cancel
         </button>
       </div>
-      <PaymentElement
-        options={{ layout: "tabs", paymentMethodOrder: ["card"] }}
-      />
-      <div className="order_button mt-5">
-        <button type="submit" disabled={!stripe || submitting}>
-          {submitting
-            ? "Processing payment..."
-            : `Pay $${payment.amount.toFixed(2)} with Stripe`}
-        </button>
-      </div>
-      <button
-        type="button"
-        onClick={onClose}
-        disabled={submitting}
-        className="mt-3 w-full rounded border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
-      >
-        Cancel
-      </button>
     </form>
   );
 }
@@ -188,18 +193,18 @@ export function StripeCheckout({
             },
           }}
         >
-          <div
-            className="fixed inset-0 z-[1000] flex items-center justify-center overflow-y-auto bg-black/65 p-4"
-            role="presentation"
-            onMouseDown={(event) => {
-              if (event.target === event.currentTarget) setPayment(null);
-            }}
-          >
+          <>
+            <div
+              className="fixed inset-0 z-[1100] bg-black/65 backdrop-blur-sm transition-opacity"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget) setPayment(null);
+              }}
+            />
             <div
               role="dialog"
               aria-modal="true"
               aria-labelledby="stripe-payment-title"
-              className="my-auto w-full max-w-lg rounded-xl bg-white p-5 shadow-2xl sm:p-7"
+              className="fixed inset-0 sm:left-auto sm:right-0 sm:top-0 sm:bottom-0 z-[1101] w-full sm:max-w-lg h-full min-h-[100dvh] bg-white shadow-2xl flex flex-col overflow-y-auto p-4 sm:p-7"
             >
               <PaymentForm
                 payment={payment}
@@ -207,7 +212,7 @@ export function StripeCheckout({
                 onSuccess={onSuccess}
               />
             </div>
-          </div>
+          </>
         </Elements>
       )}
     </>
