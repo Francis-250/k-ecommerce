@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import {
   Check,
   LockKeyhole,
@@ -23,6 +24,7 @@ import {
 } from "@/features/storefront/checkout/api";
 import { toast } from "sonner";
 import { useAuthStore } from "@/features/auth/store";
+import { customerApi } from "@/features/customer/api";
 
 type FieldProps = {
   id: string;
@@ -62,7 +64,25 @@ function Field({
   );
 }
 
-function DeliveryFields({ prefix = "shipping" }: { prefix?: string }) {
+type DeliveryValues = {
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+  street?: string;
+  apartment?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  phone?: string;
+};
+
+function DeliveryFields({
+  prefix = "shipping",
+  defaultValues,
+}: {
+  prefix?: string;
+  defaultValues?: DeliveryValues;
+}) {
   return (
     <div className="pc-fields">
       <div className="pc-field pc-field-full">
@@ -79,11 +99,15 @@ function DeliveryFields({ prefix = "shipping" }: { prefix?: string }) {
         id={`${prefix}-first-name`}
         label="First name"
         autoComplete="given-name"
+        defaultValue={defaultValues?.firstName}
+        key={`${prefix}-fn-${defaultValues?.firstName || ""}`}
       />
       <Field
         id={`${prefix}-last-name`}
         label="Last name"
         autoComplete="family-name"
+        defaultValue={defaultValues?.lastName}
+        key={`${prefix}-ln-${defaultValues?.lastName || ""}`}
       />
       <div className="pc-field-full">
         <Field
@@ -91,6 +115,8 @@ function DeliveryFields({ prefix = "shipping" }: { prefix?: string }) {
           label="Company"
           autoComplete="organization"
           required={false}
+          defaultValue={defaultValues?.company}
+          key={`${prefix}-co-${defaultValues?.company || ""}`}
         />
       </div>
       <div className="pc-field-full">
@@ -99,6 +125,8 @@ function DeliveryFields({ prefix = "shipping" }: { prefix?: string }) {
           label="Street address"
           autoComplete="address-line1"
           placeholder="House number and street name"
+          defaultValue={defaultValues?.street}
+          key={`${prefix}-st-${defaultValues?.street || ""}`}
         />
       </div>
       <div className="pc-field-full">
@@ -107,20 +135,38 @@ function DeliveryFields({ prefix = "shipping" }: { prefix?: string }) {
           label="Apartment, suite, etc."
           autoComplete="address-line2"
           required={false}
+          defaultValue={defaultValues?.apartment}
+          key={`${prefix}-apt-${defaultValues?.apartment || ""}`}
         />
       </div>
-      <Field id={`${prefix}-city`} label="City" autoComplete="address-level2" />
+      <Field
+        id={`${prefix}-city`}
+        label="City"
+        autoComplete="address-level2"
+        defaultValue={defaultValues?.city}
+        key={`${prefix}-ct-${defaultValues?.city || ""}`}
+      />
       <Field
         id={`${prefix}-state`}
         label="State"
         autoComplete="address-level1"
+        defaultValue={defaultValues?.state}
+        key={`${prefix}-stt-${defaultValues?.state || ""}`}
       />
-      <Field id={`${prefix}-zip`} label="ZIP code" autoComplete="postal-code" />
+      <Field
+        id={`${prefix}-zip`}
+        label="ZIP code"
+        autoComplete="postal-code"
+        defaultValue={defaultValues?.zip}
+        key={`${prefix}-zp-${defaultValues?.zip || ""}`}
+      />
       <Field
         id={`${prefix}-phone`}
         label="Phone"
         type="tel"
         autoComplete="tel"
+        defaultValue={defaultValues?.phone}
+        key={`${prefix}-ph-${defaultValues?.phone || ""}`}
       />
     </div>
   );
@@ -132,10 +178,42 @@ export default function CheckoutPage() {
   const { items, subtotal } = useCart();
   const user = useAuthStore((state) => state.user);
   const status = useAuthStore((state) => state.status);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [billingOpen, setBillingOpen] = useState(false);
   const [couponOpen, setCouponOpen] = useState(false);
   const [coupon, setCoupon] = useState("");
   const [completedOrder, setCompletedOrder] = useState("");
+
+  const { data: addresses = [] } = useQuery({
+    queryKey: ["customer", "addresses"],
+    queryFn: customerApi.listAddresses,
+    enabled: Boolean(user),
+  });
+
+  const selectedSavedAddress =
+    addresses.find((a) => a.id === selectedAddressId) || addresses[0];
+
+  const defaultDeliveryValues: DeliveryValues = useMemo(() => {
+    if (selectedSavedAddress) {
+      const parts = selectedSavedAddress.fullName.split(" ");
+      return {
+        firstName: parts[0] || user?.firstName || "",
+        lastName: parts.slice(1).join(" ") || user?.lastName || "",
+        company: selectedSavedAddress.company || "",
+        street: selectedSavedAddress.street || "",
+        apartment: selectedSavedAddress.street2 || "",
+        city: selectedSavedAddress.city || "",
+        state: selectedSavedAddress.province || "",
+        zip: selectedSavedAddress.postalCode || "",
+        phone: selectedSavedAddress.phone || user?.phone || "",
+      };
+    }
+    return {
+      firstName: user?.firstName || "",
+      lastName: user?.lastName || "",
+      phone: user?.phone || "",
+    };
+  }, [selectedSavedAddress, user]);
   const shipping = subtotal >= 100 ? 0 : items.length ? 12 : 0;
   const estimatedTotal = subtotal + shipping;
 
@@ -192,6 +270,28 @@ export default function CheckoutPage() {
         options: item.options,
       })),
     });
+
+    // Save shipping address to customer address book in backend
+    if (user && shippingAddress.line1 && shippingAddress.city) {
+      const fullName = `${shippingAddress.firstName} ${shippingAddress.lastName}`.trim();
+      customerApi
+        .createAddress({
+          fullName,
+          phone: shippingAddress.phone || "0000000000",
+          street: shippingAddress.line1,
+          street2: shippingAddress.line2 || null,
+          city: shippingAddress.city,
+          province: shippingAddress.state || null,
+          country: shippingAddress.country || "United States",
+          countryCode: shippingAddress.countryCode || "US",
+          postalCode: shippingAddress.postalCode || null,
+          company: shippingAddress.company || null,
+        })
+        .catch(() => {
+          // Address saved or ignore duplicate
+        });
+    }
+
     return order.id;
   }
 
@@ -288,7 +388,32 @@ export default function CheckoutPage() {
                   <p>Currently shipping to addresses in the United States.</p>
                 </div>
               </div>
-              <DeliveryFields />
+
+              {addresses.length > 0 && (
+                <div className="mb-4 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                  <label
+                    htmlFor="saved-address-select"
+                    className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1"
+                  >
+                    Use a saved address
+                  </label>
+                  <select
+                    id="saved-address-select"
+                    value={selectedSavedAddress?.id || ""}
+                    onChange={(e) => setSelectedAddressId(e.target.value)}
+                    className="w-full h-10 px-3 border border-slate-300 rounded bg-white text-sm font-medium text-slate-800"
+                  >
+                    {addresses.map((addr) => (
+                      <option key={addr.id} value={addr.id}>
+                        {addr.fullName} — {addr.street}, {addr.city}{" "}
+                        {addr.postalCode || ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <DeliveryFields defaultValues={defaultDeliveryValues} />
             </section>
 
             <section className="pc-card pc-options">
