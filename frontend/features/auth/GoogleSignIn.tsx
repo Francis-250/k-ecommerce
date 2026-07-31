@@ -95,6 +95,7 @@ export function GoogleSignIn() {
       size: "large",
       text: "continue_with",
       shape: "rectangular",
+      locale: "en",
       width: Math.min(360, button.current.clientWidth || 360),
     });
   }, [config.data?.clientId, handleCredential, scriptReady]);
@@ -102,7 +103,7 @@ export function GoogleSignIn() {
   return (
     <div className="mt-6">
       <Script
-        src="https://accounts.google.com/gsi/client"
+        src="https://accounts.google.com/gsi/client?hl=en"
         strategy="afterInteractive"
         onLoad={() => setScriptReady(true)}
         onError={() => toast.error("Unable to load Google sign-in.")}
