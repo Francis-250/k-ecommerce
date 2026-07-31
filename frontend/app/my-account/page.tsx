@@ -38,9 +38,9 @@ export default function MyAccountPage() {
           firstName: authUser.firstName,
           lastName: authUser.lastName,
           username: authUser.username ?? null,
-          phone: authUser.phone ?? null,
-          bio: authUser.bio ?? null,
-          avatar: authUser.avatar ?? null,
+          phone: (authUser as { phone?: string | null }).phone ?? null,
+          bio: (authUser as { bio?: string | null }).bio ?? null,
+          avatar: (authUser as { avatar?: string | null }).avatar ?? null,
           role: authUser.role,
           isVerified: authUser.isVerified ?? true,
         }
