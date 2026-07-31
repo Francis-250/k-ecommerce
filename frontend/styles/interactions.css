@@ -727,7 +727,7 @@ body.mobile-nav-open {
 .mobile-nav-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 998;
+  z-index: 1050;
   background: rgba(8, 47, 53, 0.65);
   backdrop-filter: blur(4px);
   opacity: 0;
@@ -745,7 +745,7 @@ body.mobile-nav-open {
   top: 0;
   bottom: 0;
   left: 0;
-  z-index: 999;
+  z-index: 1051;
   width: min(86vw, 320px);
   height: 100vh;
   background: #fffdf7;
@@ -820,7 +820,7 @@ body.mobile-nav-open {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  padding: 12px 0 24px;
+  padding: 12px 0 80px;
 }
 
 .mobile-drawer-nav ul {
@@ -903,7 +903,7 @@ body.mobile-nav-open {
 
 .mobile-drawer-footer {
   margin-top: auto;
-  padding: 18px 18px 0;
+  padding: 18px 18px 80px;
   border-top: 1px solid #eee8db;
 }
 
@@ -2264,7 +2264,7 @@ body.auth-drawer-open {
 .auth-drawer-body {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: 24px 24px 80px;
 }
 
 /* Auth Drawer Form Inputs & Buttons */
