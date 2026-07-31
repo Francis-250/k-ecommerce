@@ -72,6 +72,7 @@ export const sendEmail = async ({ to, subject, text, html }: EmailOptions) => {
 
     const payload: Record<string, any> = {
       sender: { name: senderName, email: senderEmail },
+      replyTo: { name: senderName, email: senderEmail },
       to: [{ email: to }],
       subject,
       textContent: text,
