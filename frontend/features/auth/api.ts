@@ -1,13 +1,15 @@
 export type AuthUser = {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  username: string | null;
-  avatar: string | null;
-  role: "CUSTOMER" | "STAFF" | "ADMIN" | "SUPER_ADMIN";
-  isVerified: boolean;
-  isActive: boolean;
+  firstName: string | null;
+  lastName: string | null;
+  username?: string | null;
+  phone?: string | null;
+  bio?: string | null;
+  avatar?: string | null;
+  role: "CUSTOMER" | "STAFF" | "ADMIN" | "SUPER_ADMIN" | string;
+  isVerified?: boolean;
+  isActive?: boolean;
 };
 
 type ApiEnvelope<T = undefined> = {

@@ -48,7 +48,7 @@ export function GoogleSignIn() {
   const button = useRef<HTMLDivElement>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [buttonRendered, setButtonRendered] = useState(false);
-  const googleLogin = useAuthStore((state) => state.logout ? state.googleLogin : state.googleLogin);
+  const googleLogin = useAuthStore((state) => state.googleLogin);
   const closeAuthDrawer = useAuthStore((state) => state.closeAuthDrawer);
   
   const config = useQuery({
@@ -109,7 +109,6 @@ export function GoogleSignIn() {
         size: "large",
         text: "continue_with",
         shape: "rectangular",
-        locale: "en",
         width: Math.min(360, button.current.clientWidth || 360),
       });
       setButtonRendered(true);
