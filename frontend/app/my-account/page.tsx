@@ -768,67 +768,125 @@ export default function MyAccountPage() {
         </>
       )}
 
-      {/* Order Details Modal */}
+      {/* Order Details Side Drawer */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-[1100] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-lg w-full p-4 sm:p-5 shadow-xl space-y-3 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <h3 className="font-bold text-slate-900 text-sm sm:text-base">
-                Order #{selectedOrder.orderNumber}
-              </h3>
+        <>
+          <div
+            className="fixed inset-0 z-[1100] bg-slate-950/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setSelectedOrder(null)}
+            aria-hidden="true"
+          />
+          <aside
+            className="fixed top-0 bottom-0 right-0 z-[1101] w-full max-w-lg h-full bg-white shadow-2xl flex flex-col overflow-hidden border-l border-slate-200"
+            aria-label={`Order #${selectedOrder.orderNumber}`}
+          >
+            <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 bg-slate-50">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-slate-900 text-sm sm:text-base">
+                    Order #{selectedOrder.orderNumber}
+                  </h3>
+                  <span className="inline-block px-2 py-0.5 text-[10px] uppercase font-bold text-slate-700 bg-white border border-slate-200 rounded">
+                    {selectedOrder.status}
+                  </span>
+                </div>
+                <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
+                  Placed on {new Date(selectedOrder.createdAt).toLocaleDateString()}
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="text-slate-400 hover:text-slate-600"
+                className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 shadow-sm"
+                aria-label="Close order details"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <div className="divide-y divide-slate-100 border border-slate-200 rounded">
-                {selectedOrder.items?.map((item) => (
-                  <div key={item.id} className="p-2.5 flex justify-between">
-                    <div>
-                      <p className="font-semibold text-slate-900">{item.productName}</p>
-                      <p className="text-slate-500 text-[11px]">
-                        ${Number(item.unitPrice).toFixed(2)} × {item.quantity}
-                      </p>
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-xs pb-24">
+              <div>
+                <h4 className="font-semibold text-slate-900 text-xs mb-2">
+                  Items Purchased ({selectedOrder.items?.length || 0})
+                </h4>
+                <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden bg-white">
+                  {selectedOrder.items?.map((item) => (
+                    <div key={item.id} className="p-3 flex justify-between items-center gap-3">
+                      <div>
+                        <p className="font-semibold text-slate-900 text-xs">{item.productName}</p>
+                        <p className="text-slate-500 text-[11px]">
+                          ${Number(item.unitPrice).toFixed(2)} × {item.quantity}
+                        </p>
+                      </div>
+                      <span className="font-bold text-slate-900 text-xs shrink-0">
+                        ${Number(item.total).toFixed(2)}
+                      </span>
                     </div>
-                    <span className="font-bold text-slate-900">
-                      ${Number(item.total).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
-              <div className="bg-slate-50 p-3 rounded space-y-1">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>${Number(selectedOrder.subtotal).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>${Number(selectedOrder.shippingTotal).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-bold text-slate-900 border-t border-slate-200 pt-1">
-                  <span>Total</span>
-                  <span>${Number(selectedOrder.total).toFixed(2)}</span>
+              {(() => {
+                const shippingAddress =
+                  selectedOrder.addresses?.find((a) => a.type === "SHIPPING") ||
+                  (selectedOrder as unknown as { shippingAddress?: any }).shippingAddress;
+                if (!shippingAddress) return null;
+                return (
+                  <div>
+                    <h4 className="font-semibold text-slate-900 text-xs mb-1.5">
+                      Shipping Address
+                    </h4>
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-600 text-xs leading-relaxed">
+                      <p className="font-semibold text-slate-900 mb-0.5">
+                        {shippingAddress.fullName || `${shippingAddress.firstName} ${shippingAddress.lastName || ""}`.trim()}
+                      </p>
+                      <p>{shippingAddress.street || shippingAddress.line1}</p>
+                      <p>
+                        {shippingAddress.city},{" "}
+                        {shippingAddress.province || shippingAddress.state || ""}{" "}
+                        {shippingAddress.postalCode || ""}
+                      </p>
+                      <p>{shippingAddress.country}</p>
+                      {shippingAddress.phone && (
+                        <p className="mt-1 text-slate-500">Phone: {shippingAddress.phone}</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div>
+                <h4 className="font-semibold text-slate-900 text-xs mb-1.5">
+                  Payment Summary
+                </h4>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1.5 text-xs">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Subtotal</span>
+                    <span>${Number(selectedOrder.subtotal).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-600">
+                    <span>Shipping</span>
+                    <span>${Number(selectedOrder.shippingTotal).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-slate-900 border-t border-slate-200 pt-2 text-sm">
+                    <span>Total</span>
+                    <span>${Number(selectedOrder.total).toFixed(2)}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="pt-2 flex justify-end">
+            <div className="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
               <button
                 type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="w-full sm:w-auto px-4 py-2 bg-slate-800 text-white text-xs font-semibold rounded"
+                className="w-full sm:w-auto px-5 py-2 bg-[#082f35] text-white text-xs font-semibold rounded hover:bg-[#062429]"
               >
-                Close
+                Close Order Details
               </button>
             </div>
-          </div>
-        </div>
+          </aside>
+        </>
       )}
     </StorefrontShell>
   );
