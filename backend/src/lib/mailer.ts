@@ -3,8 +3,8 @@ import "dotenv/config";
 interface EmailOptions {
   to: string;
   subject: string;
-  text: string;
-  html?: string;
+  html: string;
+  text?: string;
 }
 
 export function generateOtpEmailHtml(otp: string, title = "Verification Code") {
@@ -60,26 +60,23 @@ export function generateOtpEmailHtml(otp: string, title = "Verification Code") {
   `;
 }
 
-export const sendEmail = async ({ to, subject, text, html }: EmailOptions) => {
+export const sendEmail = async ({ to, subject, html, text }: EmailOptions) => {
   try {
-    const senderEmail = process.env.SMTP_FROM || process.env.SMTP_USER || "munyankindif0@gmail.com";
-    const senderName = process.env.SMTP_FROM_NAME || "I-RAS Store";
     const apiKey = process.env.BREVO_API_KEY;
+    const senderEmail =
+      process.env.BREVO_SENDER_EMAIL ??
+      process.env.BREVO_EMAIL_USER ??
+      "munyankindif0@gmail.com";
+    const senderName = process.env.BREVO_SENDER_NAME || "I-RAS Store";
 
     if (!apiKey) {
-      throw new Error("BREVO_API_KEY is missing from environment variables");
+      console.error("Email error: BREVO_API_KEY is not configured");
+      return false;
     }
 
-    const payload: Record<string, any> = {
-      sender: { name: senderName, email: senderEmail },
-      replyTo: { name: senderName, email: senderEmail },
-      to: [{ email: to }],
-      subject,
-      textContent: text,
-    };
-
-    if (html) {
-      payload.htmlContent = html;
+    if (!senderEmail) {
+      console.error("Email error: BREVO_SENDER_EMAIL is not configured");
+      return false;
     }
 
     const response = await fetch("https://api.brevo.com/v3/smtp/email", {
@@ -89,20 +86,47 @@ export const sendEmail = async ({ to, subject, text, html }: EmailOptions) => {
         "api-key": apiKey,
         "content-type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        sender: {
+          name: senderName,
+          email: senderEmail,
+        },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+        ...(text ? { textContent: text } : {}),
+      }),
     });
 
-    const data = (await response.json()) as { messageId?: string; message?: string; code?: string };
+    const responseText = await response.text();
+    let responseBody: unknown = responseText;
 
-    if (!response.ok) {
-      throw new Error(data.message || `Brevo API returned status ${response.status}`);
+    try {
+      responseBody = responseText ? JSON.parse(responseText) : null;
+    } catch {
+      // Brevo can return a non-JSON proxy response.
     }
 
-    console.log("Email sent successfully via Brevo API:", data.messageId);
-    return data;
+    if (!response.ok) {
+      console.error("Brevo email error:", {
+        status: response.status,
+        response: responseBody,
+      });
+      return false;
+    }
+
+    console.log("Email sent to:", to);
+    return true;
   } catch (error) {
-    console.error("Error sending email via Brevo:", error);
-    throw error;
+    console.error("Email error:", error);
+    return false;
   }
 };
 
+export const sendEmailOrThrow = async (options: EmailOptions) => {
+  const sent = await sendEmail(options);
+
+  if (!sent) {
+    throw new Error("Email delivery failed. Check the Brevo sender configuration.");
+  }
+};
