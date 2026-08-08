@@ -9,17 +9,19 @@ import {
   ArticleSections,
   BackLink,
 } from "@/features/storefront/content/ContentUi";
-import { blogPosts, getBlogPost } from "@/features/storefront/content/data";
+import { getBlogPostBySlug, getBlogPosts } from "@/features/storefront/content/api";
 
-export function generateStaticParams() {
-  return blogPosts.map(({ slug }) => ({ slug }));
+export async function generateStaticParams() {
+  const posts = await getBlogPosts();
+  return posts.map(({ slug }) => ({ slug }));
 }
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const post = getBlogPost((await params).slug);
+  const { slug } = await params;
+  const post = await getBlogPostBySlug(slug);
   return post
     ? { title: `${post.title} | I-RAS STYLES`, description: post.excerpt }
     : {};
@@ -30,7 +32,8 @@ export default async function BlogPostPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const post = getBlogPost((await params).slug);
+  const { slug } = await params;
+  const post = await getBlogPostBySlug(slug);
   if (!post) notFound();
   return (
     <StorefrontShell>

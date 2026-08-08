@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -178,11 +178,24 @@ export default function CheckoutPage() {
   const { items, subtotal } = useCart();
   const user = useAuthStore((state) => state.user);
   const status = useAuthStore((state) => state.status);
+  const initialize = useAuthStore((state) => state.initialize);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [billingOpen, setBillingOpen] = useState(false);
   const [couponOpen, setCouponOpen] = useState(false);
   const [coupon, setCoupon] = useState("");
   const [completedOrder, setCompletedOrder] = useState("");
+
+  useEffect(() => {
+    if (status === "idle") {
+      void initialize();
+      return;
+    }
+
+    if (status === "unauthenticated" || (status !== "loading" && !user)) {
+      toast.error("Please sign in to access checkout.");
+      router.replace("/login?redirect=/checkout");
+    }
+  }, [initialize, router, status, user]);
 
   const { data: addresses = [] } = useQuery({
     queryKey: ["customer", "addresses"],
@@ -295,6 +308,48 @@ export default function CheckoutPage() {
     return order.id;
   }
 
+  if (status === "idle" || status === "loading") {
+    return (
+      <StorefrontShell>
+        <Breadcrumb title="Checkout" />
+        <div className="grid min-h-[450px] place-items-center bg-white">
+          <div className="flex flex-col items-center gap-3">
+            <div
+              className="size-9 animate-spin rounded-full border-2 border-slate-300 border-t-slate-900"
+              role="status"
+              aria-label="Checking authentication access"
+            />
+            <p className="text-sm font-medium text-slate-600">Verifying session...</p>
+          </div>
+        </div>
+      </StorefrontShell>
+    );
+  }
+
+  if (status === "unauthenticated" || !user) {
+    return (
+      <StorefrontShell>
+        <Breadcrumb title="Checkout" />
+        <div className="grid min-h-[450px] place-items-center bg-white">
+          <div className="flex flex-col items-center gap-3 text-center px-4">
+            <LockKeyhole size={36} className="text-slate-400" />
+            <h2 className="text-xl font-bold text-slate-900">Sign in to Checkout</h2>
+            <p className="text-sm text-slate-600 max-w-sm">
+              You must be logged in to access the checkout page. Redirecting to login...
+            </p>
+            <button
+              type="button"
+              onClick={() => router.replace("/login?redirect=/checkout")}
+              className="mt-2 rounded-lg bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
+            >
+              Sign In Now
+            </button>
+          </div>
+        </div>
+      </StorefrontShell>
+    );
+  }
+
   if (completedOrder) {
     return (
       <StorefrontShell>
@@ -360,7 +415,11 @@ export default function CheckoutPage() {
                   <h2>Contact information</h2>
                   <p>We’ll send your receipt and delivery updates here.</p>
                 </div>
-                {status !== "authenticated" && <a href="/login">Sign in</a>}
+                {user?.email && (
+                  <span className="text-xs font-medium text-slate-500">
+                    Logged in as {user.email}
+                  </span>
+                )}
               </div>
               <div className="pc-fields">
                 <div className="pc-field-full">

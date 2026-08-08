@@ -38,7 +38,16 @@ export function LoginForm() {
       toast.success("Welcome back!");
       closeAuthDrawer();
       const currentUser = useAuthStore.getState().user;
-      if (currentUser?.role === "ADMIN" || currentUser?.role === "SUPER_ADMIN") {
+      const redirect =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("redirect")
+          : null;
+      if (redirect && redirect.startsWith("/")) {
+        router.push(redirect);
+      } else if (
+        currentUser?.role === "ADMIN" ||
+        currentUser?.role === "SUPER_ADMIN"
+      ) {
         router.push("/admin");
       } else {
         router.push("/");

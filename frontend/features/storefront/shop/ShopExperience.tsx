@@ -272,6 +272,7 @@ export function ShopExperience({
                   height={220}
                   priority
                   unoptimized
+                  style={{ width: "100%", height: "auto" }}
                 />
               </div>
             ) : (

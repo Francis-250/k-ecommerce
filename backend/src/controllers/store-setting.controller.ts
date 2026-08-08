@@ -83,6 +83,20 @@ const schema = z.object({
   key: z.string().min(1).max(120),
   value: z.unknown(),
 });
+export const getStoreSettingByKey = async (req: Request, res: Response) => {
+  const key = String(req.params.key);
+  const setting = await prisma.storeSetting.findUnique({
+    where: { key },
+  });
+  if (!setting) {
+    return res.status(404).json({
+      success: false,
+      message: `Setting '${key}' not found`,
+    });
+  }
+  return res.json({ success: true, setting });
+};
+
 export const listStoreSettings = async (_req: Request, res: Response) =>
   res.json({
     success: true,

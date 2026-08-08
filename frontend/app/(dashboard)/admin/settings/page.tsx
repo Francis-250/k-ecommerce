@@ -4,6 +4,7 @@ import {
   Bell,
   CheckCircle2,
   CreditCard,
+  FileText,
   Globe2,
   ImageIcon,
   LoaderCircle,
@@ -21,6 +22,7 @@ import { toast } from "sonner";
 import { AdminPageHeader } from "../_components/AdminPageHeader";
 import { ImageUploadField } from "../_components/AdminFormUI";
 import { StorefrontAppearanceSettings } from "../_components/StorefrontAppearanceSettings";
+import { AdminContentManagement } from "../_components/AdminContentManagement";
 
 type SettingItem = {
   id: string;
@@ -226,6 +228,8 @@ export default function SettingsPage() {
 
         <div className="p-6 sm:p-8">
           {tab === "appearance" && <StorefrontAppearanceSettings />}
+
+          {tab === "content" && <AdminContentManagement />}
 
           {tab === "store" && (
             <div className="grid max-w-5xl gap-8 lg:grid-cols-[1fr_300px]">

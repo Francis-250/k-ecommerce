@@ -295,6 +295,7 @@ export function StorefrontHome() {
                             width={420}
                             height={180}
                             unoptimized
+                            style={{ width: "100%", height: "auto" }}
                           />
                           <div
                             className={`banner_title ${index === 1 ? "title_2" : ""}`}

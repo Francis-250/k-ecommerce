@@ -9,11 +9,13 @@ import {
   CheckCheck,
   ChevronDown,
   ExternalLink,
+  LogOut,
   Menu,
   MessageSquareText,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
+  Settings,
   Tag,
   X,
 } from "lucide-react";
@@ -25,6 +27,8 @@ import {
   useMarkAlertsAsRead,
 } from "@/features/admin/catalog/hooks";
 import { useGeneralStoreSettings } from "@/features/admin/hooks/useGeneralStoreSettings";
+import { useAuthStore } from "@/features/auth/store";
+import { toast } from "sonner";
 
 export function AdminHeader({
   collapsed,
@@ -37,8 +41,10 @@ export function AdminHeader({
 }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
 
   const settings = useGeneralStoreSettings();
   const adminInitials = (settings.adminName || "AD")
@@ -263,35 +269,75 @@ export function AdminHeader({
 
         <div className="mx-1 hidden h-6 w-px bg-slate-200 sm:block" />
 
-        <button className="flex shrink-0 items-center gap-2 rounded-lg p-1 pr-2 hover:bg-slate-100 transition-colors">
-          {settings.adminAvatarUrl ? (
-            <Image
-              src={settings.adminAvatarUrl}
-              alt={settings.adminName}
-              width={32}
-              height={32}
-              unoptimized
-              className="size-8 rounded-lg object-cover"
+        <div className="relative">
+          <button
+            onClick={() => setUserMenuOpen((v) => !v)}
+            className="flex shrink-0 items-center gap-2 rounded-lg p-1 pr-2 hover:bg-slate-100 transition-colors"
+          >
+            {settings.adminAvatarUrl ? (
+              <Image
+                src={settings.adminAvatarUrl}
+                alt={settings.adminName}
+                width={32}
+                height={32}
+                unoptimized
+                className="size-8 rounded-lg object-cover"
+              />
+            ) : (
+              <span className="grid size-8 place-items-center rounded-lg bg-slate-950 text-xs font-semibold text-white">
+                {adminInitials}
+              </span>
+            )}
+            <span className="hidden text-left xl:block">
+              <span className="block text-sm font-medium leading-tight text-slate-800">
+                {settings.adminName}
+              </span>
+              <span className="block text-[11px] leading-tight text-slate-500">
+                {settings.adminEmail || "Store manager"}
+              </span>
+            </span>
+            <ChevronDown
+              className="hidden text-slate-400 sm:block"
+              size={14}
+              strokeWidth={2}
             />
-          ) : (
-            <span className="grid size-8 place-items-center rounded-lg bg-slate-950 text-xs font-semibold text-white">
-              {adminInitials}
-            </span>
+          </button>
+
+          {userMenuOpen && (
+            <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg z-50 animate-in fade-in-50 zoom-in-95 duration-100">
+              <div className="border-b border-slate-100 px-3 py-2">
+                <p className="text-sm font-semibold text-slate-900">{settings.adminName}</p>
+                <p className="text-xs text-slate-500 truncate">{settings.adminEmail}</p>
+              </div>
+              <div className="py-1">
+                <Link
+                  href="/admin/settings"
+                  onClick={() => setUserMenuOpen(false)}
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  <Settings size={15} /> Store Settings
+                </Link>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setUserMenuOpen(false);
+                    try {
+                      await logout();
+                      toast.success("Logged out successfully");
+                    } catch {
+                      // ignore
+                    } finally {
+                      router.push("/login");
+                    }
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50"
+                >
+                  <LogOut size={15} /> Log out
+                </button>
+              </div>
+            </div>
           )}
-          <span className="hidden text-left xl:block">
-            <span className="block text-sm font-medium leading-tight text-slate-800">
-              {settings.adminName}
-            </span>
-            <span className="block text-[11px] leading-tight text-slate-500">
-              {settings.adminEmail || "Store manager"}
-            </span>
-          </span>
-          <ChevronDown
-            className="hidden text-slate-400 sm:block"
-            size={14}
-            strokeWidth={2}
-          />
-        </button>
+        </div>
       </div>
 
       {/* Expandable Mobile Search Bar */}

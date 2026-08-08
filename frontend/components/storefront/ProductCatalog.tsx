@@ -206,6 +206,7 @@ export function Sidebar({
                   width={270}
                   height={130}
                   unoptimized
+                  style={{ width: "100%", height: "auto" }}
                 />
               </div>
               <div className="banner_img">
@@ -215,6 +216,7 @@ export function Sidebar({
                   width={270}
                   height={130}
                   unoptimized
+                  style={{ width: "100%", height: "auto" }}
                 />
               </div>
             </>
@@ -268,6 +270,7 @@ export function Sidebar({
                 width={270}
                 height={340}
                 unoptimized
+                style={{ width: "100%", height: "auto" }}
               />
             </div>
           </div>

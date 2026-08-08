@@ -1185,6 +1185,112 @@ async function main() {
     },
   });
 
+  // Seed Page Settings for About, Services, FAQ, Contact
+  await prisma.storeSetting.upsert({
+    where: { key: "pages.about" },
+    update: {},
+    create: {
+      key: "pages.about",
+      updatedBy: admin.id,
+      value: {
+        eyebrow: "Our story",
+        title: "Style made thoughtful",
+        description: "I-RAS STYLES brings together enduring design, honest quality, and an easy sense of individuality.",
+        since: "Since 2010",
+        heading: "Designed for real wardrobes and real lives",
+        paragraphs: [
+          "We started I-RAS STYLES with a simple belief: good style should feel considered, useful, and entirely your own.",
+          "Our team works across design, sourcing, and storytelling to create collections that balance modern perspective with lasting appeal."
+        ],
+        values: [
+          { title: "Purposeful design", text: "Every detail should earn its place and make daily life feel easier." },
+          { title: "Lasting quality", text: "We favour materials and construction designed to be worn, loved, and kept." },
+          { title: "Personal style", text: "Confidence comes from clothes that support the person wearing them." }
+        ],
+        howWeWork: {
+          heading: "Craftsmanship & Consideration",
+          text: "From initial sketches to final fitting, every piece passes through dozens of hands dedicated to precision, comfort, and sustainable practice."
+        }
+      }
+    }
+  });
+
+  await prisma.storeSetting.upsert({
+    where: { key: "pages.services" },
+    update: {},
+    create: {
+      key: "pages.services",
+      updatedBy: admin.id,
+      value: {
+        cards: [
+          { title: "DESIGN THE COVER", image: "/storefront/img/services/service2.jpg", description: "Creative vision and art direction tailored to modern brand identity." },
+          { title: "BUILD YOUR BRAND", image: "/storefront/img/services/service1.jpg", description: "Full-scale brand identity development and strategic positioning." },
+          { title: "CREATE THE EXPERIENCE", image: "/storefront/img/services/service3.jpg", description: "Digital storefront architecture and seamless customer experience design." }
+        ],
+        heading: "OUR SERVICES",
+        subheading: "Thoughtful solutions crafted to elevate fashion brands and retail experiences.",
+        services: [
+          { name: "BRANDING", icon: "◆", description: "Distinct visual identity and brand guidelines." },
+          { name: "WEB DESIGN", icon: "◈", description: "Modern, responsive storefront interfaces." },
+          { name: "PHOTOGRAPHY", icon: "●", description: "High-end lookbook and product photography." },
+          { name: "CODING", icon: "⚙", description: "Performant full-stack e-commerce architecture." },
+          { name: "DEVELOPMENT", icon: "⌘", description: "Custom storefront features and integrations." },
+          { name: "MARKETING", icon: "▥", description: "Targeted digital marketing and launch strategies." },
+          { name: "SUPPORT", icon: "♬", description: "Ongoing technical and operational support." },
+          { name: "GRAPHIC DESIGN", icon: "✦", description: "Print, packaging, and digital asset creation." }
+        ],
+        unlimitedSection: {
+          title: "UNLIMITED IDEAS",
+          text: "We partner with visionary brands to elevate their presence through design, strategy, and seamless execution.",
+          image: "/storefront/img/services/service4.jpg",
+          ctaText: "More info",
+          ctaLink: "/contact"
+        }
+      }
+    }
+  });
+
+  await prisma.storeSetting.upsert({
+    where: { key: "pages.faq" },
+    update: {},
+    create: {
+      key: "pages.faq",
+      updatedBy: admin.id,
+      value: {
+        title: "Frequently asked questions",
+        introHeading: "Below are frequently asked questions; you may find the answer for yourself.",
+        introText: "Have questions about ordering, shipping, sizing, or returns? Find quick answers below.",
+        items: [
+          { question: "How long does shipping take?", answer: "Standard delivery within the US takes 3-5 business days. Express international shipping takes 5-7 business days with tracking." },
+          { question: "Can I track my order in real-time?", answer: "Yes! Once your order is shipped, you will receive a tracking link via email and on your account dashboard." },
+          { question: "What is your return policy?", answer: "We offer a 30-day return policy on all unworn items in original condition with tags attached." },
+          { question: "How do I choose the right size?", answer: "Check our detailed size guide on each product page or contact our styling team for personal fit advice." },
+          { question: "Do you offer custom tailoring or styling advice?", answer: "Yes, our team offers personal styling consultations and custom garment tailoring for select collections." },
+          { question: "Which payment methods are accepted?", answer: "We accept all major credit/debit cards via Stripe, including Visa, MasterCard, and American Express." }
+        ]
+      }
+    }
+  });
+
+  await prisma.storeSetting.upsert({
+    where: { key: "pages.contact" },
+    update: {},
+    create: {
+      key: "pages.contact",
+      updatedBy: admin.id,
+      value: {
+        title: "Tell us your project",
+        sidebarTitle: "Contact us",
+        sidebarDescription: "We would love to hear from you. Reach out with questions, inquiries, or custom project requests.",
+        address: "No 40 Baria Street 133/2, New York City",
+        email: "info@roadthemes.com",
+        phone: "0 (1234) 567 890",
+        workingHours: "Monday – Saturday: 08AM – 22PM",
+        storeNotice: "Visit our flagship store at No 40 Baria Street 133/2, New York City"
+      }
+    }
+  });
+
   await prisma.storeSetting.upsert({
     where: { key: "storefront.appearance" },
     update: {

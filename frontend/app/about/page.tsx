@@ -6,35 +6,25 @@ import {
   StorefrontShell,
 } from "@/components/storefront/StorefrontShell";
 import { PageIntro } from "@/features/storefront/content/ContentUi";
+import { getAboutPageContent } from "@/features/storefront/content/api";
 
 export const metadata: Metadata = {
   title: "About | I-RAS STYLES",
   description:
     "Meet I-RAS STYLES and discover our approach to enduring, thoughtful style.",
 };
-const values = [
-  {
-    title: "Purposeful design",
-    text: "Every detail should earn its place and make daily life feel easier.",
-  },
-  {
-    title: "Lasting quality",
-    text: "We favour materials and construction designed to be worn, loved, and kept.",
-  },
-  {
-    title: "Personal style",
-    text: "Confidence comes from clothes that support the person wearing them.",
-  },
-];
-export default function AboutPage() {
+
+export default async function AboutPage() {
+  const content = await getAboutPageContent();
+
   return (
     <StorefrontShell>
       <Breadcrumb title="About us" />
       <main className="coron-container coron-content">
         <PageIntro
-          eyebrow="Our story"
-          title="Style made thoughtful"
-          description="I-RAS STYLES brings together enduring design, honest quality, and an easy sense of individuality."
+          eyebrow={content.eyebrow}
+          title={content.title}
+          description={content.description}
         />
         <section className="grid items-center gap-10 lg:grid-cols-2">
           <Image
@@ -47,21 +37,15 @@ export default function AboutPage() {
           />
           <div>
             <p className="mb-3 text-xs font-bold uppercase tracking-[.2em] text-[#D4AF4A]">
-              Since 2010
+              {content.since}
             </p>
             <h2 className="mb-5 text-3xl leading-tight text-[#333]">
-              Designed for real wardrobes and real lives
+              {content.heading}
             </h2>
             <div className="space-y-4 text-base leading-7 text-[#666]">
-              <p>
-                We started I-RAS STYLES with a simple belief: good style should
-                feel considered, useful, and entirely your own.
-              </p>
-              <p>
-                Our team works across design, sourcing, and storytelling to
-                create collections that balance modern perspective with lasting
-                appeal.
-              </p>
+              {content.paragraphs.map((p, idx) => (
+                <p key={idx}>{p}</p>
+              ))}
             </div>
             <Link className="coron-btn mt-6 inline-block" href="/portfolio">
               Explore our work
@@ -71,7 +55,7 @@ export default function AboutPage() {
         <section className="my-14 border-y border-[#e5e5e5] py-12">
           <h2 className="sr-only">Our values</h2>
           <div className="grid gap-8 md:grid-cols-3">
-            {values.map((value, index) => (
+            {content.values.map((value, index) => (
               <article key={value.title}>
                 <span
                   className="mb-4 block text-3xl font-bold text-[#D4AF4A]"
@@ -100,15 +84,10 @@ export default function AboutPage() {
               How we work
             </p>
             <h2 className="mb-5 text-3xl text-[#333]">
-              Curiosity, craft, and close collaboration
+              {content.howWeWork.heading}
             </h2>
             <p className="mb-4 text-base leading-7 text-[#666]">
-              From the first sketch to the final fitting, we ask what will make
-              a piece more useful, more expressive, and better made.
-            </p>
-            <p className="text-base leading-7 text-[#666]">
-              That same care shapes our campaigns, customer experience, and the
-              long-term relationships behind every collection.
+              {content.howWeWork.text}
             </p>
           </div>
         </section>

@@ -10,19 +10,21 @@ import {
   BackLink,
 } from "@/features/storefront/content/ContentUi";
 import {
-  getPortfolioProject,
-  portfolioProjects,
-} from "@/features/storefront/content/data";
+  getPortfolioProjectBySlug,
+  getPortfolioProjects,
+} from "@/features/storefront/content/api";
 
-export function generateStaticParams() {
-  return portfolioProjects.map(({ slug }) => ({ slug }));
+export async function generateStaticParams() {
+  const projects = await getPortfolioProjects();
+  return projects.map(({ slug }) => ({ slug }));
 }
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const project = getPortfolioProject((await params).slug);
+  const { slug } = await params;
+  const project = await getPortfolioProjectBySlug(slug);
   return project
     ? { title: `${project.title} | I-RAS STYLES`, description: project.summary }
     : {};
@@ -32,7 +34,8 @@ export default async function ProjectPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const project = getPortfolioProject((await params).slug);
+  const { slug } = await params;
+  const project = await getPortfolioProjectBySlug(slug);
   if (!project) notFound();
   return (
     <StorefrontShell>

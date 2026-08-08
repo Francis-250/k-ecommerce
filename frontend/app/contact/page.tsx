@@ -1,49 +1,41 @@
+import type { Metadata } from "next";
 import {
   Breadcrumb,
   StorefrontShell,
 } from "@/components/storefront/StorefrontShell";
-export default function ContactPage() {
+import { getContactPageContent } from "@/features/storefront/content/api";
+import { ContactFormUI } from "./ContactFormUI";
+
+export const metadata: Metadata = {
+  title: "Contact | I-RAS STYLES",
+  description: "Get in touch with I-RAS STYLES for inquiries, support, and custom styling projects.",
+};
+
+export default async function ContactPage() {
+  const content = await getContactPageContent();
+
   return (
     <StorefrontShell>
       <Breadcrumb title="Contact" />
       <main className="coron-container coron-content">
         <div className="coron-two">
           <section>
-            <h1 className="coron-page-title">Tell us your project</h1>
-            <form className="coron-form">
-              <div className="coron-two">
-                <input aria-label="Name" placeholder="Name *" required />
-                <input
-                  aria-label="Email"
-                  placeholder="Email *"
-                  type="email"
-                  required
-                />
-                <input aria-label="Subject" placeholder="Subject *" />
-                <input aria-label="Phone" placeholder="Phone *" type="tel" />
-              </div>
-              <textarea aria-label="Message" placeholder="Message *" required />
-              <button className="coron-btn" type="submit">
-                Send message
-              </button>
-            </form>
+            <h1 className="coron-page-title">{content.title}</h1>
+            <ContactFormUI />
           </section>
           <aside className="coron-article">
-            <h2 className="coron-page-title">Contact us</h2>
+            <h2 className="coron-page-title">{content.sidebarTitle}</h2>
+            <p>{content.sidebarDescription}</p>
+            <p>Address: {content.address}</p>
             <p>
-              Claritas est etiam processus dynamicus, qui sequitur mutationem
-              consuetudium lectorum.
-            </p>
-            <p>Address: No 40 Baria Street 133/2, New York City</p>
-            <p>
-              <a href="mailto:info@roadthemes.com">info@roadthemes.com</a>
+              <a href={`mailto:${content.email}`}>{content.email}</a>
             </p>
             <p>
-              <a href="tel:+01234567890">0 (1234) 567 890</a>
+              <a href={`tel:${content.phone.replace(/[^0-9+]/g, "")}`}>{content.phone}</a>
             </p>
             <h3>Working hours</h3>
             <p>
-              <strong>Monday – Saturday:</strong> 08AM – 22PM
+              <strong>{content.workingHours}</strong>
             </p>
           </aside>
         </div>
@@ -56,7 +48,7 @@ export default function ContactPage() {
           }}
         >
           <h2>Visit our store</h2>
-          <p>No 40 Baria Street 133/2, New York City</p>
+          <p>{content.storeNotice}</p>
         </div>
       </main>
     </StorefrontShell>

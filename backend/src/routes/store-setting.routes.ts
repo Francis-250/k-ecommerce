@@ -3,6 +3,7 @@ import * as c from "../controllers/store-setting.controller";
 import { requireAdmin, verifyToken } from "../middlewares/auth.middleware";
 const router = Router();
 router.get("/storefront", c.getStorefrontAppearance);
+router.get("/public/:key", c.getStoreSettingByKey);
 router.use(verifyToken, requireAdmin);
 router.put("/storefront", c.updateStorefrontAppearance);
 router.get("/", c.listStoreSettings);
