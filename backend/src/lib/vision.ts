@@ -45,9 +45,14 @@ export async function preloadVisionModel() {
  */
 export async function generateImageEmbedding(imageUrlOrBuffer: string | Buffer): Promise<number[]> {
   try {
-    const inputImage = Buffer.isBuffer(imageUrlOrBuffer) 
-      ? new Blob([new Uint8Array(imageUrlOrBuffer)]) 
-      : imageUrlOrBuffer;
+    let inputImage: any = imageUrlOrBuffer;
+    if (Buffer.isBuffer(imageUrlOrBuffer)) {
+      inputImage = new Blob([new Uint8Array(imageUrlOrBuffer)]);
+    } else if (typeof imageUrlOrBuffer === "string" && imageUrlOrBuffer.startsWith("data:")) {
+      const base64Data = imageUrlOrBuffer.split(",")[1] || imageUrlOrBuffer;
+      const buffer = Buffer.from(base64Data, "base64");
+      inputImage = new Blob([new Uint8Array(buffer)]);
+    }
 
     // Race extraction against a 10s timeout to prevent hanging on cold boot
     const extractionPromise = (async () => {
