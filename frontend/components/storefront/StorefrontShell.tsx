@@ -258,20 +258,22 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                               searchFocused && searchQuery.length > 0
                             }
                           />
-                          <div className="search_actions">
-                            <button
-                              type="button"
-                              className="visual-search-btn"
-                              onClick={() => setIsVisualSearchOpen(true)}
-                              title="Search by Image"
-                              aria-label="Search by Image"
-                            >
-                              <Camera size={18} aria-hidden="true" />
-                            </button>
-                            <button type="submit" aria-label="Search">
-                              <Search size={18} aria-hidden="true" />
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            className="visual-search-btn"
+                            onClick={() => setIsVisualSearchOpen(true)}
+                            title="Search by Image"
+                            aria-label="Search by Image"
+                          >
+                            <Camera size={18} aria-hidden="true" />
+                          </button>
+                          <button
+                            type="submit"
+                            className="search-submit-btn"
+                            aria-label="Search"
+                          >
+                            <Search size={18} aria-hidden="true" />
+                          </button>
                         </form>
                         {searchFocused && searchQuery.trim() && (
                           <div

@@ -188,39 +188,58 @@ button:focus-visible {
   position: relative;
   height: 38px;
 }
+
 .search_bar form input {
   height: 38px;
-  padding-right: 80px !important;
+  padding-right: 86px !important;
 }
-.search_bar form button {
-  height: 38px;
+
+.search_bar form button.visual-search-btn {
+  position: absolute !important;
+  right: 42px !important;
+  top: 0 !important;
+  width: 40px !important;
+  height: 38px !important;
+  background: transparent !important;
+  border: none !important;
+  border-right: 1px solid #e2e8f0 !important;
+  color: #555555 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+  border-radius: 0 !important;
 }
-.search_actions {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding-right: 4px;
+
+.search_bar form button.visual-search-btn:hover {
+  color: #e84c3d !important;
+  background: #f8fafc !important;
 }
-.visual-search-btn {
-  background: transparent;
-  border: none;
-  color: #555555;
-  cursor: pointer;
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+
+.search_bar form button.search-submit-btn,
+.search_bar form button[type="submit"] {
+  position: absolute !important;
+  right: 0 !important;
+  top: 0 !important;
+  width: 42px !important;
+  height: 38px !important;
+  background: transparent !important;
+  border: none !important;
+  color: #555555 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  cursor: pointer !important;
 }
-.visual-search-btn:hover {
-  color: #e84c3d;
-  background: #f1f5f9;
+
+.search_bar form button.search-submit-btn:hover,
+.search_bar form button[type="submit"]:hover {
+  color: #e84c3d !important;
+  background: #f8fafc !important;
 }
 .shopping_cart > a {
   display: flex !important;
