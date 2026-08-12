@@ -139,62 +139,67 @@ export const googleLogin = async (
       });
     }
 
-    let user = await prisma.user.findFirst({
-      where: { OR: [{ googleId }, { email }] },
-    });
-
-    if (user?.googleId && user.googleId !== googleId) {
-      return res.status(409).json({
-        success: false,
-        message: "This email is already linked to another Google account",
-      });
-    }
-
     const googleIsAuthoritative =
       email.endsWith("@gmail.com") || Boolean(payload.hd);
 
-    if (user && !user.googleId && !googleIsAuthoritative) {
-      return res.status(409).json({
+    const randomPassword = await hashPassword(randomBytes(32).toString("hex"));
+
+    const userResult = await prisma.$transaction(async (tx) => {
+      let existingUser = await tx.user.findFirst({
+        where: { OR: [{ googleId }, { email }] },
+      });
+
+      if (existingUser?.googleId && existingUser.googleId !== googleId) {
+        return { error: 409, message: "This email is already linked to another Google account" };
+      }
+
+      if (existingUser && !existingUser.googleId && !googleIsAuthoritative) {
+        return { error: 409, message: "Sign in with your password before linking Google to this account" };
+      }
+
+      if (existingUser && (!existingUser.isActive || existingUser.isBanned)) {
+        return { error: 403, message: "Your account is unavailable" };
+      }
+
+      if (existingUser) {
+        const updated = await tx.user.update({
+          where: { id: existingUser.id },
+          data: {
+            googleId,
+            isVerified: true,
+            emailVerifiedAt: existingUser.emailVerifiedAt ?? new Date(),
+            avatar: existingUser.avatar ?? payload.picture,
+            lastLogin: new Date(),
+          },
+        });
+        return { user: updated };
+      } else {
+        const fallbackName = email.split("@")[0] || "Customer";
+        const created = await tx.user.create({
+          data: {
+            email,
+            googleId,
+            password: randomPassword,
+            firstName: payload.given_name?.trim() || fallbackName,
+            lastName: payload.family_name?.trim() || "Customer",
+            avatar: payload.picture,
+            isVerified: true,
+            emailVerifiedAt: new Date(),
+            lastLogin: new Date(),
+          },
+        });
+        return { user: created };
+      }
+    });
+
+    if (userResult.error) {
+      return res.status(userResult.error).json({
         success: false,
-        message:
-          "Sign in with your password before linking Google to this account",
+        message: userResult.message,
       });
     }
 
-    if (user && (!user.isActive || user.isBanned)) {
-      return res.status(403).json({
-        success: false,
-        message: "Your account is unavailable",
-      });
-    }
-
-    if (user) {
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          googleId,
-          isVerified: true,
-          emailVerifiedAt: user.emailVerifiedAt ?? new Date(),
-          avatar: user.avatar ?? payload.picture,
-          lastLogin: new Date(),
-        },
-      });
-    } else {
-      const fallbackName = email.split("@")[0] || "Customer";
-      user = await prisma.user.create({
-        data: {
-          email,
-          googleId,
-          password: await hashPassword(randomBytes(32).toString("hex")),
-          firstName: payload.given_name?.trim() || fallbackName,
-          lastName: payload.family_name?.trim() || "Customer",
-          avatar: payload.picture,
-          isVerified: true,
-          emailVerifiedAt: new Date(),
-          lastLogin: new Date(),
-        },
-      });
-    }
+    const user = userResult.user!;
 
     const token = createSession(res, user);
 

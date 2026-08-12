@@ -127,21 +127,6 @@ export const getProduct = async (req: Request, res: Response) => {
 export const createProduct = async (req: Request, res: Response) => {
   const { categoryName, category, imageUrl, image, images, brandName, ...bodyData } = req.body;
 
-  let categoryId = bodyData.categoryId;
-  if (!categoryId && (categoryName || category)) {
-    const catName = categoryName || category;
-    const catSlug = String(catName).toLowerCase().replace(/[^a-z0-9]+/g, "-");
-    let cat = await prisma.category.findFirst({
-      where: { OR: [{ slug: catSlug }, { name: String(catName) }] },
-    });
-    if (!cat) {
-      cat = await prisma.category.create({
-        data: { name: String(catName), slug: catSlug },
-      });
-    }
-    categoryId = cat.id;
-  }
-
   let brandId = bodyData.brandId;
   if (!brandId) {
     const defaultBrand = await prisma.brand.findFirst();
@@ -150,24 +135,48 @@ export const createProduct = async (req: Request, res: Response) => {
 
   const parsed = productSchema.safeParse({
     ...bodyData,
-    ...(categoryId ? { categoryId } : {}),
     ...(brandId ? { brandId } : {}),
   });
   if (!parsed.success) return validationError(res, parsed.error);
 
-  const product = await prisma.product.create({ data: parsed.data });
-
   const primaryImage = imageUrl || image || images?.[0];
-  if (primaryImage) {
-    await prisma.productImage.create({
+
+  const product = await prisma.$transaction(async (tx) => {
+    let finalCatId = parsed.data.categoryId;
+    if (!finalCatId && (categoryName || category)) {
+      const catName = categoryName || category;
+      const catSlug = String(catName).toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      let cat = await tx.category.findFirst({
+        where: { OR: [{ slug: catSlug }, { name: String(catName) }] },
+      });
+      if (!cat) {
+        cat = await tx.category.create({
+          data: { name: String(catName), slug: catSlug },
+        });
+      }
+      finalCatId = cat.id;
+    }
+
+    const createdProduct = await tx.product.create({
       data: {
-        productId: product.id,
-        url: primaryImage,
-        altText: product.name,
-        isPrimary: true,
+        ...parsed.data,
+        ...(finalCatId ? { categoryId: finalCatId } : {}),
       },
     });
-  }
+
+    if (primaryImage) {
+      await tx.productImage.create({
+        data: {
+          productId: createdProduct.id,
+          url: primaryImage,
+          altText: createdProduct.name,
+          isPrimary: true,
+        },
+      });
+    }
+
+    return createdProduct;
+  });
 
   memoryCache.del("products:");
   delCache("products:*").catch(() => {});
@@ -178,53 +187,58 @@ export const updateProduct = async (req: Request, res: Response) => {
   const { id } = idParamsSchema.parse(req.params);
   const { categoryName, category, imageUrl, image, images, brandName, ...bodyData } = req.body;
 
-  let categoryId = bodyData.categoryId;
-  if (!categoryId && (categoryName || category)) {
-    const catName = categoryName || category;
-    const catSlug = String(catName).toLowerCase().replace(/[^a-z0-9]+/g, "-");
-    let cat = await prisma.category.findFirst({
-      where: { OR: [{ slug: catSlug }, { name: String(catName) }] },
-    });
-    if (!cat) {
-      cat = await prisma.category.create({
-        data: { name: String(catName), slug: catSlug },
-      });
-    }
-    categoryId = cat.id;
-  }
-
-  const parsed = productSchema.partial().safeParse({
-    ...bodyData,
-    ...(categoryId ? { categoryId } : {}),
-  });
+  const parsed = productSchema.partial().safeParse(bodyData);
   if (!parsed.success) return validationError(res, parsed.error);
 
-  const product = await prisma.product.update({
-    where: { id },
-    data: parsed.data,
-  });
-
   const primaryImage = imageUrl || image || images?.[0];
-  if (primaryImage) {
-    const existingImg = await prisma.productImage.findFirst({
-      where: { productId: product.id },
-    });
-    if (existingImg) {
-      await prisma.productImage.update({
-        where: { id: existingImg.id },
-        data: { url: primaryImage },
+
+  const product = await prisma.$transaction(async (tx) => {
+    let finalCatId = parsed.data.categoryId;
+    if (!finalCatId && (categoryName || category)) {
+      const catName = categoryName || category;
+      const catSlug = String(catName).toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      let cat = await tx.category.findFirst({
+        where: { OR: [{ slug: catSlug }, { name: String(catName) }] },
       });
-    } else {
-      await prisma.productImage.create({
-        data: {
-          productId: product.id,
-          url: primaryImage,
-          altText: product.name,
-          isPrimary: true,
-        },
-      });
+      if (!cat) {
+        cat = await tx.category.create({
+          data: { name: String(catName), slug: catSlug },
+        });
+      }
+      finalCatId = cat.id;
     }
-  }
+
+    const updatedProduct = await tx.product.update({
+      where: { id },
+      data: {
+        ...parsed.data,
+        ...(finalCatId ? { categoryId: finalCatId } : {}),
+      },
+    });
+
+    if (primaryImage) {
+      const existingImg = await tx.productImage.findFirst({
+        where: { productId: updatedProduct.id },
+      });
+      if (existingImg) {
+        await tx.productImage.update({
+          where: { id: existingImg.id },
+          data: { url: primaryImage },
+        });
+      } else {
+        await tx.productImage.create({
+          data: {
+            productId: updatedProduct.id,
+            url: primaryImage,
+            altText: updatedProduct.name,
+            isPrimary: true,
+          },
+        });
+      }
+    }
+
+    return updatedProduct;
+  });
 
   memoryCache.del("products:");
   delCache("products:*").catch(() => {});
