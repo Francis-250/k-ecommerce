@@ -52,11 +52,15 @@ export async function searchProductsByImage(
   const queryEmbedding = await generateImageEmbedding(imageUrlOrBuffer);
   const vectorString = `[${queryEmbedding.join(",")}]`;
 
-  // 2. Perform Groq visual analysis if a public image URL is available
+  // 2. Perform Groq visual analysis with a 3.5s timeout so it never blocks vector search
   let groqAnalysis: GroqVisualAnalysis | null = null;
   if (imageUrlForGroq) {
     try {
-      groqAnalysis = await analyzeImageWithGroq(imageUrlForGroq);
+      const groqPromise = analyzeImageWithGroq(imageUrlForGroq);
+      const timeoutPromise = new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), 3500)
+      );
+      groqAnalysis = await Promise.race([groqPromise, timeoutPromise]);
     } catch (e) {
       console.warn("Groq visual analysis skipped:", e);
     }

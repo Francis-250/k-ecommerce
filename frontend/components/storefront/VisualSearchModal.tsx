@@ -98,13 +98,18 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
     setHasSearched(true);
     setResults([]);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
       const response = await fetch(`${API_URL}/visual-search/search-by-image`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...payload, limit: 12 }),
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       const data = await response.json();
 
       if (!response.ok || !data.success) {
@@ -113,8 +118,13 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
 
       setResults(data.products || []);
     } catch (err: any) {
+      clearTimeout(timeoutId);
       console.error("Visual search error:", err);
-      setError(err.message || "An error occurred while searching for products.");
+      if (err.name === "AbortError") {
+        setError("Search request timed out. Please try again.");
+      } else {
+        setError(err.message || "An error occurred while searching for products.");
+      }
     } finally {
       setIsSearching(false);
     }

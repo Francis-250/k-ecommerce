@@ -34,21 +34,26 @@ export const searchByImage = async (req: Request, res: Response) => {
 
     let finalImageUrl = imageUrl || "";
 
-    // If dataUri is provided, upload to Cloudinary visual-search temp folder
+    // Upload image to Cloudinary in parallel or with quick timeout
     if (!imageUrl && dataUri) {
-      const uploadResult = await cloudinary.uploader.upload(dataUri, {
-        folder: "iras-styles/visual-searches",
-        resource_type: "image",
-        transformation: [
-          { width: 1000, height: 1000, crop: "limit" },
-          { quality: "auto", fetch_format: "auto" },
-        ],
-      });
-      finalImageUrl = uploadResult.secure_url;
+      try {
+        const uploadResult = await cloudinary.uploader.upload(dataUri, {
+          folder: "iras-styles/visual-searches",
+          resource_type: "image",
+          transformation: [
+            { width: 800, height: 800, crop: "limit" },
+            { quality: "auto", fetch_format: "auto" },
+          ],
+        });
+        finalImageUrl = uploadResult.secure_url;
+      } catch (err) {
+        console.warn("Cloudinary temp upload failed, continuing with direct memory vector search:", err);
+      }
     }
 
+    // Pass dataUri || finalImageUrl directly to avoid redundant network download
     const searchResult = await searchProductsByImage(
-      finalImageUrl,
+      dataUri || finalImageUrl,
       limit,
       finalImageUrl
     );
