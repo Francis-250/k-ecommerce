@@ -18,6 +18,8 @@ export const listProductImages = async (req: Request, res: Response) => {
   return res.json({ success: true, images });
 };
 
+import { saveImageEmbedding } from "../services/visual-search.service";
+
 export const createProductImage = async (req: Request, res: Response) => {
   const parsed = createSchema.safeParse(req.body);
   if (!parsed.success) return validationError(res, parsed.error);
@@ -28,6 +30,12 @@ export const createProductImage = async (req: Request, res: Response) => {
     });
   }
   const image = await prisma.productImage.create({ data: parsed.data });
+
+  // Generate vector embedding in background for visual search
+  saveImageEmbedding(image.id, image.url).catch((err) =>
+    console.error(`Failed background embedding generation for image ${image.id}:`, err)
+  );
+
   return res.status(201).json({ success: true, image });
 };
 

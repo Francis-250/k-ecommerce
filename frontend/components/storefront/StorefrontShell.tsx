@@ -36,6 +36,7 @@ import { useAuthStore } from "@/features/auth/store";
 import { useStorefrontAppearance } from "@/features/storefront/appearance/useStorefrontAppearance";
 import { useStorefrontCatalog } from "@/features/storefront/catalog/useStorefrontCatalog";
 import { useGeneralStoreSettings } from "@/features/admin/hooks/useGeneralStoreSettings";
+import { VisualSearchModal } from "./VisualSearchModal";
 
 const mainLinks = [
   { label: "Home", href: "/", children: [] },
@@ -95,6 +96,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
+  const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
 
   const displayLogoUrl = appearance.data?.logo?.url || storeSettings.logoUrl;
   const displayLogoAlt = appearance.data?.logo?.alt || storeSettings.storeName;
@@ -256,6 +258,28 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                               searchFocused && searchQuery.length > 0
                             }
                           />
+                          <button
+                            type="button"
+                            className="visual-search-btn"
+                            onClick={() => setIsVisualSearchOpen(true)}
+                            title="Search by Image (AI Visual Search)"
+                            aria-label="Search by Image"
+                            style={{
+                              marginRight: "6px",
+                              background: "#e0e7ff",
+                              border: "none",
+                              color: "#4f46e5",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              padding: "6px 10px",
+                              borderRadius: "6px",
+                              transition: "all 0.2s ease"
+                            }}
+                          >
+                            <Camera size={18} aria-hidden="true" />
+                          </button>
                           <button type="submit" aria-label="Search">
                             <Search size={18} aria-hidden="true" />
                           </button>
@@ -516,6 +540,10 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
       </div>
       <CartDrawer />
       <AuthDrawer />
+      <VisualSearchModal
+        isOpen={isVisualSearchOpen}
+        onClose={() => setIsVisualSearchOpen(false)}
+      />
       <MobileBottomBar onOpenMenu={() => setMobileOpen(true)} />
       <Footer />
     </>

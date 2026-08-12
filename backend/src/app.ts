@@ -128,6 +128,9 @@ app.use("/api/newsletter-subscribers", newsletterSubscriberRoutes);
 app.use("/api/store-settings", storeSettingRoutes);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/otp-codes", otpCodeRoutes);
+import visualSearchRoutes from "./routes/visual-search.routes";
+
+app.use("/api/visual-search", visualSearchRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
 app.get("/", (req: Request, res: Response) => {
