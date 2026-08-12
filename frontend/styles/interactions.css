@@ -184,13 +184,43 @@ button:focus-visible {
   padding: 0;
   line-height: 1;
 }
-.search_bar form,
-.shopping_cart {
+.search_bar form {
+  position: relative;
   height: 38px;
 }
-.search_bar form input,
+.search_bar form input {
+  height: 38px;
+  padding-right: 80px !important;
+}
 .search_bar form button {
   height: 38px;
+}
+.search_actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-right: 4px;
+}
+.visual-search-btn {
+  background: transparent;
+  border: none;
+  color: #555555;
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.visual-search-btn:hover {
+  color: #e84c3d;
+  background: #f1f5f9;
 }
 .shopping_cart > a {
   display: flex !important;

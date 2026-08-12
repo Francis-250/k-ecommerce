@@ -258,34 +258,20 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                               searchFocused && searchQuery.length > 0
                             }
                           />
-                          <button
-                            type="button"
-                            className="visual-search-trigger-pill"
-                            onClick={() => setIsVisualSearchOpen(true)}
-                            title="Search by Image"
-                            aria-label="Search by Image"
-                            style={{
-                              marginRight: "8px",
-                              background: "#f1f5f9",
-                              border: "1px solid #d1d5db",
-                              color: "#222222",
-                              cursor: "pointer",
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: "6px",
-                              padding: "5px 10px",
-                              borderRadius: "4px",
-                              fontSize: "0.78rem",
-                              fontWeight: 600,
-                              transition: "all 0.2s ease"
-                            }}
-                          >
-                            <Camera size={15} aria-hidden="true" />
-                            <span>Search by Image</span>
-                          </button>
-                          <button type="submit" aria-label="Search">
-                            <Search size={18} aria-hidden="true" />
-                          </button>
+                          <div className="search_actions">
+                            <button
+                              type="button"
+                              className="visual-search-btn"
+                              onClick={() => setIsVisualSearchOpen(true)}
+                              title="Search by Image"
+                              aria-label="Search by Image"
+                            >
+                              <Camera size={18} aria-hidden="true" />
+                            </button>
+                            <button type="submit" aria-label="Search">
+                              <Search size={18} aria-hidden="true" />
+                            </button>
+                          </div>
                         </form>
                         {searchFocused && searchQuery.trim() && (
                           <div
