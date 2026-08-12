@@ -12,7 +12,6 @@ import {
   ArrowRight,
   RefreshCw,
   Link as LinkIcon,
-  CircleX,
 } from "lucide-react";
 
 const API_URL =
@@ -93,7 +92,10 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
     performSearch({ imageUrl: urlInput.trim() });
   };
 
-  const performSearch = async (payload: { imageUrl?: string; dataUri?: string }) => {
+  const performSearch = async (payload: {
+    imageUrl?: string;
+    dataUri?: string;
+  }) => {
     setIsSearching(true);
     setError(null);
     setHasSearched(true);
@@ -126,7 +128,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
       if (err.name === "AbortError") {
         setError("Search request timed out. Please try again.");
       } else {
-        setError(err.message || "An error occurred while searching for products.");
+        setError(
+          err.message || "An error occurred while searching for products.",
+        );
       }
     } finally {
       setIsSearching(false);
@@ -186,7 +190,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
             <div className="vs-loading-state">
               <Loader2 size={36} className="vs-spinner" />
               <p className="vs-loading-title">AI Processing Image...</p>
-              <span className="vs-loading-sub">Analyzing visual context & matching products</span>
+              <span className="vs-loading-sub">
+                Analyzing visual context & matching products
+              </span>
             </div>
           ) : !selectedImage ? (
             /* Dropzone / Upload state */
@@ -208,7 +214,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                   </div>
                   <h4>Upload a Photo</h4>
                   <p>Drag & drop or click to browse an image of a product</p>
-                  <span className="vs-file-hint">JPEG, PNG, WEBP up to 8MB</span>
+                  <span className="vs-file-hint">
+                    JPEG, PNG, WEBP up to 8MB
+                  </span>
                 </div>
               </div>
 
@@ -232,7 +240,11 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                       autoFocus
                     />
                     <div className="vs-url-actions">
-                      <button type="submit" className="vs-btn-primary" disabled={isSearching}>
+                      <button
+                        type="submit"
+                        className="vs-btn-primary"
+                        disabled={isSearching}
+                      >
                         Search
                       </button>
                       <button
@@ -257,7 +269,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                 </div>
                 <div className="vs-selected-info">
                   <span className="vs-search-label">
-                    {isSearching ? "Analyzing photo with AI..." : "Searching using photo"}
+                    {isSearching
+                      ? "Analyzing photo..."
+                      : "Searching using photo"}
                   </span>
                   <button
                     type="button"
@@ -265,7 +279,11 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                     onClick={handleReset}
                     disabled={isSearching}
                   >
-                    <RefreshCw size={14} className={isSearching ? "vs-spinner" : ""} /> Change Photo
+                    <RefreshCw
+                      size={14}
+                      className={isSearching ? "vs-spinner" : ""}
+                    />{" "}
+                    Change Photo
                   </button>
                 </div>
               </div>
@@ -274,8 +292,10 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
               {isSearching ? (
                 <div className="vs-loading-state">
                   <Loader2 size={32} className="vs-spinner" />
-                  <p className="vs-loading-title">Analyzing visual context...</p>
-                  <span className="vs-loading-sub">Searching catalog using LangChain Groq AI</span>
+                  <p className="vs-loading-title">Analyzing photo details...</p>
+                  <span className="vs-loading-sub">
+                    Finding visually matching products...
+                  </span>
                 </div>
               ) : error ? (
                 <div className="vs-error-state">
@@ -294,7 +314,8 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                   <ShoppingBag size={36} />
                   <p>
                     {analysis?.isEcommerceProduct === false
-                      ? analysis.rejectionReason || `Detected as ${analysis.productType || "non-retail object"}.`
+                      ? analysis.rejectionReason ||
+                        `Detected as ${analysis.productType || "non-retail object"}.`
                       : "No matching products found."}
                   </p>
                   <span className="vs-empty-sub">
@@ -323,13 +344,19 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
 
                   <div className="vs-matches-list">
                     {results.map((product) => {
-                      const mainImg = product.images?.[0]?.url || "/placeholder.png";
-                      const matchPct = Math.round(product.similarityScore * 100);
+                      const mainImg =
+                        product.images?.[0]?.url || "/placeholder.png";
+                      const matchPct = Math.round(
+                        product.similarityScore * 100,
+                      );
 
                       return (
                         <div className="vs-item-row" key={product.id}>
                           <div className="vs-item-img">
-                            <Link href={`/products/${product.slug}`} onClick={onClose}>
+                            <Link
+                              href={`/products/${product.slug}`}
+                              onClick={onClose}
+                            >
                               <Image
                                 src={mainImg}
                                 alt={product.name}
@@ -341,7 +368,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                           </div>
                           <div className="vs-item-info">
                             {product.brand && (
-                              <span className="vs-item-brand">{product.brand.name}</span>
+                              <span className="vs-item-brand">
+                                {product.brand.name}
+                              </span>
                             )}
                             <Link
                               href={`/products/${product.slug}`}
@@ -354,7 +383,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                               <span className="vs-item-price">
                                 ${Number(product.basePrice || 0).toFixed(2)}
                               </span>
-                              <span className="vs-match-tag">{matchPct}% Match</span>
+                              <span className="vs-match-tag">
+                                {matchPct}% Match
+                              </span>
                             </div>
                           </div>
                           <div className="vs-item-action">
@@ -386,7 +417,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
           background: rgba(0, 0, 0, 0.5);
           opacity: 0;
           visibility: hidden;
-          transition: opacity 0.3s ease, visibility 0.3s ease;
+          transition:
+            opacity 0.3s ease,
+            visibility 0.3s ease;
         }
 
         .vs-drawer-backdrop.is-open {
@@ -477,7 +510,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
           text-align: center;
           cursor: pointer;
           background: #f9fafb;
-          transition: background 0.2s, border-color 0.2s;
+          transition:
+            background 0.2s,
+            border-color 0.2s;
         }
 
         .vs-dropzone:hover {
@@ -752,7 +787,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
           border: 1px solid #f3f4f6;
           border-radius: 8px;
           background: #ffffff;
-          transition: border-color 0.2s, box-shadow 0.2s;
+          transition:
+            border-color 0.2s,
+            box-shadow 0.2s;
         }
 
         .vs-item-row:hover {
@@ -839,7 +876,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
           border-radius: 50%;
           background: #f3f4f6;
           color: #374151;
-          transition: background 0.2s, color 0.2s;
+          transition:
+            background 0.2s,
+            color 0.2s;
         }
 
         .vs-view-arrow:hover {
