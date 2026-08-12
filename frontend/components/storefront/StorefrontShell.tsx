@@ -262,27 +262,26 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                             type="button"
                             className="visual-search-trigger-pill"
                             onClick={() => setIsVisualSearchOpen(true)}
-                            title="Search by Image using AI"
+                            title="Search by Image"
                             aria-label="Search by Image"
                             style={{
                               marginRight: "8px",
-                              background: "linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%)",
-                              border: "1px solid #c7d2fe",
-                              color: "#4338ca",
+                              background: "#f1f5f9",
+                              border: "1px solid #d1d5db",
+                              color: "#222222",
                               cursor: "pointer",
                               display: "inline-flex",
                               alignItems: "center",
                               gap: "6px",
                               padding: "5px 10px",
-                              borderRadius: "20px",
-                              fontSize: "0.76rem",
+                              borderRadius: "4px",
+                              fontSize: "0.78rem",
                               fontWeight: 600,
-                              transition: "all 0.25s ease",
-                              boxShadow: "0 2px 5px rgba(99, 102, 241, 0.12)"
+                              transition: "all 0.2s ease"
                             }}
                           >
                             <Camera size={15} aria-hidden="true" />
-                            <span>Visual Search</span>
+                            <span>Search by Image</span>
                           </button>
                           <button type="submit" aria-label="Search">
                             <Search size={18} aria-hidden="true" />
