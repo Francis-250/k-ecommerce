@@ -162,7 +162,11 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
         {/* Drawer Header */}
         <div className="vs-drawer-header">
           <div className="vs-header-title">
-            <Camera size={20} aria-hidden="true" />
+            {isSearching ? (
+              <Loader2 size={20} className="vs-spinner" aria-hidden="true" />
+            ) : (
+              <Camera size={20} aria-hidden="true" />
+            )}
             <h3>Search by Image</h3>
           </div>
           <button
@@ -174,10 +178,17 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
             <X size={20} aria-hidden="true" />
           </button>
         </div>
+        {isSearching && <div className="vs-loading-bar" />}
 
         {/* Drawer Content */}
         <div className="vs-drawer-content">
-          {!selectedImage ? (
+          {isSearching && !selectedImage ? (
+            <div className="vs-loading-state">
+              <Loader2 size={36} className="vs-spinner" />
+              <p className="vs-loading-title">AI Processing Image...</p>
+              <span className="vs-loading-sub">Analyzing visual context & matching products</span>
+            </div>
+          ) : !selectedImage ? (
             /* Dropzone / Upload state */
             <div className="vs-upload-container">
               <div
@@ -221,7 +232,7 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                       autoFocus
                     />
                     <div className="vs-url-actions">
-                      <button type="submit" className="vs-btn-primary">
+                      <button type="submit" className="vs-btn-primary" disabled={isSearching}>
                         Search
                       </button>
                       <button
@@ -245,13 +256,16 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                   <img src={selectedImage} alt="Search target" />
                 </div>
                 <div className="vs-selected-info">
-                  <span className="vs-search-label">Searching using photo</span>
+                  <span className="vs-search-label">
+                    {isSearching ? "Analyzing photo with AI..." : "Searching using photo"}
+                  </span>
                   <button
                     type="button"
                     className="vs-change-btn"
                     onClick={handleReset}
+                    disabled={isSearching}
                   >
-                    <RefreshCw size={14} /> Change Photo
+                    <RefreshCw size={14} className={isSearching ? "vs-spinner" : ""} /> Change Photo
                   </button>
                 </div>
               </div>
@@ -260,7 +274,8 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
               {isSearching ? (
                 <div className="vs-loading-state">
                   <Loader2 size={32} className="vs-spinner" />
-                  <p>Searching for matching products...</p>
+                  <p className="vs-loading-title">Analyzing visual context...</p>
+                  <span className="vs-loading-sub">Searching catalog using LangChain Groq AI</span>
                 </div>
               ) : error ? (
                 <div className="vs-error-state">
@@ -649,6 +664,35 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
           text-align: center;
           color: #6b7280;
           gap: 8px;
+        }
+
+        .vs-loading-bar {
+          height: 3px;
+          width: 100%;
+          background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+          background-size: 200% 100%;
+          animation: loading-bar-move 1.5s infinite linear;
+        }
+
+        @keyframes loading-bar-move {
+          0% {
+            background-position: 100% 0;
+          }
+          100% {
+            background-position: -100% 0;
+          }
+        }
+
+        .vs-loading-title {
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #111827;
+          margin: 4px 0 0 0;
+        }
+
+        .vs-loading-sub {
+          font-size: 0.78rem;
+          color: #6b7280;
         }
 
         .vs-spinner {
