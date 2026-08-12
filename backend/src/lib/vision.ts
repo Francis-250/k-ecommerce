@@ -28,19 +28,41 @@ async function getTextExtractor() {
 }
 
 /**
+ * Preload the CLIP vision transformer model at server startup
+ */
+export async function preloadVisionModel() {
+  try {
+    console.log("Preloading CLIP Vision transformer model...");
+    await getVisionExtractor();
+    console.log("✓ CLIP Vision transformer model warm and ready.");
+  } catch (err) {
+    console.warn("CLIP Vision model preloading warning:", err);
+  }
+}
+
+/**
  * Generate a 512-dimension vector embedding from an image URL or image Buffer
  */
 export async function generateImageEmbedding(imageUrlOrBuffer: string | Buffer): Promise<number[]> {
   try {
-    const extractor = await getVisionExtractor();
     const inputImage = Buffer.isBuffer(imageUrlOrBuffer) 
       ? new Blob([new Uint8Array(imageUrlOrBuffer)]) 
       : imageUrlOrBuffer;
-    const image = await RawImage.read(inputImage as any);
-    const result = await extractor(image);
+
+    // Race extraction against a 10s timeout to prevent hanging on cold boot
+    const extractionPromise = (async () => {
+      const extractor = await getVisionExtractor();
+      const image = await RawImage.read(inputImage as any);
+      const result = await extractor(image);
+      return Array.from(result.data) as number[];
+    })();
+
+    const timeoutPromise = new Promise<number[]>((_, reject) =>
+      setTimeout(() => reject(new Error("CLIP extraction timeout")), 10000)
+    );
+
+    const data = await Promise.race([extractionPromise, timeoutPromise]);
     
-    const data = Array.from(result.data) as number[];
-    // Normalize or trim/pad to exactly 512 numbers
     if (data.length >= 512) {
       return data.slice(0, 512);
     }
@@ -48,12 +70,11 @@ export async function generateImageEmbedding(imageUrlOrBuffer: string | Buffer):
     for (let i = 0; i < data.length; i++) padded[i] = data[i];
     return padded;
   } catch (error) {
-    console.error("CLIP Image embedding error:", error);
-    // Fallback: create deterministic 512 vector from string if URL
+    console.warn("CLIP Image embedding fallback triggered:", (error as Error).message);
     if (typeof imageUrlOrBuffer === "string") {
       return generateSimpleHashVector(imageUrlOrBuffer, 512);
     }
-    return new Array(512).fill(0.01);
+    return generateSimpleHashVector("default_image_vector", 512);
   }
 }
 
