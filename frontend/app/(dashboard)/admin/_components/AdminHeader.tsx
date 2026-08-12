@@ -8,15 +8,19 @@ import {
   Check,
   CheckCheck,
   ChevronDown,
+  CreditCard,
   ExternalLink,
   LogOut,
   Menu,
   MessageSquareText,
+  Package,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
   Settings,
+  ShoppingBag,
   Tag,
+  UserCheck,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -115,7 +119,6 @@ export function AdminHeader({
           )}
         </button>
 
-        {/* Desktop Search Bar */}
         <form className="relative ml-auto hidden w-full max-w-sm md:block">
           <Search
             className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
@@ -129,7 +132,6 @@ export function AdminHeader({
           />
         </form>
 
-        {/* Mobile Search Toggle Button */}
         <button
           type="button"
           onClick={() => setMobileSearchOpen((prev) => !prev)}
@@ -139,7 +141,6 @@ export function AdminHeader({
           <Search size={19} strokeWidth={1.75} />
         </button>
 
-        {/* Notifications Button & Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setNotificationsOpen((prev) => !prev)}
@@ -148,7 +149,7 @@ export function AdminHeader({
           >
             <Bell size={19} strokeWidth={1.75} />
             {alertCount > 0 && (
-              <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white ring-2 ring-white">
+              <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white ring-2 ring-white animate-pulse">
                 {alertCount > 9 ? "9+" : alertCount}
               </span>
             )}
@@ -159,7 +160,7 @@ export function AdminHeader({
               <header className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-slate-900 text-sm">
-                    Notifications
+                    Store Notifications
                   </h3>
                   {alertCount > 0 && (
                     <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[11px] font-bold text-rose-800">
@@ -175,7 +176,7 @@ export function AdminHeader({
                       className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 font-medium px-2 py-1 rounded hover:bg-slate-100 transition"
                       title="Mark all as read"
                     >
-                      <CheckCheck size={14} /> Mark all read
+                      <CheckCheck size={14} /> Mark read
                     </button>
                   )}
                   <button
@@ -190,7 +191,7 @@ export function AdminHeader({
               <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
                 {isLoading ? (
                   <p className="p-4 text-center text-xs text-slate-400">
-                    Checking store notifications...
+                    Syncing live store notifications...
                   </p>
                 ) : alerts.length === 0 ? (
                   <div className="p-6 text-center">
@@ -198,10 +199,10 @@ export function AdminHeader({
                       <Check size={20} />
                     </span>
                     <p className="text-xs font-medium text-slate-800">
-                      All notifications clear!
+                      All store alerts clear!
                     </p>
                     <p className="text-[11px] text-slate-400 mt-0.5">
-                      No active stock or promo alerts.
+                      No out of stock, failed payments, or pending order alerts.
                     </p>
                   </div>
                 ) : (
@@ -213,16 +214,26 @@ export function AdminHeader({
                         alert.read
                           ? "border-slate-200 bg-slate-50/50 text-slate-600 opacity-70"
                           : alert.type === "OUT_OF_STOCK"
-                            ? "border-rose-200 bg-rose-50/60 text-rose-900 hover:bg-rose-50"
-                            : alert.type === "EXPIRED_COUPON"
-                              ? "border-blue-200 bg-blue-50/60 text-blue-900 hover:bg-blue-50"
-                              : "border-amber-200 bg-amber-50/60 text-amber-900 hover:bg-amber-50"
+                            ? "border-rose-200 bg-rose-50/70 text-rose-900 hover:bg-rose-100/60"
+                            : alert.type === "FAILED_PAYMENT"
+                              ? "border-red-200 bg-red-50/70 text-red-900 hover:bg-red-100/60"
+                              : alert.type === "NEW_ORDER"
+                                ? "border-emerald-200 bg-emerald-50/70 text-emerald-900 hover:bg-emerald-100/60"
+                                : alert.type === "STAFF_ACTION"
+                                  ? "border-blue-200 bg-blue-50/70 text-blue-900 hover:bg-blue-100/60"
+                                  : "border-amber-200 bg-amber-50/70 text-amber-900 hover:bg-amber-100/60"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-1.5 font-semibold">
                           {alert.type === "OUT_OF_STOCK" ? (
                             <AlertOctagon size={15} className="text-rose-600 shrink-0" />
+                          ) : alert.type === "FAILED_PAYMENT" ? (
+                            <CreditCard size={15} className="text-red-600 shrink-0" />
+                          ) : alert.type === "NEW_ORDER" ? (
+                            <ShoppingBag size={15} className="text-emerald-600 shrink-0" />
+                          ) : alert.type === "STAFF_ACTION" ? (
+                            <UserCheck size={15} className="text-blue-600 shrink-0" />
                           ) : alert.type === "EXPIRED_COUPON" ? (
                             <Tag size={15} className="text-blue-600 shrink-0" />
                           ) : (
@@ -246,14 +257,14 @@ export function AdminHeader({
 
               <footer className="mt-3 border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs">
                 <span className="text-[10px] text-slate-400">
-                  Auto-synced via node-cron
+                  Auto-synced in real time
                 </span>
                 <Link
                   href="/admin/inventory"
                   onClick={() => setNotificationsOpen(false)}
                   className="flex items-center gap-1 font-semibold text-slate-900 hover:underline"
                 >
-                  View Inventory <ExternalLink size={12} />
+                  Manage Inventory <ExternalLink size={12} />
                 </Link>
               </footer>
             </div>
@@ -340,7 +351,6 @@ export function AdminHeader({
         </div>
       </div>
 
-      {/* Expandable Mobile Search Bar */}
       {mobileSearchOpen && (
         <div className="border-t border-slate-100 p-3 md:hidden bg-slate-50 animate-in slide-in-from-top-1 duration-150">
           <form className="relative w-full">

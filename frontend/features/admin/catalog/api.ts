@@ -44,12 +44,7 @@ export type BrandInput = Pick<
 
 export type CategoryInput = Pick<
   Category,
-  | "name"
-  | "slug"
-  | "description"
-  | "parentId"
-  | "isActive"
-  | "sortOrder"
+  "name" | "slug" | "description" | "parentId" | "isActive" | "sortOrder"
 >;
 
 export type Coupon = {
@@ -171,13 +166,20 @@ export type InventoryAlert = {
   productId?: string;
   variantId?: string;
   couponId?: string;
+  orderId?: string;
   title: string;
   productName?: string;
   sku?: string;
   category?: string;
   quantity?: number;
   reorderPoint?: number;
-  type: "OUT_OF_STOCK" | "LOW_STOCK" | "EXPIRED_COUPON";
+  type:
+    | "OUT_OF_STOCK"
+    | "LOW_STOCK"
+    | "FAILED_PAYMENT"
+    | "NEW_ORDER"
+    | "STAFF_ACTION"
+    | "EXPIRED_COUPON";
   message: string;
   link: string;
   read?: boolean;

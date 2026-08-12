@@ -6,12 +6,19 @@ export type InventoryAlert = {
   productId?: string;
   variantId?: string;
   couponId?: string;
+  orderId?: string;
   title: string;
   sku?: string;
   category?: string;
   quantity?: number;
   reorderPoint?: number;
-  type: "OUT_OF_STOCK" | "LOW_STOCK" | "EXPIRED_COUPON";
+  type:
+    | "OUT_OF_STOCK"
+    | "LOW_STOCK"
+    | "FAILED_PAYMENT"
+    | "NEW_ORDER"
+    | "STAFF_ACTION"
+    | "EXPIRED_COUPON";
   message: string;
   link: string;
   read?: boolean;
@@ -22,6 +29,7 @@ export async function runInventoryCronCheck(): Promise<InventoryAlert[]> {
   try {
     const alerts: InventoryAlert[] = [];
     const now = new Date();
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     const inventories = await prisma.inventory.findMany({
       include: {
@@ -82,12 +90,71 @@ export async function runInventoryCronCheck(): Promise<InventoryAlert[]> {
       }
     }
 
+    const failedPayments = await prisma.payment.findMany({
+      where: { status: "FAILED" },
+      include: { order: true },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    });
+
+    for (const payment of failedPayments) {
+      alerts.push({
+        id: `alert-failed-payment-${payment.id}`,
+        orderId: payment.orderId,
+        title: `Failed Payment (#${payment.order.orderNumber})`,
+        type: "FAILED_PAYMENT",
+        message: `Payment of $${payment.amount} failed for order #${payment.order.orderNumber}.`,
+        link: `/admin/orders/${payment.orderId}`,
+        read: false,
+        updatedAt: payment.createdAt.toISOString(),
+      });
+    }
+
+    const newOrders = await prisma.order.findMany({
+      where: {
+        createdAt: { gte: oneDayAgo },
+        status: { in: ["PENDING_PAYMENT", "PAID", "PROCESSING"] },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    });
+
+    for (const order of newOrders) {
+      alerts.push({
+        id: `alert-new-order-${order.id}`,
+        orderId: order.id,
+        title: `New Order (#${order.orderNumber})`,
+        type: "NEW_ORDER",
+        message: `New order #${order.orderNumber} placed for $${order.total.toFixed(2)}.`,
+        link: `/admin/orders/${order.id}`,
+        read: false,
+        updatedAt: order.createdAt.toISOString(),
+      });
+    }
+
+    const staffLogs = await prisma.auditLog.findMany({
+      where: { createdAt: { gte: oneDayAgo } },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    });
+
+    for (const log of staffLogs) {
+      const staffName = log.actorId ? `Staff Member (${log.actorId.slice(0, 8)})` : "Staff Member";
+      const targetEntity = log.entityType || "system";
+      alerts.push({
+        id: `alert-staff-${log.id}`,
+        title: `Staff Action: ${log.action}`,
+        type: "STAFF_ACTION",
+        message: `${staffName} performed ${log.action} on ${targetEntity}.`,
+        link: `/admin/analytics`,
+        read: false,
+        updatedAt: log.createdAt.toISOString(),
+      });
+    }
+
     const expiredCoupons = await prisma.coupon.findMany({
       where: {
-        OR: [
-          { status: "EXPIRED" },
-          { endsAt: { lt: now } },
-        ],
+        OR: [{ status: "EXPIRED" }, { endsAt: { lt: now } }],
       },
     });
 
@@ -120,18 +187,22 @@ export async function runInventoryCronCheck(): Promise<InventoryAlert[]> {
     });
 
     console.log(
-      `[Cron] Inventory & Promo check completed. Alerts count: ${alerts.length} (${
+      `[Cron] Background check completed. Alerts count: ${alerts.length} (${
         alerts.filter((a) => a.type === "OUT_OF_STOCK").length
       } out of stock, ${
         alerts.filter((a) => a.type === "LOW_STOCK").length
       } low stock, ${
-        alerts.filter((a) => a.type === "EXPIRED_COUPON").length
-      } expired coupons).`,
+        alerts.filter((a) => a.type === "FAILED_PAYMENT").length
+      } failed payments, ${
+        alerts.filter((a) => a.type === "NEW_ORDER").length
+      } new orders, ${
+        alerts.filter((a) => a.type === "STAFF_ACTION").length
+      } staff updates).`,
     );
 
     return alerts;
   } catch (error) {
-    console.error("[Cron] Failed to run inventory check:", error);
+    console.error("[Cron] Failed to run background notification check:", error);
     return [];
   }
 }
