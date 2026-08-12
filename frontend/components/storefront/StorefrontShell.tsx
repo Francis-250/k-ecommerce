@@ -260,25 +260,29 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                           />
                           <button
                             type="button"
-                            className="visual-search-btn"
+                            className="visual-search-trigger-pill"
                             onClick={() => setIsVisualSearchOpen(true)}
-                            title="Search by Image (AI Visual Search)"
+                            title="Search by Image using AI"
                             aria-label="Search by Image"
                             style={{
-                              marginRight: "6px",
-                              background: "#e0e7ff",
-                              border: "none",
-                              color: "#4f46e5",
+                              marginRight: "8px",
+                              background: "linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%)",
+                              border: "1px solid #c7d2fe",
+                              color: "#4338ca",
                               cursor: "pointer",
                               display: "inline-flex",
                               alignItems: "center",
-                              justifyContent: "center",
-                              padding: "6px 10px",
-                              borderRadius: "6px",
-                              transition: "all 0.2s ease"
+                              gap: "6px",
+                              padding: "5px 10px",
+                              borderRadius: "20px",
+                              fontSize: "0.76rem",
+                              fontWeight: 600,
+                              transition: "all 0.25s ease",
+                              boxShadow: "0 2px 5px rgba(99, 102, 241, 0.12)"
                             }}
                           >
-                            <Camera size={18} aria-hidden="true" />
+                            <Camera size={15} aria-hidden="true" />
+                            <span>Visual Search</span>
                           </button>
                           <button type="submit" aria-label="Search">
                             <Search size={18} aria-hidden="true" />
