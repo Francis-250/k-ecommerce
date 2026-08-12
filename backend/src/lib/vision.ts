@@ -1,14 +1,24 @@
-import { Groq } from "groq-sdk";
+import { ChatGroq } from "@langchain/groq";
+import { HumanMessage } from "@langchain/core/messages";
 
-// Initialize Groq client
+// Initialize ChatGroq instance (zero local memory overhead)
 const groqApiKey = process.env.GROQ_API_KEY;
-const groq = groqApiKey ? new Groq({ apiKey: groqApiKey }) : null;
+
+let chatGroq: ChatGroq | null = null;
+if (groqApiKey) {
+  chatGroq = new ChatGroq({
+    apiKey: groqApiKey,
+    model: "llama-3.2-11b-vision-instruct",
+    temperature: 0.1,
+    maxTokens: 500,
+  });
+}
 
 /**
  * Preload vision service (lightweight zero-memory initialization)
  */
 export async function preloadVisionModel() {
-  console.log("✓ Vision service initialized (Lightweight zero-memory mode for 512MB RAM).");
+  console.log("✓ LangChain Groq Vision service initialized (Lightweight zero-memory mode).");
 }
 
 /**
@@ -74,59 +84,76 @@ function generatePerceptualVector(str: string, dimensions: number = 512): number
 }
 
 export interface GroqVisualAnalysis {
+  isEcommerceProduct: boolean;
   productType: string;
+  category?: string;
   colors: string[];
   style: string;
   searchKeywords: string[];
   description: string;
+  rejectionReason?: string;
 }
 
 /**
- * Use Groq Vision (llama-3.2-11b-vision-instruct) for visual metadata extraction
+ * Use LangChain + Groq Vision (llama-3.2-11b-vision-instruct) for visual context & metadata extraction
  */
 export async function analyzeImageWithGroq(imageUrl: string): Promise<GroqVisualAnalysis | null> {
-  if (!groq) {
+  if (!chatGroq) {
     return null;
   }
 
   try {
-    const response = await groq.chat.completions.create({
-      model: "llama-3.2-11b-vision-instruct",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `Analyze this product image for visual search. Return ONLY a JSON object formatted as follows:
+    const promptText = `You are an expert AI visual search classifier for an e-commerce platform powered by LangChain and Groq.
+Analyze the provided image carefully and determine whether it represents a valid retail store e-commerce product (e.g. clothing, fashion, shoes, sneakers, dresses, jackets, bags, watches, jewelry, accessories, electronics, home goods) OR a non-store object (e.g. car, automobile, truck, vehicle, building, real estate, landscape, pet/animal, meme, or random non-retail object).
+
+STRICT CLASSIFICATION RULES:
+1. If the image depicts a CAR, AUTOMOBILE, VEHICLE, BUILDING, LANDSCAPE, PET, ANIMAL, or non-store item:
+   - "isEcommerceProduct": false
+   - "rejectionReason": "The image is identified as a car or non-retail object, which is not sold in this store."
+2. If the image depicts clothing, shoes, fashion, or retail products:
+   - "isEcommerceProduct": true
+
+Return ONLY a raw JSON object matching this structure (no markdown codeblock fences, no extra text):
 {
-  "productType": "type of item e.g. jacket, sneakers, handbag, watch, dress",
-  "colors": ["primary_color", "secondary_color"],
+  "isEcommerceProduct": true,
+  "productType": "item type e.g. car, sneakers, jacket, handbag, dress, watch",
+  "category": "broader category e.g. Footwear, Apparel, Accessories, Automotive",
+  "colors": ["color1", "color2"],
   "style": "casual / formal / luxury / athletic / streetwear",
   "searchKeywords": ["tag1", "tag2", "tag3"],
-  "description": "Short visual summary"
-}`,
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: imageUrl,
-              },
-            },
-          ],
+  "description": "Short visual summary",
+  "rejectionReason": ""
+}`;
+
+    const message = new HumanMessage({
+      content: [
+        { type: "text", text: promptText },
+        {
+          type: "image_url",
+          image_url: {
+            url: imageUrl,
+          },
         },
       ],
-      response_format: { type: "json_object" },
-      temperature: 0.2,
-      max_tokens: 300,
     });
 
-    const content = response.choices[0]?.message?.content;
-    if (!content) return null;
+    const response = await chatGroq.invoke([message]);
+    const rawContent =
+      typeof response.content === "string"
+        ? response.content
+        : Array.isArray(response.content)
+        ? response.content
+            .map((item) => (typeof item === "string" ? item : JSON.stringify(item)))
+            .join("")
+        : JSON.stringify(response.content);
 
-    return JSON.parse(content) as GroqVisualAnalysis;
+    const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return null;
+
+    const parsed = JSON.parse(jsonMatch[0]) as GroqVisualAnalysis;
+    return parsed;
   } catch (error) {
-    console.error("Groq vision analysis error:", error);
+    console.error("LangChain ChatGroq vision analysis error:", error);
     return null;
   }
 }

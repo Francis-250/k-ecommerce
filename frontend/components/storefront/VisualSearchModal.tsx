@@ -43,6 +43,7 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<ProductMatch[]>([]);
+  const [analysis, setAnalysis] = useState<any>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -97,6 +98,7 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
     setError(null);
     setHasSearched(true);
     setResults([]);
+    setAnalysis(null);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 45000);
@@ -117,6 +119,7 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
       }
 
       setResults(data.products || []);
+      setAnalysis(data.analysis || null);
     } catch (err: any) {
       clearTimeout(timeoutId);
       console.error("Visual search error:", err);
@@ -135,6 +138,7 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
     setUrlInput("");
     setShowUrlInput(false);
     setResults([]);
+    setAnalysis(null);
     setHasSearched(false);
     setError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -273,9 +277,15 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
               ) : hasSearched && results.length === 0 ? (
                 <div className="vs-empty-state">
                   <ShoppingBag size={36} />
-                  <p>No matching products found.</p>
+                  <p>
+                    {analysis?.isEcommerceProduct === false
+                      ? analysis.rejectionReason || `Detected as ${analysis.productType || "non-retail object"}.`
+                      : "No matching products found."}
+                  </p>
                   <span className="vs-empty-sub">
-                    Try uploading a clearer photo of an item.
+                    {analysis?.isEcommerceProduct === false
+                      ? "Our AI search matches fashion & retail store items (clothing, shoes, accessories)."
+                      : "Try uploading a clearer photo of a retail product item."}
                   </span>
                   <button
                     type="button"
@@ -289,6 +299,11 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                 <div className="vs-matches-section">
                   <div className="vs-matches-header">
                     <span>Matches Found ({results.length})</span>
+                    {analysis?.productType && (
+                      <span className="vs-ai-tag">
+                        AI Detected: {analysis.productType}
+                      </span>
+                    )}
                   </div>
 
                   <div className="vs-matches-list">
@@ -659,11 +674,24 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
         }
 
         .vs-matches-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
           font-size: 0.88rem;
           font-weight: 700;
           color: #222222;
           border-bottom: 1px solid #f3f4f6;
           padding-bottom: 6px;
+        }
+
+        .vs-ai-tag {
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: #6366f1;
+          background: #eef2ff;
+          padding: 2px 8px;
+          border-radius: 12px;
+          text-transform: capitalize;
         }
 
         .vs-matches-list {

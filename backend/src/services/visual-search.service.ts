@@ -48,26 +48,37 @@ export async function searchProductsByImage(
   limit: number = 12,
   imageUrlForGroq?: string
 ): Promise<ImageSearchResponse> {
-  // 1. Generate query embedding vector
-  const queryEmbedding = await generateImageEmbedding(imageUrlOrBuffer);
-  const vectorString = `[${queryEmbedding.join(",")}]`;
-
-  // 2. Perform Groq visual analysis with a 3.5s timeout so it never blocks vector search
+  // 1. Perform LangChain Groq visual analysis if imageUrlForGroq is provided
   let groqAnalysis: GroqVisualAnalysis | null = null;
   if (imageUrlForGroq) {
     try {
       const groqPromise = analyzeImageWithGroq(imageUrlForGroq);
       const timeoutPromise = new Promise<null>((resolve) =>
-        setTimeout(() => resolve(null), 3500)
+        setTimeout(() => resolve(null), 4500)
       );
       groqAnalysis = await Promise.race([groqPromise, timeoutPromise]);
     } catch (e) {
-      console.warn("Groq visual analysis skipped:", e);
+      console.warn("LangChain Groq visual analysis skipped/errored:", e);
     }
   }
 
-  // 3. Vector similarity search in PostgreSQL via pgvector
-  // Cosine distance <=> operator (lower distance = higher similarity)
+  // 2. CONTEXT GATING: Rejection of non-store products (e.g., car, vehicle, building, animal)
+  if (groqAnalysis && groqAnalysis.isEcommerceProduct === false) {
+    console.log(
+      `[AI Search] Image gated: Detected non-ecommerce object '${groqAnalysis.productType}' (${groqAnalysis.rejectionReason})`
+    );
+    return {
+      products: [],
+      analysis: groqAnalysis,
+      totalFound: 0,
+    };
+  }
+
+  // 3. Generate query embedding vector
+  const queryEmbedding = await generateImageEmbedding(imageUrlOrBuffer);
+  const vectorString = `[${queryEmbedding.join(",")}]`;
+
+  // 4. Vector similarity search in PostgreSQL via pgvector (fetch wider candidate set for re-ranking)
   const rawResults: any[] = await prisma.$queryRawUnsafe(
     `
     SELECT 
@@ -82,20 +93,22 @@ export async function searchProductsByImage(
     LIMIT $2
     `,
     vectorString,
-    limit
+    limit * 3
   );
 
   if (!rawResults || rawResults.length === 0) {
     return { products: [], analysis: groqAnalysis, totalFound: 0 };
   }
 
-  const productIds = rawResults.map((r) => r.productId);
-  const similarityMap = new Map(rawResults.map((r) => [r.productId, Number(r.similarity)]));
+  const candidateIds = rawResults.map((r) => r.productId);
+  const similarityMap = new Map(
+    rawResults.map((r) => [r.productId, Number(r.similarity)])
+  );
 
-  // 4. Fetch complete product data for the matched IDs
+  // 5. Fetch complete product data for candidate IDs
   const products = await prisma.product.findMany({
     where: {
-      id: { in: productIds },
+      id: { in: candidateIds },
       status: "ACTIVE",
     },
     include: {
@@ -111,13 +124,66 @@ export async function searchProductsByImage(
     },
   });
 
-  // Sort returned products to preserve vector similarity order
-  const sortedProducts = products
-    .map((product) => ({
-      ...product,
-      similarityScore: Math.round((similarityMap.get(product.id) || 0) * 100) / 100,
-    }))
-    .sort((a, b) => (b.similarityScore || 0) - (a.similarityScore || 0));
+  // 6. Context-Aware Re-ranking and Filtering using LangChain Groq AI Analysis
+  let filteredProducts = products;
+
+  if (groqAnalysis) {
+    const keywords = (groqAnalysis.searchKeywords || []).map((k) =>
+      k.toLowerCase()
+    );
+    const productType = (groqAnalysis.productType || "").toLowerCase();
+    const category = (groqAnalysis.category || "").toLowerCase();
+
+    // Strict semantic filter: Keep products matching the detected item type, category, or keywords
+    const contextualMatches = products.filter((product) => {
+      const fullText = `${product.name} ${product.description || ""} ${
+        product.category?.name || ""
+      }`.toLowerCase();
+
+      const typeMatch = productType && fullText.includes(productType);
+      const categoryMatch = category && fullText.includes(category);
+      const keywordMatch = keywords.some((kw) => fullText.includes(kw));
+
+      return typeMatch || categoryMatch || keywordMatch;
+    });
+
+    if (contextualMatches.length > 0) {
+      filteredProducts = contextualMatches;
+    }
+  }
+
+  // 7. Calculate score & sort
+  const sortedProducts = filteredProducts
+    .map((product) => {
+      const baseSim = similarityMap.get(product.id) || 0;
+      let scoreBoost = 0;
+
+      if (groqAnalysis) {
+        const text = `${product.name} ${product.description || ""} ${
+          product.category?.name || ""
+        }`.toLowerCase();
+        if (
+          groqAnalysis.productType &&
+          text.includes(groqAnalysis.productType.toLowerCase())
+        ) {
+          scoreBoost += 0.25;
+        }
+        for (const kw of groqAnalysis.searchKeywords || []) {
+          if (text.includes(kw.toLowerCase())) {
+            scoreBoost += 0.1;
+          }
+        }
+      }
+
+      const finalScore = Math.min(0.99, Math.max(0.1, baseSim * 0.5 + scoreBoost + 0.3));
+
+      return {
+        ...product,
+        similarityScore: Math.round(finalScore * 100) / 100,
+      };
+    })
+    .sort((a, b) => (b.similarityScore || 0) - (a.similarityScore || 0))
+    .slice(0, limit);
 
   return {
     products: sortedProducts,
