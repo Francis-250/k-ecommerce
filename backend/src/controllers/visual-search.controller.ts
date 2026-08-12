@@ -13,9 +13,6 @@ const imageSearchSchema = z.object({
   limit: z.coerce.number().min(1).max(50).default(12),
 });
 
-/**
- * Controller for searching products by uploaded image (URL or dataUri)
- */
 export const searchByImage = async (req: Request, res: Response) => {
   try {
     const parsed = imageSearchSchema.safeParse(req.body);
@@ -34,7 +31,6 @@ export const searchByImage = async (req: Request, res: Response) => {
 
     let finalImageUrl = imageUrl || "";
 
-    // Upload image to Cloudinary in parallel or with quick timeout
     if (!imageUrl && dataUri) {
       try {
         const uploadResult = await cloudinary.uploader.upload(dataUri, {
@@ -51,7 +47,6 @@ export const searchByImage = async (req: Request, res: Response) => {
       }
     }
 
-    // Pass dataUri || finalImageUrl directly to avoid redundant network download
     const searchResult = await searchProductsByImage(
       dataUri || finalImageUrl,
       limit,
@@ -74,15 +69,11 @@ export const searchByImage = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Backfill embeddings for all product images missing vectors in DB
- */
 export const triggerBackfillEmbeddings = async (
   req: Request,
   res: Response
 ) => {
   try {
-    // Run backfill asynchronously in background
     backfillProductEmbeddings().catch((err) =>
       console.error("Backfill background error:", err)
     );

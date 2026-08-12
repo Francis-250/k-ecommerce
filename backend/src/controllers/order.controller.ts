@@ -236,8 +236,6 @@ export const createOrder = async (req: Request, res: Response) => {
     }
 
     const shippingTotal = subtotal - discountTotal >= 100 ? 0 : 12;
-    // Final U.S. sales tax is calculated from the delivery address by Stripe
-    // Tax immediately before the PaymentIntent is created.
     const taxTotal = 0;
     const total = Number(
       (subtotal - discountTotal + shippingTotal + taxTotal).toFixed(2),

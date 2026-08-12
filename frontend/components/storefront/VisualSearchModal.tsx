@@ -47,7 +47,6 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Close drawer on Escape key & manage body lock class (matching CartDrawer)
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -150,20 +149,17 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className={`vs-drawer-backdrop ${isOpen ? "is-open" : ""}`}
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Side Drawer Panel */}
       <aside
         className={`vs-drawer-panel ${isOpen ? "is-open" : ""}`}
         aria-label="Image Search Drawer"
         aria-hidden={!isOpen}
       >
-        {/* Drawer Header */}
         <div className="vs-drawer-header">
           <div className="vs-header-title">
             {isSearching ? (
@@ -184,7 +180,6 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
         </div>
         {isSearching && <div className="vs-loading-bar" />}
 
-        {/* Drawer Content */}
         <div className="vs-drawer-content">
           {isSearching && !selectedImage ? (
             <div className="vs-loading-state">
@@ -195,7 +190,6 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
               </span>
             </div>
           ) : !selectedImage ? (
-            /* Dropzone / Upload state */
             <div className="vs-upload-container">
               <div
                 className="vs-dropzone"
@@ -260,9 +254,7 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
               </div>
             </div>
           ) : (
-            /* Selected Image & Search Results */
             <div className="vs-results-container">
-              {/* Selected Photo Card */}
               <div className="vs-selected-card">
                 <div className="vs-thumb-box">
                   <img src={selectedImage} alt="Search target" />
@@ -288,7 +280,6 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
                 </div>
               </div>
 
-              {/* Status States */}
               {isSearching ? (
                 <div className="vs-loading-state">
                   <Loader2 size={32} className="vs-spinner" />

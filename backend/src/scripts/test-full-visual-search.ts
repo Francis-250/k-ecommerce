@@ -3,7 +3,6 @@ import { searchProductsByImage } from "../services/visual-search.service";
 async function main() {
   console.log("=== End-to-End Visual Search Test ===");
 
-  // Sample 1x1 base64 red pixel PNG data URI
   const sampleDataUri =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
 

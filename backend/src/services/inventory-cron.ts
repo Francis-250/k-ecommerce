@@ -23,7 +23,6 @@ export async function runInventoryCronCheck(): Promise<InventoryAlert[]> {
     const alerts: InventoryAlert[] = [];
     const now = new Date();
 
-    // 1. Check Inventory Stock (Out of stock & Low stock)
     const inventories = await prisma.inventory.findMany({
       include: {
         variant: {
@@ -83,7 +82,6 @@ export async function runInventoryCronCheck(): Promise<InventoryAlert[]> {
       }
     }
 
-    // 2. Check Expired Coupons
     const expiredCoupons = await prisma.coupon.findMany({
       where: {
         OR: [
@@ -106,7 +104,6 @@ export async function runInventoryCronCheck(): Promise<InventoryAlert[]> {
       });
     }
 
-    // Save compiled inventory & promo alerts to StoreSetting
     await prisma.storeSetting.upsert({
       where: { key: "inventory_notifications" },
       update: {

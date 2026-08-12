@@ -9,5 +9,7 @@ export function useStorefrontCatalog() {
   return useQuery({
     queryKey: storefrontCatalogQueryKey,
     queryFn: getStorefrontCatalog,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
   });
 }

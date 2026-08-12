@@ -7,20 +7,42 @@ import {
   pagination,
   validationError,
 } from "../utils/http";
+import { memoryCache } from "../utils/cache";
+import { getCache, setCache, delCache } from "../utils/redis";
 
 export const listProducts = async (req: Request, res: Response) => {
+  const isAdmin = req.query.admin === "true";
   const { page, limit, skip } = pagination(req);
   const search =
     typeof req.query.search === "string" ? req.query.search : undefined;
+  const category = req.query.category ? String(req.query.category) : undefined;
+  const audience = req.query.audience ? String(req.query.audience) : undefined;
+
+  const cacheKey = `products:${isAdmin ? "admin" : "public"}:${page}:${limit}:${search || ""}:${category || ""}:${audience || ""}`;
+
+  if (!isAdmin) {
+    res.setHeader(
+      "Cache-Control",
+      "public, max-age=30, s-maxage=120, stale-while-revalidate=300",
+    );
+    const memCached = memoryCache.get(cacheKey);
+    if (memCached) {
+      return res.json(memCached);
+    }
+
+    const redisCached = await getCache(cacheKey);
+    if (redisCached) {
+      memoryCache.set(cacheKey, redisCached, 60);
+      return res.json(redisCached);
+    }
+  }
+
   const where = {
-    ...(req.query.admin === "true" ? {} : { status: "ACTIVE" as const }),
-    ...(req.query.category
-      ? { category: { slug: String(req.query.category) } }
-      : {}),
-    ...(req.query.audience
+    ...(isAdmin ? {} : { status: "ACTIVE" as const }),
+    ...(category ? { category: { slug: category } } : {}),
+    ...(audience
       ? {
-          audience: String(req.query.audience) as
-            "WOMEN" | "MEN" | "UNISEX" | "KIDS",
+          audience: audience as "WOMEN" | "MEN" | "UNISEX" | "KIDS",
         }
       : {}),
     ...(search
@@ -45,14 +67,20 @@ export const listProducts = async (req: Request, res: Response) => {
         variants: { include: { inventory: true } },
         _count: { select: { reviews: true } },
       },
-      orderBy:
-        req.query.admin === "true"
-          ? [{ createdAt: "desc" }]
-          : [{ isFeatured: "desc" }, { createdAt: "desc" }],
+      orderBy: isAdmin
+        ? [{ createdAt: "desc" }]
+        : [{ isFeatured: "desc" }, { createdAt: "desc" }],
     }),
     prisma.product.count({ where }),
   ]);
-  return res.json(paginated(products, total, page, limit));
+
+  const result = paginated(products, total, page, limit);
+  if (!isAdmin) {
+    memoryCache.set(cacheKey, result, 60);
+    setCache(cacheKey, result, 120).catch(() => {});
+  }
+
+  return res.json(result);
 };
 
 export const getProduct = async (req: Request, res: Response) => {
@@ -141,6 +169,8 @@ export const createProduct = async (req: Request, res: Response) => {
     });
   }
 
+  memoryCache.del("products:");
+  delCache("products:*").catch(() => {});
   return res.status(201).json({ success: true, product });
 };
 
@@ -196,6 +226,8 @@ export const updateProduct = async (req: Request, res: Response) => {
     }
   }
 
+  memoryCache.del("products:");
+  delCache("products:*").catch(() => {});
   return res.json({ success: true, product });
 };
 
@@ -205,5 +237,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
     where: { id },
     data: { status: "ARCHIVED", publishedAt: null },
   });
+  memoryCache.del("products:");
+  delCache("products:*").catch(() => {});
   return res.status(204).send();
 };

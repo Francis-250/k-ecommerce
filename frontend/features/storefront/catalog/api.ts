@@ -74,7 +74,7 @@ async function get<T>(path: string): Promise<T> {
 
 export async function getStorefrontCatalog(): Promise<StorefrontCatalog> {
   const [products, categories, brands] = await Promise.all([
-    get<ProductsResponse>("/products?limit=100"),
+    get<ProductsResponse>("/products?limit=24"),
     get<CategoriesResponse>("/categories"),
     get<BrandsResponse>("/brands"),
   ]);

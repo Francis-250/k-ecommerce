@@ -1,7 +1,6 @@
 import { ChatGroq } from "@langchain/groq";
 import { HumanMessage } from "@langchain/core/messages";
 
-// Initialize ChatGroq instance (zero local memory overhead)
 const groqApiKey = process.env.GROQ_API_KEY;
 
 let chatGroq: ChatGroq | null = null;
@@ -14,16 +13,10 @@ if (groqApiKey) {
   });
 }
 
-/**
- * Preload vision service (lightweight zero-memory initialization)
- */
 export async function preloadVisionModel() {
   console.log("✓ LangChain Groq Vision service initialized (Lightweight zero-memory mode).");
 }
 
-/**
- * Generate a 512-dimension visual feature vector with ultra-low memory footprint (< 2MB RAM)
- */
 export async function generateImageEmbedding(imageUrlOrBuffer: string | Buffer): Promise<number[]> {
   try {
     let strPayload = "";
@@ -40,21 +33,13 @@ export async function generateImageEmbedding(imageUrlOrBuffer: string | Buffer):
   }
 }
 
-/**
- * Generate a 512-dimension vector from text
- */
 export async function generateTextEmbedding(text: string): Promise<number[]> {
   return generatePerceptualVector(text, 512);
 }
 
-/**
- * Perceptual visual feature vector generator.
- * Produces a 512-dimension normalized float array using zero external ONNX models.
- */
 function generatePerceptualVector(str: string, dimensions: number = 512): number[] {
   const vec = new Array(dimensions).fill(0);
   
-  // Seeded hash algorithm to map visual string data to float features
   let hash1 = 5381;
   let hash2 = 0x811c9dc5;
 
@@ -69,7 +54,6 @@ function generatePerceptualVector(str: string, dimensions: number = 512): number
     vec[i] = rawVal;
   }
 
-  // L2 Normalization
   let norm = 0;
   for (let i = 0; i < dimensions; i++) {
     norm += vec[i] * vec[i];
@@ -94,9 +78,6 @@ export interface GroqVisualAnalysis {
   rejectionReason?: string;
 }
 
-/**
- * Use LangChain + Groq Vision (llama-3.2-11b-vision-instruct) for visual context & metadata extraction
- */
 export async function analyzeImageWithGroq(imageUrl: string): Promise<GroqVisualAnalysis | null> {
   if (!chatGroq) {
     return null;

@@ -30,8 +30,6 @@ export const createProductImage = async (req: Request, res: Response) => {
     });
   }
   const image = await prisma.productImage.create({ data: parsed.data });
-
-  // Generate vector embedding in background for visual search
   saveImageEmbedding(image.id, image.url).catch((err) =>
     console.error(`Failed background embedding generation for image ${image.id}:`, err)
   );

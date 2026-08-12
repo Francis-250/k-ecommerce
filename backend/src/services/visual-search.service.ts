@@ -20,9 +20,6 @@ export interface ImageSearchResponse {
   totalFound: number;
 }
 
-/**
- * Update a ProductImage record with its vector embedding
- */
 export async function saveImageEmbedding(productImageId: string, imageUrl: string): Promise<boolean> {
   try {
     const embedding = await generateImageEmbedding(imageUrl);
@@ -40,15 +37,11 @@ export async function saveImageEmbedding(productImageId: string, imageUrl: strin
   }
 }
 
-/**
- * Search for visually similar products using an uploaded image URL or Buffer
- */
 export async function searchProductsByImage(
   imageUrlOrBuffer: string | Buffer,
   limit: number = 12,
   imageUrlForGroq?: string
 ): Promise<ImageSearchResponse> {
-  // 1. Perform LangChain Groq visual analysis if imageUrlForGroq is provided
   let groqAnalysis: GroqVisualAnalysis | null = null;
   if (imageUrlForGroq) {
     try {
@@ -62,7 +55,6 @@ export async function searchProductsByImage(
     }
   }
 
-  // 2. CONTEXT GATING: Rejection of non-store products (e.g., car, vehicle, building, animal)
   if (groqAnalysis && groqAnalysis.isEcommerceProduct === false) {
     console.log(
       `[AI Search] Image gated: Detected non-ecommerce object '${groqAnalysis.productType}' (${groqAnalysis.rejectionReason})`
@@ -74,11 +66,9 @@ export async function searchProductsByImage(
     };
   }
 
-  // 3. Generate query embedding vector
   const queryEmbedding = await generateImageEmbedding(imageUrlOrBuffer);
   const vectorString = `[${queryEmbedding.join(",")}]`;
 
-  // 4. Vector similarity search in PostgreSQL via pgvector (fetch wider candidate set for re-ranking)
   const rawResults: any[] = await prisma.$queryRawUnsafe(
     `
     SELECT 
@@ -105,7 +95,6 @@ export async function searchProductsByImage(
     rawResults.map((r) => [r.productId, Number(r.similarity)])
   );
 
-  // 5. Fetch complete product data for candidate IDs
   const products = await prisma.product.findMany({
     where: {
       id: { in: candidateIds },
@@ -124,7 +113,6 @@ export async function searchProductsByImage(
     },
   });
 
-  // 6. Context-Aware Re-ranking and Filtering using LangChain Groq AI Analysis
   let filteredProducts = products;
 
   if (groqAnalysis) {
@@ -134,7 +122,6 @@ export async function searchProductsByImage(
     const productType = (groqAnalysis.productType || "").toLowerCase();
     const category = (groqAnalysis.category || "").toLowerCase();
 
-    // Strict semantic filter: Keep products matching the detected item type, category, or keywords
     const contextualMatches = products.filter((product) => {
       const fullText = `${product.name} ${product.description || ""} ${
         product.category?.name || ""
@@ -152,7 +139,6 @@ export async function searchProductsByImage(
     }
   }
 
-  // 7. Calculate score & sort
   const sortedProducts = filteredProducts
     .map((product) => {
       const baseSim = similarityMap.get(product.id) || 0;
@@ -192,13 +178,9 @@ export async function searchProductsByImage(
   };
 }
 
-/**
- * Backfill vector embeddings for all ProductImage records missing embeddings
- */
 export async function backfillProductEmbeddings(): Promise<{ processed: number; success: number; failed: number }> {
   console.log("Starting backfill for missing product image embeddings...");
 
-  // Get product images missing embedding
   const images: any[] = await prisma.$queryRawUnsafe(`
     SELECT id, url FROM "ProductImage" WHERE embedding IS NULL LIMIT 200
   `);

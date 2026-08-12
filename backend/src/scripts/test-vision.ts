@@ -2,7 +2,7 @@ import { generateImageEmbedding, analyzeImageWithGroq } from "../lib/vision";
 
 async function test() {
   console.log("Testing image vector embedding generation...");
-  const sampleImageUrl = "https://images.unsplash.com/photo-1542291026-7eec264c27ff"; // Nike red sneaker
+  const sampleImageUrl = "https://images.unsplash.com/photo-1542291026-7eec264c27ff";
   
   const embedding = await generateImageEmbedding(sampleImageUrl);
   console.log("✓ Generated embedding vector length:", embedding.length);
