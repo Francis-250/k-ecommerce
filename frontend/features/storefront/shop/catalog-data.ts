@@ -6,6 +6,7 @@ export type CatalogProduct = {
   category: string;
   audience: "Women" | "Men" | "Unisex" | "Kids";
   image: string;
+  images?: string[];
   featured?: boolean;
   createdAt?: string;
 };

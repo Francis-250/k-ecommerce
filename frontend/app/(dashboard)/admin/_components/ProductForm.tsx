@@ -58,7 +58,7 @@ export function ProductForm({
   const [status, setStatus] = useState("ACTIVE");
   const [variants, setVariants] = useState<VariantRow[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>(
-    product?.image ? [product.image] : [],
+    product?.images?.length ? product.images : product?.image ? [product.image] : [],
   );
 
   function addVariant() {
@@ -265,7 +265,7 @@ export function ProductForm({
               label="Product images"
               description="JPG, PNG, or WebP. Images selected here are uploaded directly to Cloudinary."
               multiple
-              initialUrls={product?.image ? [product.image] : []}
+              initialUrls={imageUrls}
               aspect="square"
               onChange={(urls) => setImageUrls(urls)}
             />

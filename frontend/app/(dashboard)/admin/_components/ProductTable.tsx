@@ -64,6 +64,7 @@ export function ProductTable() {
       image:
         p.images[0]?.url ??
         "/storefront/assets/img/african-products/ankara-midi-dress.png",
+      images: p.images.map((img) => img.url),
       featured: p.isFeatured,
       status: p.status === "ACTIVE" ? "Active" : "Draft",
     }));
@@ -247,13 +248,29 @@ export function ProductTable() {
                 <tr key={product.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <Image
-                        className="size-10 rounded-md border border-slate-200 object-cover"
-                        src={product.image}
-                        alt={product.name}
-                        width={40}
-                        height={40}
-                      />
+                      <div className="flex -space-x-2">
+                        {(product.images?.length
+                          ? product.images
+                          : [product.image]
+                        )
+                          .slice(0, 3)
+                          .map((src, i) => (
+                            <Image
+                              key={`${product.id}-${src}`}
+                              className="size-10 rounded-md border border-slate-200 object-cover ring-2 ring-white"
+                              src={src}
+                              alt={product.name}
+                              width={40}
+                              height={40}
+                              style={{ zIndex: 3 - i }}
+                            />
+                          ))}
+                        {(product.images?.length ?? 0) > 3 && (
+                          <span className="grid size-10 place-items-center rounded-md border border-slate-200 bg-slate-100 text-[10px] font-semibold text-slate-500 ring-2 ring-white">
+                            +{(product.images?.length ?? 0) - 3}
+                          </span>
+                        )}
+                      </div>
                       <div>
                         <p className="font-medium text-slate-800">
                           {product.name}
@@ -412,6 +429,33 @@ export function ProductTable() {
                 <p className="text-base font-bold text-slate-900">
                   ${viewingProduct.price.toFixed(2)}
                 </p>
+              </div>
+            </div>
+
+            {/* All product images */}
+            <div>
+              <h3 className="mb-2 text-sm font-semibold text-slate-800">
+                Product images
+                {(viewingProduct.images?.length ?? 0) > 0 && (
+                  <span className="ml-1.5 font-normal text-slate-400">
+                    ({viewingProduct.images!.length})
+                  </span>
+                )}
+              </h3>
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                {(viewingProduct.images?.length
+                  ? viewingProduct.images
+                  : [viewingProduct.image]
+                ).map((src, i) => (
+                  <Image
+                    key={`${src}-${i}`}
+                    src={src}
+                    alt={`${viewingProduct.name} image ${i + 1}`}
+                    width={120}
+                    height={120}
+                    className="aspect-square w-full rounded-md border border-slate-200 object-cover"
+                  />
+                ))}
               </div>
             </div>
 

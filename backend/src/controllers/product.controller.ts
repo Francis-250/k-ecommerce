@@ -63,7 +63,7 @@ export const listProducts = async (req: Request, res: Response) => {
       include: {
         brand: true,
         category: true,
-        images: { orderBy: { sortOrder: "asc" }, take: 1 },
+        images: { orderBy: { sortOrder: "asc" } },
         variants: { include: { inventory: true } },
         _count: { select: { reviews: true } },
       },
@@ -139,7 +139,11 @@ export const createProduct = async (req: Request, res: Response) => {
   });
   if (!parsed.success) return validationError(res, parsed.error);
 
-  const primaryImage = imageUrl || image || images?.[0];
+  const imageList = images?.length
+    ? images
+    : imageUrl || image
+      ? [imageUrl || image]
+      : [];
 
   const product = await prisma.$transaction(async (tx) => {
     let finalCatId = parsed.data.categoryId;
@@ -164,14 +168,15 @@ export const createProduct = async (req: Request, res: Response) => {
       },
     });
 
-    if (primaryImage) {
-      await tx.productImage.create({
-        data: {
+    if (imageList.length) {
+      await tx.productImage.createMany({
+        data: imageList.map((url: string, i: number) => ({
           productId: createdProduct.id,
-          url: primaryImage,
+          url,
           altText: createdProduct.name,
-          isPrimary: true,
-        },
+          sortOrder: i,
+          isPrimary: i === 0,
+        })),
       });
     }
 
@@ -190,7 +195,11 @@ export const updateProduct = async (req: Request, res: Response) => {
   const parsed = productSchema.partial().safeParse(bodyData);
   if (!parsed.success) return validationError(res, parsed.error);
 
-  const primaryImage = imageUrl || image || images?.[0];
+  const imageList = images?.length
+    ? images
+    : imageUrl || image
+      ? [imageUrl || image]
+      : null;
 
   const product = await prisma.$transaction(async (tx) => {
     let finalCatId = parsed.data.categoryId;
@@ -216,25 +225,19 @@ export const updateProduct = async (req: Request, res: Response) => {
       },
     });
 
-    if (primaryImage) {
-      const existingImg = await tx.productImage.findFirst({
+    if (imageList) {
+      await tx.productImage.deleteMany({
         where: { productId: updatedProduct.id },
       });
-      if (existingImg) {
-        await tx.productImage.update({
-          where: { id: existingImg.id },
-          data: { url: primaryImage },
-        });
-      } else {
-        await tx.productImage.create({
-          data: {
-            productId: updatedProduct.id,
-            url: primaryImage,
-            altText: updatedProduct.name,
-            isPrimary: true,
-          },
-        });
-      }
+      await tx.productImage.createMany({
+        data: imageList.map((url: string, i: number) => ({
+          productId: updatedProduct.id,
+          url,
+          altText: updatedProduct.name,
+          sortOrder: i,
+          isPrimary: i === 0,
+        })),
+      });
     }
 
     return updatedProduct;
