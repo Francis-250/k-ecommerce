@@ -69,9 +69,9 @@ const mainLinks = [
       ["Accessories", "/shop?gender=Men&category=Accessories"],
     ],
   },
-  { label: "Blog", href: "/blog", children: [["Latest stories", "/blog"]] },
+  // { label: "Blog", href: "/blog", children: [["Latest stories", "/blog"]] },
   {
-    label: "Pages",
+    // label: "Pages",
     href: "/about",
     children: [
       ["About us", "/about"],
@@ -490,7 +490,8 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                           router.push("/");
                         }}
                       >
-                        <LogOut size={16} aria-hidden="true" /> Logout ({authUser.firstName})
+                        <LogOut size={16} aria-hidden="true" /> Logout (
+                        {authUser.firstName})
                       </button>
                     ) : (
                       <button
@@ -548,7 +549,10 @@ function MobileBottomBar({ onOpenMenu }: { onOpenMenu: () => void }) {
   const pathname = usePathname();
 
   return (
-    <nav className="mobile_bottom_bar d-md-none" aria-label="Mobile Navigation Bar">
+    <nav
+      className="mobile_bottom_bar d-md-none"
+      aria-label="Mobile Navigation Bar"
+    >
       <button
         type="button"
         className="mobile_tab_item"
@@ -583,7 +587,9 @@ function MobileBottomBar({ onOpenMenu }: { onOpenMenu: () => void }) {
       >
         <div className="cart_icon_wrap">
           <ShoppingCart size={20} aria-hidden="true" />
-          {itemCount > 0 && <span className="mobile_cart_badge">{itemCount}</span>}
+          {itemCount > 0 && (
+            <span className="mobile_cart_badge">{itemCount}</span>
+          )}
         </div>
         <span>Cart</span>
       </button>
@@ -711,7 +717,7 @@ function Footer() {
                 ["All Products", "/shop"],
                 ["About Us", "/about"],
                 ["Portfolio", "/portfolio"],
-                ["Blog & Stories", "/blog"],
+                // ["Blog & Stories", "/blog"],
               ]}
               colClass="col-lg-3 col-md-6 col-sm-6 mb-30"
             />

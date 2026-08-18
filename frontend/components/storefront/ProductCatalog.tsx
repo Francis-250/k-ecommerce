@@ -259,7 +259,7 @@ export function Sidebar({
           </ul>
         </div>
         <Wishlist products={homeProducts} />
-        <Tags />
+        {/* <Tags /> */}
         <Newsletter />
         {homeImages && (
           <div className="sidebar_widget bottom">
