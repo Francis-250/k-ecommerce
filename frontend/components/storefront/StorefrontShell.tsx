@@ -38,7 +38,13 @@ import { useStorefrontCatalog } from "@/features/storefront/catalog/useStorefron
 import { useGeneralStoreSettings } from "@/features/admin/hooks/useGeneralStoreSettings";
 import { VisualSearchModal } from "./VisualSearchModal";
 
-const mainLinks = [
+type MainLink = {
+  label?: string;
+  href: string;
+  children: readonly (readonly [string, string])[];
+};
+
+const mainLinks: MainLink[] = [
   { label: "Home", href: "/", children: [] },
   {
     label: "Shop",
@@ -81,7 +87,11 @@ const mainLinks = [
       ["Contact", "/contact"],
     ],
   },
-] as const;
+];
+
+const visibleMainLinks = mainLinks.filter(
+  (item): item is MainLink & { label: string } => Boolean(item.label),
+);
 
 export function StorefrontShell({ children }: { children: ReactNode }) {
   const { items, itemCount, subtotal, openCartDrawer, removeItem } = useCart();
@@ -350,7 +360,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                       <div className="main_menu">
                         <nav aria-label="Main navigation">
                           <ul>
-                            {mainLinks.map((item, index) => (
+                            {visibleMainLinks.map((item, index) => (
                               <li
                                 key={item.label}
                                 className={index === 0 ? "active" : undefined}
@@ -426,7 +436,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
               <div className="mobile-drawer-body">
                 <nav className="mobile-drawer-nav" aria-label="Mobile Menu">
                   <ul>
-                    {mainLinks.map((item) => {
+                    {visibleMainLinks.map((item) => {
                       const hasChildren = item.children.length > 0;
                       const isOpen = openSubmenu === item.label;
                       return (

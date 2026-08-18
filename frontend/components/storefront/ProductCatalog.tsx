@@ -24,7 +24,10 @@ export function ProductCard({
       <div className="group relative bg-white rounded-xl border border-slate-200/80 overflow-hidden flex flex-col justify-between transition-all duration-300 hover:border-slate-300 hover:shadow-md h-full">
         {/* Product Image Container */}
         <div className="relative aspect-square w-full overflow-hidden bg-slate-50 flex items-center justify-center p-3">
-          <Link href={`/products/${product.slug}`} className="w-full h-full block relative">
+          <Link
+            href={`/products/${product.slug}`}
+            className="w-full h-full block relative"
+          >
             <Image
               src={imagePath}
               alt={product.name}
@@ -38,9 +41,7 @@ export function ProductCard({
           <div className="absolute top-2.5 left-2.5 pointer-events-none z-10">
             <span
               className={`inline-block px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full text-white shadow-sm ${
-                product.featured
-                  ? "bg-[#D4AF4A]"
-                  : "bg-[#082f35]"
+                product.featured ? "bg-[#D4AF4A]" : "bg-[#082f35]"
               }`}
             >
               {product.featured ? "Hot" : "New"}
@@ -247,7 +248,11 @@ export function Sidebar({
                   className="category_item_link"
                 >
                   <span className="category_name">
-                    <ChevronRight size={14} className="cat_chevron" aria-hidden="true" />
+                    <ChevronRight
+                      size={14}
+                      className="cat_chevron"
+                      aria-hidden="true"
+                    />
                     {category.name}
                   </span>
                   {category.count > 0 && (
