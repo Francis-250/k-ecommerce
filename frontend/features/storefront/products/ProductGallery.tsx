@@ -44,7 +44,7 @@ export function ProductGallery({
         <div className="product_tab_button">
           <ul className="nav" aria-label={`${name} images`}>
             {images.map((item, index) => (
-              <li key={item.src}>
+              <li key={`${index}-${item.src}`}>
                 <button
                   type="button"
                   className={active === index ? "active" : ""}

@@ -3054,3 +3054,42 @@ body.auth-drawer-open {
   justify-content: center;
   line-height: 1;
 }
+
+/* Product detail: keep heart + share icons centered in their rounded circles */
+.box_quantity > a,
+.wishlist-share ul li a {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  line-height: 1;
+}
+
+.box_quantity > a {
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 50% !important;
+  border: 1px solid #ddd !important;
+  background: #d4af4a !important;
+  color: #fff !important;
+}
+
+.box_quantity > a:hover {
+  background: #e84c3d !important;
+  border-color: #e84c3d !important;
+}
+
+.wishlist-share ul li a {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+  background: #f5f5f5 !important;
+  color: #444 !important;
+}
+
+.wishlist-share ul li a:hover {
+  background: #087554 !important;
+  border-color: #087554 !important;
+  color: #fff !important;
+}
