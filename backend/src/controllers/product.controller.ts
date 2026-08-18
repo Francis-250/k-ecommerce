@@ -38,7 +38,9 @@ export const listProducts = async (req: Request, res: Response) => {
   }
 
   const where = {
-    ...(isAdmin ? {} : { status: "ACTIVE" as const }),
+    ...(isAdmin
+      ? { status: { not: "ARCHIVED" as const } }
+      : { status: "ACTIVE" as const }),
     ...(category ? { category: { slug: category } } : {}),
     ...(audience
       ? {
