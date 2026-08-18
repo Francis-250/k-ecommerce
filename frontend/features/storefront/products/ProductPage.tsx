@@ -9,8 +9,14 @@ import { ProductGallery } from "./ProductGallery";
 import { ProductTabs } from "./ProductTabs";
 import type { Product } from "./types";
 
-export function ProductPage({ product }: { product: Product }) {
-  const related = getRelatedProducts(product);
+export function ProductPage({
+  product,
+  related,
+}: {
+  product: Product;
+  related?: Product[];
+}) {
+  const relatedProducts = related?.length ? related : getRelatedProducts(product);
   return (
     <StorefrontShell>
       <main>
@@ -30,7 +36,7 @@ export function ProductPage({ product }: { product: Product }) {
             </div>
           </section>
           <ProductTabs product={product} />
-          {related.length > 0 && (
+          {relatedProducts.length > 0 && (
             <section
               className="new_product_area product_page"
               aria-labelledby="related-products"
@@ -43,7 +49,7 @@ export function ProductPage({ product }: { product: Product }) {
                 </div>
               </div>
               <div className="row">
-                {related.map((item) => (
+                {relatedProducts.map((item) => (
                   <ProductCard product={item} key={item.slug} />
                 ))}
               </div>

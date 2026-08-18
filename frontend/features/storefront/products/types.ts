@@ -25,4 +25,5 @@ export type Product = {
   options: ProductOption[];
   details: Record<string, string>;
   relatedSlugs: string[];
+  related?: Product[];
 };

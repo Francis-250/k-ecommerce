@@ -114,12 +114,66 @@ export const getProduct = async (req: Request, res: Response) => {
     _avg: { rating: true },
     _count: { rating: true },
   });
+
+  const price = Number(product.price);
+  const candidates = await prisma.product.findMany({
+    where: {
+      id: { not: product.id },
+      status: "ACTIVE",
+      OR: [
+        ...(product.categoryId ? [{ categoryId: product.categoryId }] : []),
+        { audience: product.audience },
+        ...(product.brandId ? [{ brandId: product.brandId }] : []),
+        ...(Number.isFinite(price) && price > 0
+          ? [{ price: { gte: price * 0.7, lte: price * 1.3 } }]
+          : []),
+      ],
+    },
+    include: {
+      brand: true,
+      category: true,
+      images: { orderBy: { sortOrder: "asc" } },
+      _count: { select: { reviews: true } },
+    },
+    take: 24,
+  });
+
+  const related = candidates
+    .map((candidate) => {
+      const candidatePrice = Number(candidate.price);
+      let score = 0;
+      if (candidate.categoryId && candidate.categoryId === product.categoryId) {
+        score += 3;
+      }
+      if (candidate.audience === product.audience) score += 2;
+      if (candidate.brandId && candidate.brandId === product.brandId) score += 1;
+      if (
+        Number.isFinite(price) &&
+        Number.isFinite(candidatePrice) &&
+        price > 0 &&
+        candidatePrice >= price * 0.7 &&
+        candidatePrice <= price * 1.3
+      ) {
+        score += 1;
+      }
+      if (candidate.isFeatured) score += 0.5;
+      const priceDiff =
+        Number.isFinite(price) && Number.isFinite(candidatePrice)
+          ? Math.abs(candidatePrice - price)
+          : Infinity;
+      return { candidate, score, priceDiff };
+    })
+    .sort((a, b) => b.score - a.score || a.priceDiff - b.priceDiff)
+    .slice(0, 4)
+    .map(({ candidate }) => candidate);
+
   return res.json({
     success: true,
     product: {
       ...product,
       rating: ratingSummary._avg.rating ?? 0,
       reviewCount: ratingSummary._count.rating,
+      related,
     },
   });
 };

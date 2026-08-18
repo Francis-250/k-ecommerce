@@ -76,6 +76,51 @@ async function fetchProductData(slug: string) {
             Care: "Cold gentle wash",
           },
       relatedSlugs: [],
+      related: (p.related ?? []).map(
+        (item: {
+          slug: string;
+          name: string;
+          category?: { name: string } | null;
+          shortDescription?: string | null;
+          description?: string | null;
+          price: number;
+          compareAtPrice?: number | null;
+          isFeatured: boolean;
+          images: Array<{ url: string; altText: string | null }>;
+        }) => ({
+          slug: item.slug,
+          name: item.name,
+          category: item.category?.name ?? "Uncategorized",
+          description: item.shortDescription || item.name,
+          longDescription:
+            item.description || item.shortDescription || item.name,
+          price: Number(item.price),
+          previousPrice: item.compareAtPrice
+            ? Number(item.compareAtPrice)
+            : undefined,
+          rating: 0,
+          reviewCount: 0,
+          stock: 15,
+          sku: `SKU-${item.slug}`,
+          badge: item.isFeatured ? "Sale" : "New",
+          images: item.images?.length
+            ? item.images.map(
+                (img: { url: string; altText: string | null }) => ({
+                  src: img.url,
+                  alt: img.altText || item.name,
+                }),
+              )
+            : [
+                {
+                  src: "/storefront/assets/img/african-products/ankara-midi-dress.png",
+                  alt: item.name,
+                },
+              ],
+          options: [],
+          details: {},
+          relatedSlugs: [],
+        }),
+      ),
     };
   } catch (e) {
     return getProduct(slug) ?? null;
@@ -101,5 +146,5 @@ export default async function ProductRoute({ params }: Props) {
   const { slug } = await params;
   const product = await fetchProductData(slug);
   if (!product) notFound();
-  return <ProductPage product={product} />;
+  return <ProductPage product={product} related={product.related} />;
 }
