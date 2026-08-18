@@ -2,11 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { StorefrontShell } from "@/components/storefront/StorefrontShell";
 import { ProductGrid, Sidebar } from "@/components/storefront/ProductCatalog";
 import { useStorefrontCatalog } from "@/features/storefront/catalog/useStorefrontCatalog";
 import { useStorefrontAppearance } from "@/features/storefront/appearance/useStorefrontAppearance";
+import {
+  usePreferencesStore,
+  useRecommendedProducts,
+} from "@/features/storefront/recommendations/preferences";
 
 const categoryCardImages: Record<string, string> = {
   Accessories: "/storefront/assets/img/cart/cart18.png",
@@ -144,6 +149,12 @@ function ProductSection({
 export function StorefrontHome() {
   const catalog = useStorefrontCatalog();
   const appearance = useStorefrontAppearance();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const products: HomeProduct[] =
     catalog.data?.products.data
       .filter((product) => Boolean(product.images[0]?.url))
@@ -168,6 +179,8 @@ export function StorefrontHome() {
         featured: product.isFeatured,
         createdAt: product.createdAt,
       })) ?? [];
+  const preferenceEvents = usePreferencesStore((s) => s.events);
+  const recommended = useRecommendedProducts(products);
   const newProducts = [...products].sort(
     (first, second) =>
       new Date(second.createdAt ?? 0).getTime() -
@@ -232,6 +245,18 @@ export function StorefrontHome() {
               <div className="mb-10 h-[420px] animate-pulse bg-slate-100" />
             )}
             <CategoryGridSection categories={categories} />
+            {mounted && preferenceEvents.length > 0 && (
+              <ProductSection
+                title="Recommended for you"
+                products={
+                  recommended.length
+                    ? recommended
+                    : featuredProducts.length
+                      ? featuredProducts
+                      : newProducts
+                }
+              />
+            )}
             {catalog.isPending ? (
               <div className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-3">
                 {[1, 2, 3].map((item) => (

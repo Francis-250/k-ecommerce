@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
   ChevronDown,
@@ -36,6 +36,7 @@ import { useAuthStore } from "@/features/auth/store";
 import { useStorefrontAppearance } from "@/features/storefront/appearance/useStorefrontAppearance";
 import { useStorefrontCatalog } from "@/features/storefront/catalog/useStorefrontCatalog";
 import { useGeneralStoreSettings } from "@/features/admin/hooks/useGeneralStoreSettings";
+import { usePreferencesStore } from "@/features/storefront/recommendations/preferences";
 import { VisualSearchModal } from "./VisualSearchModal";
 
 type MainLink = {
@@ -107,6 +108,12 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
   const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
+  const recordSearch = usePreferencesStore((state) => state.recordSearch);
+
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const query = searchQuery.trim();
+    if (query) recordSearch(query);
+  };
 
   const displayLogoUrl = appearance.data?.logo?.url || storeSettings.logoUrl;
   const displayLogoAlt = appearance.data?.logo?.alt || storeSettings.storeName;
@@ -247,7 +254,7 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
                   <div className="col-lg-9 col-md-8 col-12">
                     <div className="header_right_info">
                       <div className="search_bar">
-                        <form action="/shop" role="search">
+                        <form action="/shop" role="search" onSubmit={handleSearchSubmit}>
                           <input
                             name="q"
                             value={searchQuery}

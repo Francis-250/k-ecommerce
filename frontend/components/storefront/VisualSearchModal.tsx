@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Link as LinkIcon,
 } from "lucide-react";
+import { usePreferencesStore } from "@/features/storefront/recommendations/preferences";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
@@ -44,6 +45,9 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
   const [results, setResults] = useState<ProductMatch[]>([]);
   const [analysis, setAnalysis] = useState<any>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const recordImageSearch = usePreferencesStore(
+    (state) => state.recordImageSearch,
+  );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -121,6 +125,7 @@ export function VisualSearchModal({ isOpen, onClose }: VisualSearchModalProps) {
 
       setResults(data.products || []);
       setAnalysis(data.analysis || null);
+      recordImageSearch(data.analysis?.productType);
     } catch (err: any) {
       clearTimeout(timeoutId);
       console.error("Visual search error:", err);

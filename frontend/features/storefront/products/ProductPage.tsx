@@ -7,6 +7,7 @@ import { ProductCard } from "./ProductCard";
 import { ProductDetails } from "./ProductDetails";
 import { ProductGallery } from "./ProductGallery";
 import { ProductTabs } from "./ProductTabs";
+import { RecordProductView } from "../recommendations/RecordProductView";
 import type { Product } from "./types";
 
 export function ProductPage({
@@ -21,6 +22,7 @@ export function ProductPage({
     <StorefrontShell>
       <main>
         <div className="container">
+          <RecordProductView name={product.name} category={product.category} />
           <Breadcrumb
             title={product.name}
             links={[{ label: "Shop", href: "/shop" }]}
